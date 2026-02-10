@@ -25,10 +25,10 @@ class FakeRoomRepository : RoomRepository {
 
     override suspend fun getRoomById(id: Int): Result<Room> {
         roomByIdResult?.let { return it }
-        return roomsResult.map { rooms ->
-            rooms.find { it.id == id }
-                ?: throw NoSuchElementException("Room $id not found")
-        }
+        val rooms = roomsResult.getOrElse { return Result.failure(it) }
+        val room = rooms.find { it.id == id }
+            ?: return Result.failure(NoSuchElementException("Room $id not found"))
+        return Result.success(room)
     }
 
     override suspend fun getScheduledEvents(
