@@ -8,6 +8,8 @@ import de.thd.roomfinder.domain.model.Room
 import de.thd.roomfinder.domain.model.ScheduledEvent
 import de.thd.roomfinder.domain.repository.RoomRepository
 import de.thd.roomfinder.domain.usecase.GetRoomScheduleUseCase
+import de.thd.roomfinder.util.Constants
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +44,7 @@ class RoomDetailViewModel @Inject constructor(
 
     init {
         loadData()
+        startAutoRefresh()
     }
 
     fun loadData() {
@@ -83,6 +86,40 @@ class RoomDetailViewModel @Inject constructor(
                 isFreeNow = !isOccupied,
                 freeUntil = freeUntil,
                 queryDateTime = queryDateTime,
+            )
+        }
+    }
+
+    private fun startAutoRefresh() {
+        viewModelScope.launch {
+            while (true) {
+                delay(Constants.AUTO_REFRESH_INTERVAL_MS)
+                refreshSilently()
+            }
+        }
+    }
+
+    private suspend fun refreshSilently() {
+        val room = _uiState.value.room ?: return
+        val queryDateTime = _uiState.value.queryDateTime
+
+        getRoomScheduleUseCase(room.ident, queryDateTime).onSuccess { events ->
+            val isOccupied = events.any {
+                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
+            }
+            val freeUntil = if (!isOccupied) {
+                events
+                    .filter { it.startDateTime > queryDateTime }
+                    .minByOrNull { it.startDateTime }
+                    ?.startDateTime
+            } else {
+                null
+            }
+
+            _uiState.value = _uiState.value.copy(
+                events = events,
+                isFreeNow = !isOccupied,
+                freeUntil = freeUntil,
             )
         }
     }

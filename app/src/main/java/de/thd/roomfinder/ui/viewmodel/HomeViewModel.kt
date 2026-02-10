@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.thd.roomfinder.domain.repository.RoomRepository
 import de.thd.roomfinder.domain.usecase.GetFreeRoomsUseCase
+import de.thd.roomfinder.util.Constants
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +33,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadData()
+        startAutoRefresh()
     }
 
     fun loadData() {
@@ -58,6 +61,31 @@ class HomeViewModel @Inject constructor(
                         errorMessage = "Failed to load rooms: ${error.message}",
                     )
                 },
+            )
+        }
+    }
+
+    private fun startAutoRefresh() {
+        viewModelScope.launch {
+            while (true) {
+                delay(Constants.AUTO_REFRESH_INTERVAL_MS)
+                refreshSilently()
+            }
+        }
+    }
+
+    private suspend fun refreshSilently() {
+        val now = LocalDateTime.now()
+        val allRoomsResult = roomRepository.getAllRooms()
+        val freeRoomsResult = getFreeRoomsUseCase(now)
+
+        allRoomsResult.onSuccess { allRooms ->
+            val freeCount = freeRoomsResult.getOrNull()?.size ?: 0
+            _uiState.value = HomeUiState(
+                isLoading = false,
+                freeRoomCount = freeCount,
+                totalRoomCount = allRooms.size,
+                currentTime = now,
             )
         }
     }
