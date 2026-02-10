@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.thd.roomfinder.domain.model.FreeRoom
 import de.thd.roomfinder.domain.usecase.GetFreeRoomsUseCase
+import de.thd.roomfinder.util.Constants
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +35,7 @@ class RoomListViewModel @Inject constructor(
 
     init {
         loadFreeRooms()
+        startAutoRefresh()
     }
 
     fun loadFreeRooms() {
@@ -98,5 +101,44 @@ class RoomListViewModel @Inject constructor(
             isCustomTime = false,
         )
         loadFreeRooms()
+    }
+
+    private fun startAutoRefresh() {
+        viewModelScope.launch {
+            while (true) {
+                delay(Constants.AUTO_REFRESH_INTERVAL_MS)
+                refreshSilently()
+            }
+        }
+    }
+
+    private suspend fun refreshSilently() {
+        val currentState = _uiState.value
+        val dateTime = if (currentState.isCustomTime) {
+            currentState.selectedDateTime
+        } else {
+            LocalDateTime.now()
+        }
+
+        getFreeRoomsUseCase(dateTime).onSuccess { freeRooms ->
+            val buildings = freeRooms
+                .map { it.room.building }
+                .distinct()
+                .sorted()
+
+            val selectedBuilding = _uiState.value.selectedBuilding
+            val filtered = if (selectedBuilding == null) {
+                freeRooms
+            } else {
+                freeRooms.filter { it.room.building == selectedBuilding }
+            }
+
+            _uiState.value = _uiState.value.copy(
+                freeRooms = freeRooms,
+                filteredRooms = filtered,
+                buildings = buildings,
+                selectedDateTime = dateTime,
+            )
+        }
     }
 }
