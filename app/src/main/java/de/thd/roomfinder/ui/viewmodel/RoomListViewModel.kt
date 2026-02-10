@@ -18,6 +18,8 @@ data class RoomListUiState(
     val filteredRooms: List<FreeRoom> = emptyList(),
     val buildings: List<String> = emptyList(),
     val selectedBuilding: String? = null,
+    val selectedDateTime: LocalDateTime = LocalDateTime.now(),
+    val isCustomTime: Boolean = false,
     val errorMessage: String? = null,
 )
 
@@ -35,24 +37,32 @@ class RoomListViewModel @Inject constructor(
 
     fun loadFreeRooms() {
         viewModelScope.launch {
+            val dateTime = _uiState.value.selectedDateTime
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-            getFreeRoomsUseCase(LocalDateTime.now()).fold(
+            getFreeRoomsUseCase(dateTime).fold(
                 onSuccess = { freeRooms ->
                     val buildings = freeRooms
                         .map { it.room.building }
                         .distinct()
                         .sorted()
 
-                    _uiState.value = RoomListUiState(
+                    val selectedBuilding = _uiState.value.selectedBuilding
+                    val filtered = if (selectedBuilding == null) {
+                        freeRooms
+                    } else {
+                        freeRooms.filter { it.room.building == selectedBuilding }
+                    }
+
+                    _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         freeRooms = freeRooms,
-                        filteredRooms = freeRooms,
+                        filteredRooms = filtered,
                         buildings = buildings,
                     )
                 },
                 onFailure = { error ->
-                    _uiState.value = RoomListUiState(
+                    _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = "Failed to load free rooms: ${error.message}",
                     )
@@ -72,5 +82,21 @@ class RoomListViewModel @Inject constructor(
             selectedBuilding = building,
             filteredRooms = filtered,
         )
+    }
+
+    fun setDateTime(dateTime: LocalDateTime) {
+        _uiState.value = _uiState.value.copy(
+            selectedDateTime = dateTime,
+            isCustomTime = true,
+        )
+        loadFreeRooms()
+    }
+
+    fun resetToNow() {
+        _uiState.value = _uiState.value.copy(
+            selectedDateTime = LocalDateTime.now(),
+            isCustomTime = false,
+        )
+        loadFreeRooms()
     }
 }
