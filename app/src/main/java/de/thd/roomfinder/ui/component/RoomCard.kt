@@ -24,9 +24,11 @@ private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 @Composable
 internal fun RoomCard(
     freeRoom: FreeRoom,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
@@ -98,6 +100,7 @@ private fun RoomCardPreview() {
                 ),
                 freeUntil = LocalDateTime.of(2026, 2, 10, 14, 30),
             ),
+            onClick = {},
             modifier = Modifier.padding(16.dp),
         )
     }
@@ -125,6 +128,7 @@ private fun RoomCardFreeAllDayPreview() {
                 ),
                 freeUntil = null,
             ),
+            onClick = {},
             modifier = Modifier.padding(16.dp),
         )
     }
