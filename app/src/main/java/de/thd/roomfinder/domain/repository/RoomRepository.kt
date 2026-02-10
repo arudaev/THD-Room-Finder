@@ -8,5 +8,7 @@ interface RoomRepository {
 
     suspend fun getAllRooms(): Result<List<Room>>
 
+    suspend fun getRoomById(id: Int): Result<Room>
+
     suspend fun getScheduledEvents(dateTime: LocalDateTime): Result<List<ScheduledEvent>>
 }
