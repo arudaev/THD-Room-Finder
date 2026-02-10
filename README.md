@@ -65,14 +65,14 @@ THD Room Finder is a native Android app that helps students at **Technische Hoch
 ```mermaid
 graph TB
     subgraph UI["UI Layer — Jetpack Compose"]
-        Screens["Screens\n(Home, RoomList, RoomDetail)"]
+        Screens["Screens<br>(Home, RoomList, RoomDetail)"]
         VMs["ViewModels"]
         Components["Composable Components"]
     end
 
     subgraph Domain["Domain Layer"]
-        UseCases["Use Cases\n(GetFreeRooms, GetRoomSchedule)"]
-        Models["Domain Models\n(Room, FreeRoom, ScheduledEvent)"]
+        UseCases["Use Cases<br>(GetFreeRooms, GetRoomSchedule)"]
+        Models["Domain Models<br>(Room, FreeRoom, ScheduledEvent)"]
         RepoIF["Repository Interfaces"]
     end
 
@@ -82,7 +82,7 @@ graph TB
         Local["Room Database"]
     end
 
-    API["THabella Public API\nthabella.th-deg.de/thabella/opn/"]
+    API["THabella Public API<br>thabella.th-deg.de/thabella/opn/"]
 
     Screens --> VMs
     VMs --> UseCases
