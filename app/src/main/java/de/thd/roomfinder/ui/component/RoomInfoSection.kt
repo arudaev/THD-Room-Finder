@@ -2,12 +2,9 @@ package de.thd.roomfinder.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,8 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.thd.roomfinder.domain.model.Room
 import de.thd.roomfinder.ui.theme.THDRoomFinderTheme
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun RoomInfoSection(
     room: Room,
@@ -66,17 +61,11 @@ internal fun RoomInfoSection(
                 text = "Facilities",
                 style = MaterialTheme.typography.labelLarge,
             )
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                room.facilities.forEach { facility ->
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(facility) },
-                    )
-                }
-            }
+            Text(
+                text = room.facilities.joinToString(" · "),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         if (room.inChargeName != null || room.inChargeEmail != null) {
