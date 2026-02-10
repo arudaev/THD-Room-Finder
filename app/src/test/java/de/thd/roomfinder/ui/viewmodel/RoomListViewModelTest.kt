@@ -8,8 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -18,12 +18,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import java.time.LocalDateTime
 
-// TODO: Fix tests hanging due to auto-refresh while(true) coroutine in ViewModels
-@Ignore("ViewModel auto-refresh causes test process to hang — needs coroutine test fix")
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoomListViewModelTest {
 
@@ -54,7 +51,7 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertFalse(state.isLoading)
@@ -76,7 +73,7 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
         viewModel.selectBuilding("I")
 
         val state = viewModel.uiState.value
@@ -97,7 +94,7 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
         viewModel.selectBuilding("I")
         assertEquals(1, viewModel.uiState.value.filteredRooms.size)
 
@@ -115,11 +112,11 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
         val futureTime = LocalDateTime.of(2025, 6, 15, 14, 0)
 
         viewModel.setDateTime(futureTime)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertTrue(state.isCustomTime)
@@ -134,13 +131,13 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
         viewModel.setDateTime(LocalDateTime.of(2025, 6, 15, 14, 0))
-        advanceUntilIdle()
+        runCurrent()
         assertTrue(viewModel.uiState.value.isCustomTime)
 
         viewModel.resetToNow()
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
         assertFalse(state.isCustomTime)
 
@@ -153,7 +150,7 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertFalse(state.isLoading)
@@ -173,7 +170,7 @@ class RoomListViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = RoomListViewModel(useCase)
-        advanceUntilIdle()
+        runCurrent()
 
         viewModel.selectBuilding("A")
         assertEquals(1, viewModel.uiState.value.filteredRooms.size)

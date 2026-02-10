@@ -9,8 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -20,13 +20,10 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-// TODO: Fix tests hanging due to auto-refresh while(true) coroutine in ViewModels
-@Ignore("ViewModel auto-refresh causes test process to hang — needs coroutine test fix")
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoomDetailViewModelTest {
 
@@ -74,7 +71,7 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel(roomId = 1)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertFalse(state.isLoading)
@@ -100,7 +97,7 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        runCurrent()
 
         assertTrue(viewModel.uiState.value.isFreeNow)
 
@@ -122,7 +119,7 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        runCurrent()
 
         assertFalse(viewModel.uiState.value.isFreeNow)
 
@@ -145,7 +142,7 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        runCurrent()
 
         assertTrue(viewModel.uiState.value.isFreeNow)
         assertEquals(nextEventStart, viewModel.uiState.value.freeUntil)
@@ -168,7 +165,7 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        runCurrent()
 
         assertFalse(viewModel.uiState.value.isFreeNow)
         assertNull(viewModel.uiState.value.freeUntil)
@@ -183,7 +180,7 @@ class RoomDetailViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        runCurrent()
 
         assertTrue(viewModel.uiState.value.isFreeNow)
         assertNull(viewModel.uiState.value.freeUntil)
@@ -196,7 +193,7 @@ class RoomDetailViewModelTest {
         fakeRepository.roomsResult = Result.success(emptyList())
 
         val viewModel = createViewModel(roomId = 999)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertFalse(state.isLoading)
@@ -219,7 +216,7 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertEquals(2, state.events.size)

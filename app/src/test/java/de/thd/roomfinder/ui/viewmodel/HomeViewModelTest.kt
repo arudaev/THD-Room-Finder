@@ -8,8 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -17,11 +17,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
-// TODO: Fix tests hanging due to auto-refresh while(true) coroutine in ViewModels
-@Ignore("ViewModel auto-refresh causes test process to hang — needs coroutine test fix")
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
 
@@ -50,7 +47,7 @@ class HomeViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = HomeViewModel(useCase, fakeRepository)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertFalse(state.isLoading)
@@ -66,7 +63,7 @@ class HomeViewModelTest {
         fakeRepository.roomsResult = Result.failure(RuntimeException("Network error"))
 
         val viewModel = HomeViewModel(useCase, fakeRepository)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertFalse(state.isLoading)
@@ -82,14 +79,14 @@ class HomeViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = HomeViewModel(useCase, fakeRepository)
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(5, viewModel.uiState.value.totalRoomCount)
 
         val moreRooms = List(8) { i -> TestFixtures.room(id = i, ident = "R$i") }
         fakeRepository.roomsResult = Result.success(moreRooms)
 
         viewModel.loadData()
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(8, viewModel.uiState.value.totalRoomCount)
 
         viewModel.viewModelScope.cancel()
@@ -110,7 +107,7 @@ class HomeViewModelTest {
         )
 
         val viewModel = HomeViewModel(useCase, fakeRepository)
-        advanceUntilIdle()
+        runCurrent()
         val state = viewModel.uiState.value
 
         assertEquals(1, state.totalRoomCount)
@@ -125,7 +122,7 @@ class HomeViewModelTest {
         fakeRepository.eventsResult = Result.success(emptyList())
 
         val viewModel = HomeViewModel(useCase, fakeRepository)
-        advanceUntilIdle()
+        runCurrent()
 
         assertFalse(viewModel.uiState.value.isLoading)
 
