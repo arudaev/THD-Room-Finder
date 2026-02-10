@@ -18,10 +18,19 @@ internal class RoomRepositoryImpl @Inject constructor(
 ) : RoomRepository {
 
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    private var cachedRooms: List<Room>? = null
 
     override suspend fun getAllRooms(): Result<List<Room>> = runCatching {
         apiService.findRooms()
             .map { it.toDomainModel() }
+            .also { cachedRooms = it }
+    }
+
+    override suspend fun getRoomById(id: Int): Result<Room> {
+        val rooms = cachedRooms ?: getAllRooms().getOrElse { return Result.failure(it) }
+        val room = rooms.find { it.id == id }
+            ?: return Result.failure(NoSuchElementException("Room with id $id not found"))
+        return Result.success(room)
     }
 
     override suspend fun getScheduledEvents(

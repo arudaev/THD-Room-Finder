@@ -6,12 +6,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import de.thd.roomfinder.ui.screen.HomeScreen
+import de.thd.roomfinder.ui.screen.RoomDetailScreen
 import de.thd.roomfinder.ui.screen.RoomListScreen
 import de.thd.roomfinder.ui.viewmodel.HomeViewModel
+import de.thd.roomfinder.ui.viewmodel.RoomDetailViewModel
 import de.thd.roomfinder.ui.viewmodel.RoomListViewModel
+import java.time.ZoneId
 
 @Composable
 internal fun RoomFinderNavHost(
@@ -38,7 +43,32 @@ internal fun RoomFinderNavHost(
             RoomListScreen(
                 uiState = uiState,
                 onBuildingSelected = viewModel::selectBuilding,
+                onDateTimeSelected = viewModel::setDateTime,
+                onResetToNow = viewModel::resetToNow,
+                onRoomClicked = { freeRoom ->
+                    val epoch = uiState.selectedDateTime
+                        .atZone(ZoneId.systemDefault())
+                        .toEpochSecond()
+                    navController.navigate(
+                        Route.RoomDetail.createRoute(freeRoom.room.id, epoch),
+                    )
+                },
                 onRetry = viewModel::loadFreeRooms,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = Route.RoomDetail.route,
+            arguments = listOf(
+                navArgument("roomId") { type = NavType.IntType },
+                navArgument("dateTimeEpoch") { type = NavType.LongType },
+            ),
+        ) {
+            val viewModel: RoomDetailViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+            RoomDetailScreen(
+                uiState = uiState,
+                onRetry = viewModel::loadData,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
