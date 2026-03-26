@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THD Room Finder — Find Free Study Rooms Instantly</title>
+  <meta name="description" content="Find available study rooms at Technische Hochschule Deggendorf in real time. Building filters, schedule lookup, and offline support — no login required.">
+  <meta property="og:title" content="THD Room Finder">
+  <meta property="og:description" content="Instantly find free study rooms at THD. Real-time availability for 289 classrooms.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #F7F3EE;
+      --surface:  #FFFFFF;
+      --border:   #E4DDD5;
+      --text:     #1C1B1F;
+      --muted:    #6B6560;
+      --btn-primary:    #5D4E37;
+      --btn-primary-fg: #FFFFFF;
+      --btn-secondary:    #EDE0D4;
+      --btn-secondary-fg: #5D4E37;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:       #141210;
+        --surface:  #1F1D1B;
+        --border:   #2E2B28;
+        --text:     #E8E0D8;
+        --muted:    #9E9690;
+        --btn-primary:    #D4B896;
+        --btn-primary-fg: #2C2016;
+        --btn-secondary:    #2A2420;
+        --btn-secondary-fg: #D4B896;
+      }
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ─────────────────────────────── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-gh {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-gh:hover { color: var(--text); }
+
+    /* ── HERO ────────────────────────────── */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+    }
+    .hero-inner {
+      max-width: 560px;
+      width: 100%;
+    }
+
+    /* app icon */
+    .app-icon {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      display: block;
+      margin: 0 auto 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      font-size: clamp(1.9rem, 5vw, 2.75rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .btn-dl {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--btn-primary);
+      color: var(--btn-primary-fg);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.8rem 1.75rem;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-dl:hover { opacity: 0.85; }
+    .btn-gh {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--btn-secondary);
+      color: var(--btn-secondary-fg);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.8rem 1.65rem;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-gh:hover { opacity: 0.8; }
+    .ver { font-size: 0.75rem; opacity: 0.6; margin-left: 0.15rem; }
+
+    .meta-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .meta-item { display: flex; align-items: center; gap: 0.35rem; }
+
+    /* ── FEATURES ────────────────────────── */
+    .features {
+      padding: 4rem 1.5rem 5rem;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .sec-head { text-align: center; margin-bottom: 2.5rem; }
+    .sec-head h2 {
+      font-size: clamp(1.3rem, 3vw, 1.75rem);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+    }
+    .sec-head p { color: var(--muted); font-size: 0.95rem; }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .card-icon {
+      width: 38px; height: 38px;
+      background: var(--bg);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.9rem;
+    }
+    .card-icon svg {
+      width: 18px; height: 18px;
+      stroke: var(--muted); fill: none;
+      stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
+    .card p  { font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── FOOTER ──────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    .ft-links { display: flex; gap: 1.25rem; justify-content: center; margin-top: 0.5rem; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-inner { animation: fade-up 0.4s ease both; }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.25rem; }
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .features { padding: 3rem 1.25rem 4rem; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .stat-row { gap: 1.5rem; }
+    }
+    @media (max-width: 420px) {
+      .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-brand">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    THD Room Finder
+  </a>
+  <a href="https://github.com/arudaev/THD-Room-Finder" class="nav-gh" target="_blank" rel="noopener">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+    </svg>
+    GitHub
+  </a>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <svg class="app-icon" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="THD Room Finder icon">
+      <rect width="108" height="108" fill="#1565C0" rx="24"/>
+      <!-- Building body -->
+      <path fill="#FFFFFF" d="M30,38 L30,78 L66,78 L66,38 L48,26 Z"/>
+      <!-- Roof accent -->
+      <path fill="rgba(255,255,255,0.7)" d="M48,26 L30,38 L66,38 Z"/>
+      <!-- Door -->
+      <rect fill="#1565C0" x="44" y="62" width="8" height="16"/>
+      <!-- Windows -->
+      <rect fill="#1565C0" x="35" y="44" width="8" height="8"/>
+      <rect fill="#1565C0" x="53" y="44" width="8" height="8"/>
+      <rect fill="#1565C0" x="35" y="56" width="8" height="4"/>
+      <rect fill="#1565C0" x="53" y="56" width="8" height="4"/>
+      <!-- Magnifying glass -->
+      <circle cx="68" cy="60" r="9" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>
+    <h1>THD Room Finder</h1>
+    <p class="hero-sub">
+      Find free study rooms at Technische Hochschule Deggendorf — instantly.
+      Real-time availability across 289 classrooms, no account required.
+    </p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num">289</div>
+        <div class="stat-label">Classrooms</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">5 min</div>
+        <div class="stat-label">Refresh rate</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Accounts needed</div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a href="https://github.com/arudaev/THD-Room-Finder/releases/latest" id="dl-btn" class="btn-dl" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download APK
+        <span class="ver" id="ver"></span>
+      </a>
+      <a href="https://github.com/arudaev/THD-Room-Finder" class="btn-gh" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+        </svg>
+        View Source
+      </a>
+    </div>
+    <div class="meta-row">
+      <span class="meta-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/>
+        </svg>
+        Android 8.0+
+      </span>
+      <span class="meta-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Free &amp; Open Source
+      </span>
+      <span class="meta-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        MIT License
+      </span>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="sec-head">
+    <h2>Everything a student needs</h2>
+    <p>Simple, fast, and always up to date</p>
+  </div>
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>Real-time Availability</h3>
+      <p>See which rooms are free right now. Powered by THD's public THabella scheduling system — no scraping, always accurate.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <h3>Building Filters</h3>
+      <p>Filter instantly by building code — A, B, C, D, I, ITC and more. Find the closest free room to where you already are.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <h3>Schedule Lookup</h3>
+      <p>Pick any future date and time to check availability ahead of schedule. Plan your study sessions in advance.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      </div>
+      <h3>Offline Support</h3>
+      <p>Room data is cached locally with a 24-hour TTL. Browse the full list even without a connection — schedules update when back online.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>THD Room Finder &mdash; For students at Technische Hochschule Deggendorf</p>
+  <div class="ft-links">
+    <a href="https://github.com/arudaev/THD-Room-Finder" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/arudaev/THD-Room-Finder/releases" target="_blank" rel="noopener">Releases</a>
+    <a href="https://www.thd.de" target="_blank" rel="noopener">THD Website</a>
+  </div>
+</footer>
+
+<script>
+(async () => {
+  const btn = document.getElementById('dl-btn');
+  const ver = document.getElementById('ver');
+  try {
+    const r = await fetch('https://api.github.com/repos/arudaev/THD-Room-Finder/releases/latest');
+    if (!r.ok) return;
+    const d = await r.json();
+    const apk = d.assets?.find(a => a.name.endsWith('.apk'));
+    if (apk) btn.href = apk.browser_download_url;
+    else if (d.html_url) btn.href = d.html_url;
+    if (d.tag_name) ver.textContent = d.tag_name;
+  } catch { /* keep fallback */ }
+})();
+</script>
+
+</body>
+</html>
