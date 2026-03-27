@@ -129,7 +129,7 @@ graph TB
 
 ```bash
 # Clone the repository
-git clone --recurse-submodules https://github.com/HlexNC/THD-Room-Finder.git
+git clone --recurse-submodules https://github.com/arudaev/THD-Room-Finder.git
 cd THD-Room-Finder
 
 # Build debug APK
@@ -293,13 +293,13 @@ Ensure Hilt version is 2.59.1 or higher. Earlier versions are not compatible wit
 
 ## Documentation
 
-Detailed documentation is available in the [project wiki](https://github.com/HlexNC/THD-Room-Finder/wiki):
+Detailed documentation is available in the [project wiki](https://github.com/arudaev/THD-Room-Finder/wiki):
 
-- [**Architecture**](https://github.com/HlexNC/THD-Room-Finder/wiki/Architecture) — layers, data flow, caching strategy
-- [**API Reference**](https://github.com/HlexNC/THD-Room-Finder/wiki/API-Reference) — THabella endpoints and schemas
-- [**Building from Source**](https://github.com/HlexNC/THD-Room-Finder/wiki/Building-from-Source) — complete setup guide
-- [**App Features**](https://github.com/HlexNC/THD-Room-Finder/wiki/App-Features) — detailed feature documentation
-- [**Contributing**](https://github.com/HlexNC/THD-Room-Finder/wiki/Contributing) — how to contribute
+- [**Architecture**](https://github.com/arudaev/THD-Room-Finder/wiki/Architecture) — layers, data flow, caching strategy
+- [**API Reference**](https://github.com/arudaev/THD-Room-Finder/wiki/API-Reference) — THabella endpoints and schemas
+- [**Building from Source**](https://github.com/arudaev/THD-Room-Finder/wiki/Building-from-Source) — complete setup guide
+- [**App Features**](https://github.com/arudaev/THD-Room-Finder/wiki/App-Features) — detailed feature documentation
+- [**Contributing**](https://github.com/arudaev/THD-Room-Finder/wiki/Contributing) — how to contribute
 
 ---
 
