@@ -7,22 +7,36 @@ struct BuildingFilterBar: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                FilterChip(
-                    title: "All",
-                    isSelected: selectedBuilding == nil,
-                    action: { onBuildingSelected(nil) }
-                )
-
-                ForEach(buildings, id: \.self) { building in
-                    FilterChip(
-                        title: building,
-                        isSelected: selectedBuilding == building,
-                        action: { onBuildingSelected(building) }
-                    )
+            Group {
+                if #available(iOS 26, *) {
+                    GlassEffectContainer(spacing: 10) {
+                        chipRow
+                    }
+                } else {
+                    chipRow
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 4)
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    private var chipRow: some View {
+        HStack(spacing: 10) {
+            FilterChip(
+                title: "All",
+                isSelected: selectedBuilding == nil,
+                action: { onBuildingSelected(nil) }
+            )
+
+            ForEach(buildings, id: \.self) { building in
+                FilterChip(
+                    title: building,
+                    isSelected: selectedBuilding == building,
+                    action: { onBuildingSelected(building) }
+                )
+            }
         }
     }
 }
@@ -36,14 +50,28 @@ private struct FilterChip: View {
         Button(action: action) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? Color.accentColor : Color(.secondarySystemBackground))
-                )
                 .foregroundStyle(isSelected ? .white : .primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .roomFinderCapsuleSurface(
+                    fill: isSelected ? Color.accentColor.opacity(0.30) : Color.white.opacity(0.10),
+                    stroke: isSelected ? Color.accentColor.opacity(0.40) : Color.white.opacity(0.18),
+                    interactive: true
+                )
         }
         .buttonStyle(.plain)
+    }
+}
+
+#Preview("Building Filter Bar") {
+    ZStack {
+        RoomFinderScreenBackground()
+
+        BuildingFilterBar(
+            buildings: ["A", "B", "C", "D"],
+            selectedBuilding: "B",
+            onBuildingSelected: { _ in }
+        )
+        .padding()
     }
 }

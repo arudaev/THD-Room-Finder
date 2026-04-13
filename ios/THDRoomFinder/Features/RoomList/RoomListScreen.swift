@@ -113,8 +113,7 @@ final class RoomListViewModel: ObservableObject {
 
 struct RoomListScene: View {
     @StateObject private var viewModel: RoomListViewModel
-    @State private var isShowingDatePicker = false
-    @State private var draftDate: Date
+    @State private var datePickerSheet: RoomTimePickerPresentation?
 
     private let onRoomSelected: (Room, Date) -> Void
 
@@ -126,141 +125,293 @@ struct RoomListScene: View {
         _viewModel = StateObject(
             wrappedValue: RoomListViewModel(repository: repository, initialQuery: initialQuery)
         )
-        _draftDate = State(initialValue: initialQuery.selectedDate)
         self.onRoomSelected = onRoomSelected
     }
 
     var body: some View {
-        Group {
-            if viewModel.state.isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let errorMessage = viewModel.state.errorMessage {
-                VStack(spacing: 16) {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
-                        .multilineTextAlignment(.center)
-
-                    Button("Retry") {
-                        Task { await viewModel.loadFreeRooms() }
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                .padding(24)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        if viewModel.state.isCustomTime {
-                            CustomTimeBanner(
-                                selectedDate: viewModel.state.selectedDate,
-                                onReset: { Task { await viewModel.resetToNow() } }
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
-                        }
-
-                        BuildingFilterBar(
-                            buildings: viewModel.state.buildings,
-                            selectedBuilding: viewModel.state.selectedBuilding,
-                            onBuildingSelected: viewModel.selectBuilding
-                        )
-
-                        if viewModel.state.filteredRooms.isEmpty {
-                            Text(emptyMessage)
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.top, 48)
-                                .padding(.horizontal, 24)
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(viewModel.state.filteredRooms) { freeRoom in
-                                    Button {
-                                        onRoomSelected(freeRoom.room, viewModel.state.selectedDate)
-                                    } label: {
-                                        RoomCardView(freeRoom: freeRoom)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 24)
-                        }
-                    }
-                }
-            }
+        ZStack {
+            RoomFinderScreenBackground()
+            content
         }
         .navigationTitle("Free Rooms")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    draftDate = viewModel.state.selectedDate
-                    isShowingDatePicker = true
+                    datePickerSheet = RoomTimePickerPresentation(
+                        selectedDate: viewModel.state.selectedDate
+                    )
                 } label: {
-                    Label("Pick date and time", systemImage: "calendar")
+                    Label("Pick date and time", systemImage: "calendar.badge.clock")
                 }
             }
         }
-        .sheet(isPresented: $isShowingDatePicker) {
-            NavigationStack {
-                Form {
-                    DatePicker(
-                        "Date and Time",
-                        selection: $draftDate,
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                }
-                .navigationTitle("Select Time")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            isShowingDatePicker = false
-                        }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Apply") {
-                            isShowingDatePicker = false
-                            Task { await viewModel.setDate(draftDate) }
-                        }
-                    }
-                }
+        .sheet(item: $datePickerSheet) { presentation in
+            RoomTimePickerSheet(selectedDate: presentation.selectedDate) { date in
+                Task { await viewModel.setDate(date) }
             }
-            .presentationDetents([.medium])
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if viewModel.state.isLoading {
+            ProgressView("Loading free rooms...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let errorMessage = viewModel.state.errorMessage {
+            RoomListErrorState(errorMessage: errorMessage) {
+                Task { await viewModel.loadFreeRooms() }
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    RoomListSummaryCard(
+                        state: viewModel.state,
+                        onResetToNow: { Task { await viewModel.resetToNow() } }
+                    )
+
+                    BuildingFilterBar(
+                        buildings: viewModel.state.buildings,
+                        selectedBuilding: viewModel.state.selectedBuilding,
+                        onBuildingSelected: viewModel.selectBuilding
+                    )
+
+                    if viewModel.state.filteredRooms.isEmpty {
+                        RoomListEmptyStateCard(message: emptyMessage)
+                    } else {
+                        LazyVStack(spacing: 14) {
+                            ForEach(viewModel.state.filteredRooms) { freeRoom in
+                                Button {
+                                    onRoomSelected(freeRoom.room, viewModel.state.selectedDate)
+                                } label: {
+                                    RoomCardView(freeRoom: freeRoom)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 24)
+                    }
+                }
+                .padding(.top, 20)
+                .padding(.bottom, 24)
+            }
+            .scrollIndicators(.hidden)
         }
     }
 
     private var emptyMessage: String {
         if let selectedBuilding = viewModel.state.selectedBuilding {
-            return "No free rooms in building \(selectedBuilding)"
+            return "No free rooms in building \(selectedBuilding) for the selected time."
         }
         if viewModel.state.isCustomTime {
-            return "No free rooms at the selected time"
+            return "No free rooms at the selected time."
         }
-        return "No free rooms right now"
+        return "No free rooms are available right now."
     }
 }
 
-private struct CustomTimeBanner: View {
+private struct RoomTimePickerPresentation: Identifiable {
+    let id = UUID()
     let selectedDate: Date
-    let onReset: () -> Void
+}
+
+private struct RoomListSummaryCard: View {
+    let state: RoomListViewState
+    let onResetToNow: () -> Void
 
     var body: some View {
-        HStack {
-            Text(
-                selectedDate,
-                format: .dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute()
-            )
-            .font(.subheadline.weight(.medium))
+        VStack(alignment: .leading, spacing: 16) {
+            Text("\(state.filteredRooms.count)")
+                .font(.system(size: 58, weight: .bold, design: .rounded))
 
-            Spacer()
+            Text(state.isCustomTime ? "rooms free at the selected time" : "rooms free right now")
+                .font(.title3.weight(.semibold))
 
-            Button("Now", action: onReset)
-                .buttonStyle(.bordered)
+            Text(summaryDescription)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            VStack(alignment: .leading, spacing: 10) {
+                RoomListMetaPill(icon: "clock", title: selectedTimeText)
+                RoomListMetaPill(
+                    icon: "building.2",
+                    title: state.selectedBuilding.map { "Building \($0)" } ?? "All buildings"
+                )
+            }
+
+            if state.isCustomTime {
+                RoomListResetButton(action: onResetToNow)
+            }
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .roomFinderSurface(cornerRadius: 30, tint: .teal.opacity(0.16))
+        .padding(.horizontal, 20)
+    }
+
+    private var summaryDescription: String {
+        if state.isCustomTime {
+            return "Browsing a scheduled snapshot instead of the live feed."
+        }
+        return "Live results update against the current time when you refresh."
+    }
+
+    private var selectedTimeText: String {
+        if state.isCustomTime {
+            return state.selectedDate.formatted(
+                .dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute()
+            )
+        }
+        return "Now"
+    }
+}
+
+private struct RoomListMetaPill: View {
+    let icon: String
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.footnote.weight(.semibold))
+
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .roomFinderCapsuleSurface(
+            fill: Color.white.opacity(0.10),
+            stroke: Color.white.opacity(0.18)
         )
+    }
+}
+
+private struct RoomListResetButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Group {
+            if #available(iOS 26, *) {
+                Button("Back to Now", action: action)
+                    .buttonStyle(.glass)
+            } else {
+                Button("Back to Now", action: action)
+                    .buttonStyle(.bordered)
+            }
+        }
+    }
+}
+
+private struct RoomListEmptyStateCard: View {
+    let message: String
+
+    var body: some View {
+        ContentUnavailableView(
+            "No Rooms Found",
+            systemImage: "magnifyingglass",
+            description: Text(message)
+        )
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .roomFinderSurface(cornerRadius: 28, tint: Color.white.opacity(0.12))
+        .padding(.horizontal, 20)
+    }
+}
+
+private struct RoomListErrorState: View {
+    let errorMessage: String
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("We couldn't load the room list.")
+                .font(.title3.weight(.semibold))
+
+            Text(errorMessage)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Group {
+                if #available(iOS 26, *) {
+                    Button("Retry", action: onRetry)
+                        .buttonStyle(.glassProminent)
+                } else {
+                    Button("Retry", action: onRetry)
+                        .buttonStyle(.borderedProminent)
+                }
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .roomFinderSurface(cornerRadius: 30, tint: .red.opacity(0.10))
+    }
+}
+
+private struct RoomTimePickerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var draftDate: Date
+
+    let onApply: (Date) -> Void
+
+    init(selectedDate: Date, onApply: @escaping (Date) -> Void) {
+        _draftDate = State(initialValue: selectedDate)
+        self.onApply = onApply
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                DatePicker(
+                    "Date and Time",
+                    selection: $draftDate,
+                    displayedComponents: [.date, .hourAndMinute]
+                )
+            }
+            .navigationTitle("Select Time")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Apply") {
+                        onApply(draftDate)
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
+
+#Preview("Room List") {
+    NavigationStack {
+        ZStack {
+            RoomFinderScreenBackground()
+
+            RoomListSummaryCard(
+                state: RoomListViewState(
+                    isLoading: false,
+                    freeRooms: [],
+                    filteredRooms: [],
+                    buildings: ["A", "B", "C"],
+                    selectedBuilding: "B",
+                    selectedDate: .now,
+                    isCustomTime: true,
+                    errorMessage: nil
+                ),
+                onResetToNow: {}
+            )
+            .padding()
+        }
     }
 }

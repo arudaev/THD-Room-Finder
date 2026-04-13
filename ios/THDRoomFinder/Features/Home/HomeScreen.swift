@@ -104,52 +104,272 @@ private struct HomeScreen: View {
     let onNavigateToRoomList: () -> Void
 
     var body: some View {
-        VStack {
-            Spacer()
+        ZStack {
+            RoomFinderScreenBackground()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HomeHeroCard(state: state, onRetry: onRetry)
+
+                    if !state.isLoading, state.errorMessage == nil {
+                        HomeActionCard(
+                            onRetry: onRetry,
+                            onNavigateToRoomList: onNavigateToRoomList
+                        )
+
+                        HomeHighlightsCard()
+                    }
+                }
+                .padding(20)
+                .padding(.bottom, 24)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .navigationTitle("THD Room Finder")
+    }
+}
+
+private struct HomeHeroCard: View {
+    let state: HomeViewState
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Label("Live availability", systemImage: "sparkles.rectangle.stack")
+                .font(.headline)
+                .foregroundStyle(.secondary)
 
             if state.isLoading {
-                ProgressView()
-            } else if let errorMessage = state.errorMessage {
-                VStack(spacing: 16) {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
-                        .multilineTextAlignment(.center)
-
-                    Button("Retry", action: onRetry)
-                        .buttonStyle(.borderedProminent)
+                VStack(alignment: .leading, spacing: 14) {
+                    ProgressView()
+                    Text("Checking which rooms are open right now.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .padding(.horizontal, 24)
-            } else {
-                VStack(spacing: 8) {
-                    Text("\(state.summary.freeRoomCount)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
+            } else if let errorMessage = state.errorMessage {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("Room status is temporarily unavailable.")
+                        .font(.title3.weight(.semibold))
 
-                    Text("rooms available right now")
-                        .font(.title3)
-
-                    Text("out of \(state.summary.totalRoomCount) total rooms")
+                    Text(errorMessage)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    Text(
-                        state.summary.currentTime,
-                        format: .dateTime.hour(.twoDigits(amPM: .omitted)).minute()
-                    )
-                    .foregroundStyle(.secondary)
-
-                    VStack(spacing: 12) {
-                        Button("Find a Free Room", action: onNavigateToRoomList)
-                            .buttonStyle(.borderedProminent)
-
-                        Button("Refresh", action: onRetry)
-                            .buttonStyle(.bordered)
-                    }
-                    .padding(.top, 20)
+                    HomeSecondaryButton(title: "Retry", action: onRetry)
                 }
-            }
+            } else {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("\(state.summary.freeRoomCount)")
+                        .font(.system(size: 72, weight: .bold, design: .rounded))
 
-            Spacer()
+                    Text("rooms free right now")
+                        .font(.title3.weight(.semibold))
+
+                    Text("Out of \(state.summary.totalRoomCount) rooms currently tracked.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                HomeMetricsRow(summary: state.summary)
+            }
         }
         .padding(24)
-        .navigationTitle("THD Room Finder")
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .roomFinderSurface(cornerRadius: 32, tint: .teal.opacity(0.18))
+    }
+}
+
+private struct HomeMetricsRow: View {
+    let summary: HomeSummary
+
+    var body: some View {
+        Group {
+            if #available(iOS 26, *) {
+                GlassEffectContainer(spacing: 10) {
+                    metricRow
+                }
+            } else {
+                metricRow
+            }
+        }
+    }
+
+    private var metricRow: some View {
+        HStack(spacing: 10) {
+            HomeMetricPill(
+                icon: "clock",
+                title: summary.currentTime.formatted(
+                    .dateTime.hour(.twoDigits(amPM: .omitted)).minute()
+                )
+            )
+
+            HomeMetricPill(
+                icon: "arrow.clockwise",
+                title: "Auto refreshes"
+            )
+        }
+    }
+}
+
+private struct HomeMetricPill: View {
+    let icon: String
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.footnote.weight(.semibold))
+
+            Text(title)
+                .font(.footnote.weight(.semibold))
+        }
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .roomFinderCapsuleSurface(
+            fill: Color.white.opacity(0.10),
+            stroke: Color.white.opacity(0.18)
+        )
+    }
+}
+
+private struct HomeActionCard: View {
+    let onRetry: () -> Void
+    let onNavigateToRoomList: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Start exploring")
+                .font(.title3.weight(.semibold))
+
+            Text("Jump into the live room list, filter by building, and drill into room details from there.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 12) {
+                HomeProminentButton(title: "Find a Free Room", action: onNavigateToRoomList)
+                HomeSecondaryButton(title: "Refresh Snapshot", action: onRetry)
+            }
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .roomFinderSurface(cornerRadius: 28, tint: .accentColor.opacity(0.16))
+    }
+}
+
+private struct HomeHighlightsCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Built for quick decisions")
+                .font(.title3.weight(.semibold))
+
+            VStack(alignment: .leading, spacing: 14) {
+                HomeHighlightRow(
+                    icon: "building.2",
+                    title: "Building filters stay close",
+                    detail: "Jump between buildings without losing the live room list."
+                )
+                HomeHighlightRow(
+                    icon: "calendar.badge.clock",
+                    title: "Time-travel when you need it",
+                    detail: "Switch from now to a custom date and keep that context all the way to room details."
+                )
+                HomeHighlightRow(
+                    icon: "rectangle.stack.person.crop",
+                    title: "Room detail stays focused",
+                    detail: "Open a room to see facilities, occupancy, and the rest of the schedule."
+                )
+            }
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .roomFinderSurface(cornerRadius: 28, tint: Color.white.opacity(0.12))
+    }
+}
+
+private struct HomeHighlightRow: View {
+    let icon: String
+    let title: String
+    let detail: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.headline)
+                .frame(width: 28, height: 28)
+                .foregroundStyle(.teal)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct HomeProminentButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Group {
+            if #available(iOS 26, *) {
+                Button(action: action) {
+                    Text(title)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.glassProminent)
+            } else {
+                Button(action: action) {
+                    Text(title)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+}
+
+private struct HomeSecondaryButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Group {
+            if #available(iOS 26, *) {
+                Button(action: action) {
+                    Text(title)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.glass)
+            } else {
+                Button(action: action) {
+                    Text(title)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+    }
+}
+
+#Preview("Home Screen") {
+    NavigationStack {
+        HomeScreen(
+            state: HomeViewState(
+                isLoading: false,
+                summary: HomeSummary(
+                    freeRoomCount: 14,
+                    totalRoomCount: 58,
+                    currentTime: .now
+                )
+            ),
+            onRetry: {},
+            onNavigateToRoomList: {}
+        )
     }
 }
