@@ -116,8 +116,6 @@ private struct HomeScreen: View {
                             onRetry: onRetry,
                             onNavigateToRoomList: onNavigateToRoomList
                         )
-
-                        HomeHighlightsCard()
                     }
                 }
                 .padding(20)
@@ -246,60 +244,6 @@ private struct HomeActionCard: View {
         .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
         .roomFinderSurface(cornerRadius: 28, tint: .accentColor.opacity(0.16))
-    }
-}
-
-private struct HomeHighlightsCard: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Built for quick decisions")
-                .font(.title3.weight(.semibold))
-
-            VStack(alignment: .leading, spacing: 14) {
-                HomeHighlightRow(
-                    icon: "building.2",
-                    title: "Building filters stay close",
-                    detail: "Jump between buildings without losing the live room list."
-                )
-                HomeHighlightRow(
-                    icon: "calendar.badge.clock",
-                    title: "Time-travel when you need it",
-                    detail: "Switch from now to a custom date and keep that context all the way to room details."
-                )
-                HomeHighlightRow(
-                    icon: "rectangle.stack.person.crop",
-                    title: "Room detail stays focused",
-                    detail: "Open a room to see facilities, occupancy, and the rest of the schedule."
-                )
-            }
-        }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .roomFinderSurface(cornerRadius: 28, tint: Color.white.opacity(0.12))
-    }
-}
-
-private struct HomeHighlightRow: View {
-    let icon: String
-    let title: String
-    let detail: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.headline)
-                .frame(width: 28, height: 28)
-                .foregroundStyle(.teal)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-
-                Text(detail)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
     }
 }
 
