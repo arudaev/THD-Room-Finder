@@ -28,6 +28,13 @@ local.properties
 *.iws
 *.ipr
 
+# Xcode
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcuserstate
+ios/build/
+
 # Android Studio Navigation editor temp files
 .navigation/
 

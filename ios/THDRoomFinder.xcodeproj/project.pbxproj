@@ -1,0 +1,495 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B001 = {isa = PBXBuildFile; fileRef = F001; };
+		B002 = {isa = PBXBuildFile; fileRef = F002; };
+		B003 = {isa = PBXBuildFile; fileRef = F003; };
+		B004 = {isa = PBXBuildFile; fileRef = F004; };
+		B005 = {isa = PBXBuildFile; fileRef = F005; };
+		B006 = {isa = PBXBuildFile; fileRef = F006; };
+		B007 = {isa = PBXBuildFile; fileRef = F007; };
+		B008 = {isa = PBXBuildFile; fileRef = F008; };
+		B009 = {isa = PBXBuildFile; fileRef = F009; };
+		B00A = {isa = PBXBuildFile; fileRef = F00A; };
+		B00B = {isa = PBXBuildFile; fileRef = F00B; };
+		B00C = {isa = PBXBuildFile; fileRef = F00C; };
+		B00D = {isa = PBXBuildFile; fileRef = F00D; };
+		B00E = {isa = PBXBuildFile; fileRef = F00E; };
+		B00F = {isa = PBXBuildFile; fileRef = F00F; };
+		B010 = {isa = PBXBuildFile; fileRef = F011; };
+		B011 = {isa = PBXBuildFile; fileRef = F012; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C001 = {
+			isa = PBXContainerItemProxy;
+			containerPortal = PRJ1;
+			proxyType = 1;
+			remoteGlobalIDString = T001;
+			remoteInfo = THDRoomFinder;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
+		F002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = THDRoomFinderApp.swift; sourceTree = "<group>"; };
+		F003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomModels.swift; sourceTree = "<group>"; };
+		F004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPriorityPolicy.swift; sourceTree = "<group>"; };
+		F005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThabellaAPIClient.swift; sourceTree = "<group>"; };
+		F006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomRepository.swift; sourceTree = "<group>"; };
+		F007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
+		F008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListScreen.swift; sourceTree = "<group>"; };
+		F009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomDetailScreen.swift; sourceTree = "<group>"; };
+		F00A = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingFilterBar.swift; sourceTree = "<group>"; };
+		F00B = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCardView.swift; sourceTree = "<group>"; };
+		F00C = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomEntity.swift; sourceTree = "<group>"; };
+		F00D = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomIntents.swift; sourceTree = "<group>"; };
+		F00E = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
+		F00F = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F010 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPriorityPolicyTests.swift; sourceTree = "<group>"; };
+		F012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListViewModelTests.swift; sourceTree = "<group>"; };
+		F013 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = THDRoomFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F014 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = THDRoomFinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		P003 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		P005 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G001 = {
+			isa = PBXGroup;
+			children = (
+				G003,
+				G00E,
+				G002,
+			);
+			sourceTree = "<group>";
+		};
+		G002 = {
+			isa = PBXGroup;
+			children = (
+				F013,
+				F014,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		G003 = {
+			isa = PBXGroup;
+			children = (
+				G004,
+				G005,
+				G006,
+				G007,
+				G00C,
+				G00D,
+			);
+			path = THDRoomFinder;
+			sourceTree = "<group>";
+		};
+		G004 = {
+			isa = PBXGroup;
+			children = (
+				F001,
+				F002,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		G005 = {
+			isa = PBXGroup;
+			children = (
+				F003,
+				F004,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		G006 = {
+			isa = PBXGroup;
+			children = (
+				F005,
+				F006,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		G007 = {
+			isa = PBXGroup;
+			children = (
+				G008,
+				G009,
+				G00A,
+				G00B,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		G008 = {
+			isa = PBXGroup;
+			children = (
+				F007,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		G009 = {
+			isa = PBXGroup;
+			children = (
+				F008,
+			);
+			path = RoomList;
+			sourceTree = "<group>";
+		};
+		G00A = {
+			isa = PBXGroup;
+			children = (
+				F009,
+			);
+			path = RoomDetail;
+			sourceTree = "<group>";
+		};
+		G00B = {
+			isa = PBXGroup;
+			children = (
+				F00A,
+				F00B,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		G00C = {
+			isa = PBXGroup;
+			children = (
+				F00C,
+				F00D,
+				F00E,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		G00D = {
+			isa = PBXGroup;
+			children = (
+				F00F,
+				F010,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		G00E = {
+			isa = PBXGroup;
+			children = (
+				F011,
+				F012,
+			);
+			path = THDRoomFinderTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T001 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CLA1;
+			buildPhases = (
+				P001,
+				P003,
+				P002,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = THDRoomFinder;
+			productName = THDRoomFinder;
+			productReference = F013;
+			productType = "com.apple.product-type.application";
+		};
+		T002 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CLT1;
+			buildPhases = (
+				P004,
+				P005,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D001,
+			);
+			name = THDRoomFinderTests;
+			productName = THDRoomFinderTests;
+			productReference = F014;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		PRJ1 = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					T001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					T002 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = T001;
+					};
+				};
+			};
+			buildConfigurationList = CLP1;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = G001;
+			productRefGroup = G002;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T001,
+				T002,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		P002 = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00F,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		P001 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B001,
+				B002,
+				B003,
+				B004,
+				B005,
+				B006,
+				B007,
+				B008,
+				B009,
+				B00A,
+				B00B,
+				B00C,
+				B00D,
+				B00E,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		P004 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B010,
+				B011,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D001 = {
+			isa = PBXTargetDependency;
+			target = T001;
+			targetProxy = C001;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CPD = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CPR = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		CAD = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = THDRoomFinder/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.thd.roomfinder.ios;
+				PRODUCT_NAME = THDRoomFinder;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CAR = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = THDRoomFinder/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.thd.roomfinder.ios;
+				PRODUCT_NAME = THDRoomFinder;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CTD = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.thd.roomfinder.iosTests;
+				PRODUCT_NAME = THDRoomFinderTests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/THDRoomFinder.app/THDRoomFinder";
+				TEST_TARGET_NAME = THDRoomFinder;
+			};
+			name = Debug;
+		};
+		CTR = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.thd.roomfinder.iosTests;
+				PRODUCT_NAME = THDRoomFinderTests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/THDRoomFinder.app/THDRoomFinder";
+				TEST_TARGET_NAME = THDRoomFinder;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CLP1 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CPD,
+				CPR,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CLA1 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAD,
+				CAR,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CLT1 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CTD,
+				CTR,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = PRJ1;
+}
