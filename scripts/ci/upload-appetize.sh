@@ -124,6 +124,18 @@ PY
 
 APP_URL="https://appetize.io/app/${PUBLIC_KEY_RESULT}"
 
+case "${PLATFORM}" in
+  ios)
+    PLATFORM_LABEL="iOS"
+    ;;
+  android)
+    PLATFORM_LABEL="Android"
+    ;;
+  *)
+    PLATFORM_LABEL="${PLATFORM}"
+    ;;
+esac
+
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   {
     echo "public-key=${PUBLIC_KEY_RESULT}"
@@ -134,7 +146,7 @@ fi
 
 if [[ -n "${SUMMARY_FILE}" ]]; then
   {
-    echo "### Appetize ${PLATFORM^} Preview"
+    echo "### Appetize ${PLATFORM_LABEL} Preview"
     echo
     echo "- App URL: ${APP_URL}"
     echo "- Version code: ${VERSION_CODE_RESULT:-unknown}"
