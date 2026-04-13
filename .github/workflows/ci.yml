@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-test:
-    name: Build & Test
+  android:
+    name: Android Build & Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,10 +30,34 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: bash scripts/dev/android-build.sh assembleDebug
 
-      - name: Run unit tests
-        run: ./gradlew test
+      - name: Run unit tests and lint checks
+        run: bash scripts/dev/android-test.sh test lint
 
-      - name: Run lint checks
-        run: ./gradlew lint
+  ios:
+    name: iOS Build & Test
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build iOS simulator app
+        run: |
+          xcodebuild \
+            -project ios/THDRoomFinder.xcodeproj \
+            -scheme THDRoomFinder \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Run THDRoomFinderTests
+        run: |
+          xcodebuild \
+            -project ios/THDRoomFinder.xcodeproj \
+            -scheme THDRoomFinder \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -only-testing:THDRoomFinderTests \
+            CODE_SIGNING_ALLOWED=NO \
+            test

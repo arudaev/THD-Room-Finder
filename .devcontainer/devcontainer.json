@@ -1,0 +1,31 @@
+{
+  "name": "THD Room Finder",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "ANDROID_HOME": "/usr/local/android-sdk",
+    "ANDROID_SDK_ROOT": "/usr/local/android-sdk"
+  },
+  "mounts": [
+    "source=thd-room-finder-gradle-cache,target=/home/vscode/.gradle,type=volume"
+  ],
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "fwcd.kotlin",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions",
+        "ms-python.python"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "interactive",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

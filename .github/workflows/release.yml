@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  test:
-    name: Run Tests
+  android-validate:
+    name: Android Validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,15 +28,42 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run unit tests
-        run: ./gradlew test
+      - name: Build debug APK
+        run: bash scripts/dev/android-build.sh assembleDebug
 
-      - name: Run lint checks
-        run: ./gradlew lint
+      - name: Run unit tests and lint checks
+        run: bash scripts/dev/android-test.sh test lint
 
-  build-release:
+  ios-validate:
+    name: iOS Validate
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build iOS simulator app
+        run: |
+          xcodebuild \
+            -project ios/THDRoomFinder.xcodeproj \
+            -scheme THDRoomFinder \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Run THDRoomFinderTests
+        run: |
+          xcodebuild \
+            -project ios/THDRoomFinder.xcodeproj \
+            -scheme THDRoomFinder \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -only-testing:THDRoomFinderTests \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+
+  build-android-release:
     name: Build Release APK
-    needs: test
+    needs: android-validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -53,6 +80,10 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Resolve release version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Decode keystore
         env:
@@ -65,17 +96,151 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew --console=plain --no-daemon assembleRelease
+
+      - name: Normalize release APK name
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/*.apk "dist/thd-room-finder-${{ steps.version.outputs.value }}.apk"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: android-release-apk
+          path: dist/thd-room-finder-${{ steps.version.outputs.value }}.apk
+
+  package-ios-source:
+    name: Package iOS Source Bundle
+    needs: ios-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Resolve release version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Package iOS source bundle
+        run: |
+          mkdir -p dist
+          bash scripts/ci/package-ios-source-bundle.sh \
+            "${{ steps.version.outputs.value }}" \
+            "${{ github.workspace }}/dist/thd-room-finder-ios-source-${{ steps.version.outputs.value }}.zip"
+
+      - name: Upload iOS source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-source-bundle
+          path: dist/thd-room-finder-ios-source-${{ steps.version.outputs.value }}.zip
+
+  upload-testflight:
+    name: Upload iOS Beta to TestFlight
+    needs: ios-validate
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Check TestFlight configuration
+        id: config
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_STORE_CONNECT_CERTIFICATES_FILE_BASE64: ${{ secrets.APP_STORE_CONNECT_CERTIFICATES_FILE_BASE64 }}
+          APP_STORE_CONNECT_CERTIFICATES_PASSWORD: ${{ secrets.APP_STORE_CONNECT_CERTIFICATES_PASSWORD }}
+        run: |
+          missing=()
+          for name in \
+            APP_STORE_CONNECT_ISSUER_ID \
+            APP_STORE_CONNECT_KEY_ID \
+            APP_STORE_CONNECT_PRIVATE_KEY \
+            APPLE_TEAM_ID \
+            APP_STORE_CONNECT_CERTIFICATES_FILE_BASE64 \
+            APP_STORE_CONNECT_CERTIFICATES_PASSWORD
+          do
+            if [ -z "${!name}" ]; then
+              missing+=("${name}")
+            fi
+          done
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### TestFlight Beta"
+              echo
+              echo "- Skipped upload because the following secrets are missing:"
+              for name in "${missing[@]}"; do
+                echo "- \`${name}\`"
+              done
+              echo
+              echo "- GitHub Releases still publish the Android APK and the iOS source bundle only."
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Import distribution certificate
+        if: steps.config.outputs.configured == 'true'
+        uses: apple-actions/import-codesign-certs@v6
+        with:
+          p12-file-base64: ${{ secrets.APP_STORE_CONNECT_CERTIFICATES_FILE_BASE64 }}
+          p12-password: ${{ secrets.APP_STORE_CONNECT_CERTIFICATES_PASSWORD }}
+
+      - name: Download provisioning profiles
+        if: steps.config.outputs.configured == 'true'
+        uses: apple-actions/download-provisioning-profiles@v5
+        with:
+          bundle-id: de.thd.roomfinder.ios
+          profile-type: IOS_APP_STORE
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+
+      - name: Archive and export TestFlight IPA
+        id: export
+        if: steps.config.outputs.configured == 'true'
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          echo "ipa_path=$(MARKETING_VERSION='${{ steps.version.outputs.value }}' BUILD_NUMBER='${{ github.run_number }}' bash scripts/ci/export-ios-testflight.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload build to TestFlight
+        if: steps.config.outputs.configured == 'true'
+        uses: apple-actions/upload-testflight-build@v4
+        with:
+          app-path: ${{ steps.export.outputs.ipa_path }}
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          release-notes: Automated beta build for ${{ github.ref_name }}
+
+      - name: Summarize TestFlight upload
+        if: steps.config.outputs.configured == 'true'
+        run: |
+          {
+            echo "### TestFlight Beta"
+            echo
+            echo "- Uploaded \`THDRoomFinder\` version \`${{ steps.version.outputs.value }}\` to TestFlight."
+            echo "- Bundle identifier: \`de.thd.roomfinder.ios\`"
+            echo "- Install path for iPhone testers remains TestFlight only."
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
 
   create-release:
     name: Create GitHub Release
-    needs: build-release
+    needs:
+      - build-android-release
+      - package-ios-source
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -86,23 +251,18 @@ jobs:
       - name: Download APK artifact
         uses: actions/download-artifact@v4
         with:
-          name: release-apk
+          name: android-release-apk
           path: ./apk
+
+      - name: Download iOS source artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-source-bundle
+          path: ./ios-source
 
       - name: Get version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
-      - name: Rename APK
-        run: mv ./apk/*.apk "./apk/thd-room-finder-${{ steps.version.outputs.VERSION }}.apk"
-
-      - name: Prepare iOS source bundle
-        run: |
-          mkdir -p ./ios-source
-          cp -R ./ios ./ios-source/ios
-          cp ./docs/iOS-Build-and-Sideload.md ./ios-source/iOS-Build-and-Sideload.md
-          cd ./ios-source
-          zip -r "../thd-room-finder-ios-source-${{ steps.version.outputs.VERSION }}.zip" .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -111,6 +271,6 @@ jobs:
           generate_release_notes: true
           files: |
             ./apk/thd-room-finder-${{ steps.version.outputs.VERSION }}.apk
-            ./thd-room-finder-ios-source-${{ steps.version.outputs.VERSION }}.zip
+            ./ios-source/thd-room-finder-ios-source-${{ steps.version.outputs.VERSION }}.zip
           draft: false
           prerelease: false

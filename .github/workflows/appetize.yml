@@ -1,0 +1,114 @@
+name: Appetize Previews
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android-preview:
+    name: Android Preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Android preview APK
+        run: bash scripts/dev/android-build.sh assembleDebug
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-appetize-preview
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Check Appetize configuration
+        id: appetize
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+        run: |
+          if [ -z "${APPETIZE_API_TOKEN}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Appetize Android Preview"
+              echo
+              echo "- Skipped upload because \`APPETIZE_API_TOKEN\` is not configured."
+              echo "- The debug APK artifact is still attached to this workflow run."
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload Android preview to Appetize
+        if: steps.appetize.outputs.configured == 'true'
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+        run: |
+          bash scripts/ci/upload-appetize.sh \
+            --platform android \
+            --file app/build/outputs/apk/debug/app-debug.apk \
+            --public-key "${{ vars.APPETIZE_ANDROID_MAIN_PUBLIC_KEY }}" \
+            --note "main:${GITHUB_SHA}"
+
+  ios-preview:
+    name: iOS Preview
+    runs-on: macos-latest
+    env:
+      OUTPUT_ZIP: ${{ github.workspace }}/ios/build/THDRoomFinder-ios-simulator-debug.zip
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build iOS simulator preview package
+        run: bash scripts/ci/package-ios-simulator.sh
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-appetize-preview
+          path: ${{ env.OUTPUT_ZIP }}
+
+      - name: Check Appetize configuration
+        id: appetize
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+        run: |
+          if [ -z "${APPETIZE_API_TOKEN}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Appetize iOS Preview"
+              echo
+              echo "- Skipped upload because \`APPETIZE_API_TOKEN\` is not configured."
+              echo "- The zipped simulator app is still attached to this workflow run."
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload iOS preview to Appetize
+        if: steps.appetize.outputs.configured == 'true'
+        env:
+          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+        run: |
+          bash scripts/ci/upload-appetize.sh \
+            --platform ios \
+            --file "${OUTPUT_ZIP}" \
+            --public-key "${{ vars.APPETIZE_IOS_MAIN_PUBLIC_KEY }}" \
+            --note "main:${GITHUB_SHA}"

@@ -10,8 +10,8 @@
   <a href="https://developer.android.com">
     <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white" alt="Android">
   </a>
-  <a href="docs/iOS-Build-and-Sideload.md">
-    <img src="https://img.shields.io/badge/iOS-Source_Included-0A84FF?style=flat-square&logo=xcode&logoColor=white" alt="iOS Source Included">
+  <a href="https://github.com/arudaev/THD-Room-Finder/wiki/cloud-testing">
+    <img src="https://img.shields.io/badge/iOS-TestFlight_Beta-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="iOS TestFlight Beta">
   </a>
   <a href="https://kotlinlang.org">
     <img src="https://img.shields.io/badge/Kotlin-2.2-7F52FF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin">
@@ -34,7 +34,7 @@
 
 ## Overview
 
-THD Room Finder is a native room finder for **Technische Hochschule Deggendorf (THD)**. The production app is Android, and this repository now also includes a native SwiftUI iPhone project for local Xcode builds and personal-device sideloading.
+THD Room Finder is a native room finder for **Technische Hochschule Deggendorf (THD)**. The repository now follows a **local-first delivery model**: Android development stays local by default, iOS keeps its native SwiftUI project, GitHub Actions validates both platforms, Appetize provides browser previews, and TestFlight is the supported install path for real iPhone testers.
 
 Both clients query THD's public scheduling system [THabella](https://thabella.th-deg.de) and cross-reference occupied rooms against known rooms to show which classrooms are free right now, or at any future time you choose.
 
@@ -60,8 +60,9 @@ Both clients query THD's public scheduling system [THabella](https://thabella.th
 
 ### Platforms
 
-- **Android app** - shipped as a signed APK in GitHub releases
-- **Native iOS source release** - shipped as an Xcode project bundle for simulator builds and personal-device sideloading
+- **Android app** - shipped as a signed APK in GitHub Releases and previewed in Appetize
+- **iOS beta path** - shipped to real devices through TestFlight and previewed in Appetize as a simulator build
+- **Native iOS source release** - shipped as an Xcode project bundle for maintainers and local Mac builds
 - **iOS Shortcuts support** - includes App Intents for finding free rooms and opening a room directly
 
 ### Design
@@ -128,13 +129,13 @@ graph TB
 
 ## Getting Started
 
-### Android Prerequisites
+### Local Android Prerequisites
 
 - **Android Studio** (latest stable, Ladybug or newer)
 - **JDK 21** - AGP 9 requires it
 - **Android SDK** with API level 36
 
-### Android Build and Run
+### Local Android Build and Run
 
 ```bash
 # Clone the repository
@@ -142,13 +143,10 @@ git clone --recurse-submodules https://github.com/arudaev/THD-Room-Finder.git
 cd THD-Room-Finder
 
 # Build debug APK
-./gradlew assembleDebug
+bash scripts/dev/android-build.sh assembleDebug
 
-# Run unit tests
-./gradlew test
-
-# Run lint checks
-./gradlew lint
+# Run Android validation
+bash scripts/dev/android-test.sh test lint
 
 # Install on a connected device or emulator
 ./gradlew installDebug
@@ -164,15 +162,38 @@ cd THD-Room-Finder
 > export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 > ```
 
-### iOS Source Build
+### Optional Codespaces Workspace
+
+If you need a disposable cloud environment, this repository now includes a full [`.devcontainer`](.devcontainer/devcontainer.json) for GitHub Codespaces.
+
+Codespaces provisions:
+
+- JDK 21
+- Android SDK command-line tools
+- Android platform-tools
+- Android API 36 and build-tools 36.1.0
+- a persistent Gradle cache volume
+
+Use the same helper commands inside Codespaces:
+
+```bash
+bash scripts/dev/android-build.sh assembleDebug
+bash scripts/dev/android-test.sh test lint
+```
+
+> [!NOTE]
+> Codespaces is supported as a backup environment, not the default workflow. iOS builds still require either a Mac with Xcode or GitHub Actions on `macos-latest`.
+
+### iOS Build, Preview, and Install
 
 The repository includes a native SwiftUI iPhone project at `ios/THDRoomFinder.xcodeproj`.
 
-- Open the project in Xcode on macOS
-- Choose an iPhone simulator or your own device
-- For personal-device sideloading, set your Apple ID team in `Signing & Capabilities`
+- Maintainers can build locally on macOS with Xcode or [`ios/scripts/build-and-launch.sh`](ios/scripts/build-and-launch.sh)
+- Browser previews are published through Appetize from `main`
+- Real iPhone testers install the app through TestFlight
+- Public GitHub Releases include the iOS source bundle, not an installable iPhone binary
 
-See [docs/iOS-Build-and-Sideload.md](docs/iOS-Build-and-Sideload.md) for the complete guide and current Apple distribution constraints.
+See [the cloud workflow guide](https://github.com/arudaev/THD-Room-Finder/wiki/cloud-testing) for the CI/CD and preview flow and [the iOS build and sideload guide](https://github.com/arudaev/THD-Room-Finder/wiki/iOS-Build-and-Sideload) for the maintainer build path.
 
 ---
 
@@ -192,7 +213,16 @@ ios/
 `- THDRoomFinderTests/       # iOS unit tests
 
 docs/
-`- iOS-Build-and-Sideload.md # Xcode build and personal-device install guide
+|- cloud-testing.md          # Local-first CI/CD, Appetize, TestFlight, and Codespaces guide
+`- iOS-Build-and-Sideload.md # Maintainer Xcode build and sideload guide
+
+.devcontainer/
+|- devcontainer.json         # Optional Codespaces / devcontainer setup
+`- Dockerfile                # Android-ready container image
+
+scripts/
+|- dev/                      # Local Android build/test helpers
+`- ci/                       # CI packaging and upload helpers
 ```
 
 ---
@@ -203,9 +233,19 @@ docs/
 
 Every push to `main` and every pull request triggers the **CI** workflow:
 
-- builds a debug APK
-- runs Android unit tests
-- runs lint checks
+- builds the Android debug APK
+- runs Android unit tests and lint
+- builds the iOS app for the simulator
+- runs `THDRoomFinderTests` on `iPhone 16 (OS latest)`
+
+### Appetize Previews
+
+Pushes to `main` and manual `workflow_dispatch` runs trigger the **Appetize Previews** workflow:
+
+- Android preview uploads the debug `.apk`
+- iOS preview uploads a zipped simulator `.app`
+- preview URLs are written into the Actions job summaries
+- repository variables can pin stable Appetize targets for Android and iOS main previews
 
 ### Releases
 
@@ -218,20 +258,33 @@ git push origin v1.0.0
 
 This will:
 
-1. Run the Android test suite
-2. Build a signed release APK
-3. Bundle the native iOS Xcode project and sideload guide into an `iOS source` zip
-4. Create a GitHub Release with both assets attached
+1. Validate Android and iOS builds.
+2. Build a signed Android release APK.
+3. Bundle the native iOS Xcode project into an `iOS source` zip.
+4. Upload an iOS beta build to TestFlight when the Apple credentials are configured.
+5. Create a GitHub Release with the Android APK and iOS source zip attached.
+
+> [!IMPORTANT]
+> GitHub Releases do **not** include an installable iOS binary. Real iPhone installs are supported through TestFlight only.
 
 > [!NOTE]
-> Required GitHub Secrets for signed Android releases:
+> Required GitHub secrets and variables:
 >
-> | Secret | Description |
-> |--------|-------------|
-> | `KEYSTORE_BASE64` | Base64-encoded release keystore |
-> | `KEYSTORE_PASSWORD` | Keystore password |
-> | `KEY_ALIAS` | Key alias name |
-> | `KEY_PASSWORD` | Key password |
+> | Name | Type | Description |
+> |------|------|-------------|
+> | `KEYSTORE_BASE64` | Secret | Base64-encoded Android release keystore |
+> | `KEYSTORE_PASSWORD` | Secret | Android keystore password |
+> | `KEY_ALIAS` | Secret | Android signing key alias |
+> | `KEY_PASSWORD` | Secret | Android signing key password |
+> | `APPETIZE_API_TOKEN` | Secret | API token for Appetize uploads |
+> | `APPETIZE_ANDROID_MAIN_PUBLIC_KEY` | Variable | Stable Appetize app key for Android previews |
+> | `APPETIZE_IOS_MAIN_PUBLIC_KEY` | Variable | Stable Appetize app key for iOS previews |
+> | `APP_STORE_CONNECT_ISSUER_ID` | Secret | App Store Connect issuer ID |
+> | `APP_STORE_CONNECT_KEY_ID` | Secret | App Store Connect API key ID |
+> | `APP_STORE_CONNECT_PRIVATE_KEY` | Secret | App Store Connect `.p8` private key |
+> | `APPLE_TEAM_ID` | Secret | Apple Developer team ID used for signing |
+> | `APP_STORE_CONNECT_CERTIFICATES_FILE_BASE64` | Secret | Base64-encoded iOS distribution certificate `.p12` |
+> | `APP_STORE_CONNECT_CERTIFICATES_PASSWORD` | Secret | Password for the `.p12` certificate |
 
 ---
 
@@ -249,14 +302,21 @@ The iOS project includes unit tests for:
 - room-priority policy classification
 - room-list query handling for building and date/time inputs
 
-Run Android tests with:
+Run Android validation locally with:
 
 ```bash
-./gradlew test
+bash scripts/dev/android-test.sh test lint
 ```
 
 > [!IMPORTANT]
 > Android test execution in a fresh local environment still requires `ANDROID_HOME` or `local.properties` to point to a valid Android SDK.
+
+End-to-end delivery testing now also includes:
+
+- GitHub Actions Android validation on `ubuntu-latest`
+- GitHub Actions iOS simulator validation on `macos-latest`
+- Appetize browser previews for Android and iOS from `main`
+- TestFlight beta delivery for iPhone testers on tagged releases
 
 ---
 
@@ -291,7 +351,13 @@ Create `local.properties` or set `ANDROID_HOME` to a valid Android SDK installat
 <details>
 <summary><strong>iOS project opens but will not run on device</strong></summary>
 
-Set your Apple ID team in Xcode, and if needed, change the bundle identifier to a unique personal value before building to your phone.
+For the supported tester path, use TestFlight. For personal maintainer builds, set your Apple ID team in Xcode and, if needed, change the bundle identifier to a unique personal value before building to your phone.
+</details>
+
+<details>
+<summary><strong>Codespaces builds Android but cannot build iOS</strong></summary>
+
+That is expected. Codespaces is an Android and tooling workspace only. iOS builds require GitHub Actions on `macos-latest` or a Mac with Xcode.
 </details>
 
 ---
@@ -300,7 +366,8 @@ Set your Apple ID team in Xcode, and if needed, change the bundle identifier to 
 
 Additional documentation:
 
-- [iOS Build and Sideload Guide](docs/iOS-Build-and-Sideload.md)
+- [Cloud Workflow Guide](https://github.com/arudaev/THD-Room-Finder/wiki/cloud-testing)
+- [iOS Build and Sideload Guide](https://github.com/arudaev/THD-Room-Finder/wiki/iOS-Build-and-Sideload)
 - [Project Wiki](https://github.com/arudaev/THD-Room-Finder/wiki)
 
 ---
