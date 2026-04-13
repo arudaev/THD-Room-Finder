@@ -181,4 +181,45 @@ class RoomListViewModelTest {
 
         viewModel.viewModelScope.cancel()
     }
+
+    @Test
+    fun `building filter preserves the sorted order from free rooms`() = runTest(testDispatcher) {
+        val rooms = listOf(
+            TestFixtures.room(
+                id = 1,
+                ident = "A215",
+                name = "A215 - Besprechungsraum",
+                building = "A",
+                displayName = "Besprechungsraum",
+            ),
+            TestFixtures.room(
+                id = 2,
+                ident = "A008",
+                name = "A008 - Labor",
+                building = "A",
+                displayName = "Labor",
+            ),
+            TestFixtures.room(
+                id = 3,
+                ident = "B001",
+                name = "B001",
+                building = "B",
+                displayName = "B001",
+            ),
+        )
+        fakeRepository.roomsResult = Result.success(rooms)
+        fakeRepository.eventsResult = Result.success(emptyList())
+
+        val viewModel = RoomListViewModel(useCase)
+        runCurrent()
+
+        viewModel.selectBuilding("A")
+
+        assertEquals(
+            listOf("A008", "A215"),
+            viewModel.uiState.value.filteredRooms.map { it.room.ident },
+        )
+
+        viewModel.viewModelScope.cancel()
+    }
 }

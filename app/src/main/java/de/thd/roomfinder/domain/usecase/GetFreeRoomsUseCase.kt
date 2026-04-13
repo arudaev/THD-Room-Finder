@@ -1,6 +1,7 @@
 package de.thd.roomfinder.domain.usecase
 
 import de.thd.roomfinder.domain.model.FreeRoom
+import de.thd.roomfinder.domain.policy.RoomPriorityPolicy
 import de.thd.roomfinder.domain.repository.RoomRepository
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -33,7 +34,8 @@ class GetFreeRoomsUseCase @Inject constructor(
                 )
             }
             .sortedWith(
-                compareBy<FreeRoom> { it.freeUntil != null }
+                compareByDescending<FreeRoom> { RoomPriorityPolicy.isPriority(it.room) }
+                    .thenBy { it.freeUntil != null }
                     .thenByDescending { it.freeUntil }
                     .thenBy { it.room.building }
                     .thenBy { it.room.name },

@@ -136,6 +136,101 @@ class GetFreeRoomsUseCaseTest {
     }
 
     @Test
+    fun `priority rooms outrank lower bucket rooms before freeUntil sorting`() = runTest {
+        val rooms = listOf(
+            TestFixtures.room(
+                id = 1,
+                ident = "A215",
+                name = "A215 - Besprechungsraum",
+                building = "A",
+                displayName = "Besprechungsraum",
+            ),
+            TestFixtures.room(
+                id = 2,
+                ident = "C102",
+                name = "C102",
+                building = "C",
+                displayName = "C102",
+            ),
+        )
+        val events = listOf(
+            TestFixtures.event(
+                roomIdent = "C102",
+                startDateTime = LocalDateTime.of(2025, 1, 15, 11, 0),
+                durationMinutes = 60,
+            ),
+        )
+        fakeRepository.roomsResult = Result.success(rooms)
+        fakeRepository.eventsResult = Result.success(events)
+
+        val result = useCase(queryTime).getOrThrow()
+
+        assertEquals("C102", result[0].room.ident)
+        assertEquals("A215", result[1].room.ident)
+    }
+
+    @Test
+    fun `priority labs outrank special spaces in the same building`() = runTest {
+        val rooms = listOf(
+            TestFixtures.room(
+                id = 1,
+                ident = "A009",
+                name = "A009 - Besprechungsraum",
+                building = "A",
+                displayName = "Besprechungsraum",
+            ),
+            TestFixtures.room(
+                id = 2,
+                ident = "A008",
+                name = "A008 - Labor",
+                building = "A",
+                displayName = "Labor",
+            ),
+        )
+        fakeRepository.roomsResult = Result.success(rooms)
+        fakeRepository.eventsResult = Result.success(emptyList())
+
+        val result = useCase(queryTime).getOrThrow()
+
+        assertEquals("A008", result[0].room.ident)
+        assertEquals("A009", result[1].room.ident)
+    }
+
+    @Test
+    fun `excluded rooms stay in the lower bucket even when free all day`() = runTest {
+        val rooms = listOf(
+            TestFixtures.room(
+                id = 1,
+                ident = "ITC-HS2",
+                name = "ITC 2: HS 2",
+                building = "ITC",
+                displayName = "HS 2",
+            ),
+            TestFixtures.room(
+                id = 2,
+                ident = "J007",
+                name = "J007 - Fernsehstudio",
+                building = "J",
+                displayName = "Fernsehstudio",
+            ),
+        )
+        val events = listOf(
+            TestFixtures.event(
+                roomIdent = "ITC-HS2",
+                startDateTime = LocalDateTime.of(2025, 1, 15, 12, 0),
+                durationMinutes = 60,
+            ),
+        )
+        fakeRepository.roomsResult = Result.success(rooms)
+        fakeRepository.eventsResult = Result.success(events)
+
+        val result = useCase(queryTime).getOrThrow()
+
+        assertEquals("ITC-HS2", result[0].room.ident)
+        assertEquals("J007", result[1].room.ident)
+    }
+
+    @Test
     fun `sorts rooms with freeUntil descending`() = runTest {
         val rooms = listOf(
             TestFixtures.room(id = 1, ident = "A001", building = "A", name = "A001"),
@@ -164,7 +259,7 @@ class GetFreeRoomsUseCaseTest {
     }
 
     @Test
-    fun `sorts by building then name as tiebreaker`() = runTest {
+    fun `sorts by building then name as tiebreaker within a bucket`() = runTest {
         val rooms = listOf(
             TestFixtures.room(id = 1, ident = "C102", building = "C", name = "C102"),
             TestFixtures.room(id = 2, ident = "A008", building = "A", name = "A008"),
@@ -175,7 +270,7 @@ class GetFreeRoomsUseCaseTest {
 
         val result = useCase(queryTime).getOrThrow()
 
-        // All have null freeUntil, so sorted by building then name
+        // All are priority rooms with null freeUntil, so sorted by building then name
         assertEquals("A001", result[0].room.ident)
         assertEquals("A008", result[1].room.ident)
         assertEquals("C102", result[2].room.ident)
