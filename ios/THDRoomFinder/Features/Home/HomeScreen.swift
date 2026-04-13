@@ -183,15 +183,7 @@ private struct HomeMetricsRow: View {
     let summary: HomeSummary
 
     var body: some View {
-        Group {
-            if #available(iOS 26, *) {
-                GlassEffectContainer(spacing: 10) {
-                    metricRow
-                }
-            } else {
-                metricRow
-            }
-        }
+        metricRow
     }
 
     private var metricRow: some View {
@@ -316,21 +308,11 @@ private struct HomeProminentButton: View {
     let action: () -> Void
 
     var body: some View {
-        Group {
-            if #available(iOS 26, *) {
-                Button(action: action) {
-                    Text(title)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.glassProminent)
-            } else {
-                Button(action: action) {
-                    Text(title)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-            }
+        Button(action: action) {
+            Text(title)
+                .frame(maxWidth: .infinity)
         }
+        .buttonStyle(.borderedProminent)
     }
 }
 
@@ -339,21 +321,11 @@ private struct HomeSecondaryButton: View {
     let action: () -> Void
 
     var body: some View {
-        Group {
-            if #available(iOS 26, *) {
-                Button(action: action) {
-                    Text(title)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.glass)
-            } else {
-                Button(action: action) {
-                    Text(title)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-            }
+        Button(action: action) {
+            Text(title)
+                .frame(maxWidth: .infinity)
         }
+        .buttonStyle(.bordered)
     }
 }
 

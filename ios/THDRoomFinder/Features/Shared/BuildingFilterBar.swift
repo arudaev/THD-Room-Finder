@@ -7,15 +7,7 @@ struct BuildingFilterBar: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            Group {
-                if #available(iOS 26, *) {
-                    GlassEffectContainer(spacing: 10) {
-                        chipRow
-                    }
-                } else {
-                    chipRow
-                }
-            }
+            chipRow
             .padding(.horizontal, 20)
             .padding(.vertical, 4)
         }
@@ -55,8 +47,7 @@ private struct FilterChip: View {
                 .padding(.vertical, 10)
                 .roomFinderCapsuleSurface(
                     fill: isSelected ? Color.accentColor.opacity(0.30) : Color.white.opacity(0.10),
-                    stroke: isSelected ? Color.accentColor.opacity(0.40) : Color.white.opacity(0.18),
-                    interactive: true
+                    stroke: isSelected ? Color.accentColor.opacity(0.40) : Color.white.opacity(0.18)
                 )
         }
         .buttonStyle(.plain)

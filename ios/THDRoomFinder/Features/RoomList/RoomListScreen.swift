@@ -297,15 +297,8 @@ private struct RoomListResetButton: View {
     let action: () -> Void
 
     var body: some View {
-        Group {
-            if #available(iOS 26, *) {
-                Button("Back to Now", action: action)
-                    .buttonStyle(.glass)
-            } else {
-                Button("Back to Now", action: action)
-                    .buttonStyle(.bordered)
-            }
-        }
+        Button("Back to Now", action: action)
+            .buttonStyle(.bordered)
     }
 }
 
@@ -338,15 +331,8 @@ private struct RoomListErrorState: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            Group {
-                if #available(iOS 26, *) {
-                    Button("Retry", action: onRetry)
-                        .buttonStyle(.glassProminent)
-                } else {
-                    Button("Retry", action: onRetry)
-                        .buttonStyle(.borderedProminent)
-                }
-            }
+            Button("Retry", action: onRetry)
+                .buttonStyle(.borderedProminent)
         }
         .padding(24)
         .frame(maxWidth: .infinity, alignment: .leading)

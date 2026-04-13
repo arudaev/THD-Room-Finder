@@ -348,15 +348,8 @@ private struct RoomDetailErrorCard: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            Group {
-                if #available(iOS 26, *) {
-                    Button("Retry", action: onRetry)
-                        .buttonStyle(.glassProminent)
-                } else {
-                    Button("Retry", action: onRetry)
-                        .buttonStyle(.borderedProminent)
-                }
-            }
+            Button("Retry", action: onRetry)
+                .buttonStyle(.borderedProminent)
         }
         .padding(24)
         .frame(maxWidth: .infinity, alignment: .leading)

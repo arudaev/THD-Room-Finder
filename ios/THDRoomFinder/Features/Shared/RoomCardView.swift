@@ -102,60 +102,30 @@ struct RoomFinderScreenBackground: View {
 }
 
 extension View {
-    @ViewBuilder
     func roomFinderSurface(
         cornerRadius: CGFloat = 24,
         tint: Color = Color.white.opacity(0.10),
-        interactive: Bool = false
     ) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        let outlined = self.overlay(
-            shape.strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
-        )
-
-        if #available(iOS 26, *) {
-            if interactive {
-                outlined
-                    .glassEffect(
-                        .regular.tint(tint).interactive(),
-                        in: .rect(cornerRadius: cornerRadius)
-                    )
-            } else {
-                outlined
-                    .glassEffect(
-                        .regular.tint(tint),
-                        in: .rect(cornerRadius: cornerRadius)
-                    )
-            }
-        } else {
-            outlined
-                .background(.ultraThinMaterial, in: shape)
-        }
+        return self
+            .background(.ultraThinMaterial, in: shape)
+            .background(tint, in: shape)
+            .overlay(
+                shape.strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+            )
     }
 
-    @ViewBuilder
     func roomFinderCapsuleSurface(
         fill: Color = Color.white.opacity(0.10),
         stroke: Color = Color.white.opacity(0.16),
-        interactive: Bool = false
     ) -> some View {
-        let outlined = self.overlay(
-            Capsule()
-                .strokeBorder(stroke, lineWidth: 1)
-        )
-
-        if #available(iOS 26, *) {
-            if interactive {
-                outlined
-                    .glassEffect(.regular.tint(fill).interactive(), in: .capsule)
-            } else {
-                outlined
-                    .glassEffect(.regular.tint(fill), in: .capsule)
-            }
-        } else {
-            outlined
-                .background(fill, in: Capsule())
-        }
+        return self
+            .background(.ultraThinMaterial, in: Capsule())
+            .background(fill, in: Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(stroke, lineWidth: 1)
+            )
     }
 }
 
