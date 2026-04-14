@@ -24,6 +24,9 @@
 		B00F = {isa = PBXBuildFile; fileRef = F00F; };
 		B010 = {isa = PBXBuildFile; fileRef = F011; };
 		B011 = {isa = PBXBuildFile; fileRef = F012; };
+		B012 = {isa = PBXBuildFile; fileRef = F015; };
+		B013 = {isa = PBXBuildFile; fileRef = F016; };
+		B014 = {isa = PBXBuildFile; fileRef = F017; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +58,9 @@
 		F010 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPriorityPolicyTests.swift; sourceTree = "<group>"; };
 		F012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListViewModelTests.swift; sourceTree = "<group>"; };
+		F015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPresentation.swift; sourceTree = "<group>"; };
+		F016 = {isa = PBXFileReference; lastKnownFileType = text.json; name = "thd-room-taxonomy.json"; path = "../shared/thd-room-taxonomy.json"; sourceTree = SOURCE_ROOT; };
+		F017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPresentationFormatterTests.swift; sourceTree = "<group>"; };
 		F013 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = THDRoomFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F014 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = THDRoomFinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -122,6 +128,7 @@
 			children = (
 				F003,
 				F004,
+				F015,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -193,6 +200,7 @@
 			isa = PBXGroup;
 			children = (
 				F00F,
+				F016,
 				F010,
 			);
 			path = Resources;
@@ -203,6 +211,7 @@
 			children = (
 				F011,
 				F012,
+				F017,
 			);
 			path = THDRoomFinderTests;
 			sourceTree = "<group>";
@@ -288,6 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B00F,
+				B013,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +322,7 @@
 				B00C,
 				B00D,
 				B00E,
+				B012,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,6 +332,7 @@
 			files = (
 				B010,
 				B011,
+				B014,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

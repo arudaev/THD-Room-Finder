@@ -9,14 +9,14 @@ struct FindFreeRoomsIntent: AppIntent {
     @Parameter(title: "When")
     var dateTime: Date?
 
-    @Parameter(title: "Building")
-    var building: BuildingIntentValue?
+    @Parameter(title: "Campus")
+    var campus: CampusIntentValue?
 
     func perform() async throws -> some IntentResult {
         let selectedDate = dateTime ?? Date()
         let query = RoomListQuery(
             selectedDate: selectedDate,
-            selectedBuilding: building?.rawValue,
+            selectedCampusKey: campus?.rawValue ?? "deggendorf",
             isCustomTime: dateTime != nil
         )
 

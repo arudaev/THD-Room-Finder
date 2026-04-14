@@ -1,25 +1,23 @@
 import SwiftUI
 
 struct RoomCardView: View {
-    let freeRoom: FreeRoom
+    let presentedRoom: PresentedFreeRoom
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(freeRoom.room.displayName)
+                    Text(presentedRoom.presentation.primaryLabel)
                         .font(.headline)
 
-                    if !roomDetails.isEmpty {
-                        Text(roomDetails)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text(presentedRoom.presentation.secondaryLabel)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
 
                 Spacer(minLength: 12)
 
-                Text(freeRoom.room.building)
+                Text(presentedRoom.presentation.location.groupLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 10)
@@ -31,10 +29,10 @@ struct RoomCardView: View {
             }
 
             HStack(spacing: 8) {
-                Image(systemName: freeRoom.freeUntil == nil ? "sparkles" : "clock")
+                Image(systemName: presentedRoom.freeRoom.freeUntil == nil ? "sparkles" : "clock")
                     .font(.footnote.weight(.semibold))
 
-                Text(availabilityText)
+                Text(presentedRoom.availabilityLabel)
                     .font(.subheadline.weight(.semibold))
 
                 Spacer()
@@ -48,27 +46,6 @@ struct RoomCardView: View {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .roomFinderSurface(cornerRadius: 24, tint: .teal.opacity(0.12))
-    }
-
-    private var roomDetails: String {
-        var details: [String] = []
-        if let floor = freeRoom.room.floor {
-            details.append("Floor \(floor)")
-        }
-        if freeRoom.room.seatsRegular > 0 {
-            details.append("\(freeRoom.room.seatsRegular) seats")
-        }
-        if freeRoom.room.seatsExam > 0 {
-            details.append("\(freeRoom.room.seatsExam) exam seats")
-        }
-        return details.joined(separator: " | ")
-    }
-
-    private var availabilityText: String {
-        if let freeUntil = freeRoom.freeUntil {
-            return "Free until \(freeUntil.formatted(date: .omitted, time: .shortened))"
-        }
-        return "Free all day"
     }
 }
 
@@ -119,40 +96,12 @@ extension View {
         fill: Color = Color.white.opacity(0.10),
         stroke: Color = Color.white.opacity(0.16),
     ) -> some View {
-        return self
+        self
             .background(.ultraThinMaterial, in: Capsule())
             .background(fill, in: Capsule())
             .overlay(
                 Capsule()
                     .strokeBorder(stroke, lineWidth: 1)
             )
-    }
-}
-
-#Preview("Room Card") {
-    ZStack {
-        RoomFinderScreenBackground()
-
-        RoomCardView(
-            freeRoom: FreeRoom(
-                room: Room(
-                    id: 1,
-                    ident: "A-101",
-                    name: "A101",
-                    building: "A",
-                    floor: 1,
-                    displayName: "A 101",
-                    seatsRegular: 32,
-                    seatsExam: 24,
-                    facilities: ["Projector"],
-                    bookable: true,
-                    inChargeName: nil,
-                    inChargeEmail: nil,
-                    untisLongname: nil
-                ),
-                freeUntil: Calendar.current.date(byAdding: .minute, value: 45, to: .now)
-            )
-        )
-        .padding()
     }
 }

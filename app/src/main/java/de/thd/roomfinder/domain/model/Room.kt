@@ -13,4 +13,5 @@ data class Room(
     val bookable: Boolean,
     val inChargeName: String?,
     val inChargeEmail: String?,
+    val untisLongname: String? = null,
 )

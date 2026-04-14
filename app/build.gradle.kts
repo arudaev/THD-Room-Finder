@@ -12,6 +12,12 @@ android {
         version = release(36)
     }
 
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("../shared")
+        }
+    }
+
     defaultConfig {
         applicationId = "de.thd.roomfinder"
         minSdk = 26

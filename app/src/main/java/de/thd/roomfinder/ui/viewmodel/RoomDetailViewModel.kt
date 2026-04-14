@@ -4,8 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.thd.roomfinder.domain.model.Room
 import de.thd.roomfinder.domain.model.ScheduledEvent
+import de.thd.roomfinder.domain.presentation.RoomPresentationFormatter
+import de.thd.roomfinder.domain.presentation.StudentFacingRoomPresentation
 import de.thd.roomfinder.domain.repository.RoomRepository
 import de.thd.roomfinder.domain.usecase.GetRoomScheduleUseCase
 import de.thd.roomfinder.util.Constants
@@ -21,10 +22,11 @@ import javax.inject.Inject
 
 data class RoomDetailUiState(
     val isLoading: Boolean = true,
-    val room: Room? = null,
+    val roomPresentation: StudentFacingRoomPresentation? = null,
     val events: List<ScheduledEvent> = emptyList(),
     val isFreeNow: Boolean = false,
     val freeUntil: LocalDateTime? = null,
+    val occupiedUntil: LocalDateTime? = null,
     val queryDateTime: LocalDateTime = LocalDateTime.now(),
     val errorMessage: String? = null,
 )
@@ -34,6 +36,7 @@ class RoomDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val roomRepository: RoomRepository,
     private val getRoomScheduleUseCase: GetRoomScheduleUseCase,
+    private val roomPresentationFormatter: RoomPresentationFormatter,
 ) : ViewModel() {
 
     private val roomId: Int = checkNotNull(savedStateHandle["roomId"])
@@ -70,6 +73,9 @@ class RoomDetailViewModel @Inject constructor(
             val isOccupied = events.any {
                 it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
             }
+            val currentEvent = events.firstOrNull {
+                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
+            }
             val freeUntil = if (!isOccupied) {
                 events
                     .filter { it.startDateTime > queryDateTime }
@@ -81,10 +87,11 @@ class RoomDetailViewModel @Inject constructor(
 
             _uiState.value = RoomDetailUiState(
                 isLoading = false,
-                room = room,
+                roomPresentation = roomPresentationFormatter.present(room),
                 events = events,
                 isFreeNow = !isOccupied,
                 freeUntil = freeUntil,
+                occupiedUntil = currentEvent?.endDateTime,
                 queryDateTime = queryDateTime,
             )
         }
@@ -100,11 +107,14 @@ class RoomDetailViewModel @Inject constructor(
     }
 
     private suspend fun refreshSilently() {
-        val room = _uiState.value.room ?: return
+        val room = _uiState.value.roomPresentation?.room ?: return
         val queryDateTime = _uiState.value.queryDateTime
 
         getRoomScheduleUseCase(room.ident, queryDateTime).onSuccess { events ->
             val isOccupied = events.any {
+                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
+            }
+            val currentEvent = events.firstOrNull {
                 it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
             }
             val freeUntil = if (!isOccupied) {
@@ -120,6 +130,7 @@ class RoomDetailViewModel @Inject constructor(
                 events = events,
                 isFreeNow = !isOccupied,
                 freeUntil = freeUntil,
+                occupiedUntil = currentEvent?.endDateTime,
             )
         }
     }

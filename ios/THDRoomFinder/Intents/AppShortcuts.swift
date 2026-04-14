@@ -14,9 +14,9 @@ struct THDRoomFinderShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: FindFreeRoomsIntent(),
             phrases: [
-                "Check rooms in \(\.$building) with \(.applicationName)",
+                "Check rooms on \(\.$campus) with \(.applicationName)",
             ],
-            shortTitle: "Check Building",
+            shortTitle: "Check Campus",
             systemImageName: "building.2"
         )
         AppShortcut(

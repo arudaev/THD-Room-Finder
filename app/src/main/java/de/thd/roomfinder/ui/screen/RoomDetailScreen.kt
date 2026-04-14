@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -28,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import de.thd.roomfinder.ui.component.RoomInfoSection
 import de.thd.roomfinder.ui.component.ScheduleCard
 import de.thd.roomfinder.ui.viewmodel.RoomDetailUiState
+import java.text.Normalizer
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 private val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM")
 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -44,7 +47,7 @@ internal fun RoomDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.room?.displayName ?: "Room Details") },
+                title = { Text(uiState.roomPresentation?.primaryLabel ?: "Room Details") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -84,13 +87,13 @@ internal fun RoomDetailScreen(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error,
                         )
-                        androidx.compose.material3.Button(onClick = onRetry) {
+                        Button(onClick = onRetry) {
                             Text("Retry")
                         }
                     }
                 }
             }
-            uiState.room != null -> {
+            uiState.roomPresentation != null -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -98,7 +101,7 @@ internal fun RoomDetailScreen(
                     contentPadding = PaddingValues(bottom = 16.dp),
                 ) {
                     item {
-                        RoomInfoSection(room = uiState.room)
+                        RoomInfoSection(roomPresentation = uiState.roomPresentation)
                     }
 
                     item {
@@ -116,27 +119,27 @@ internal fun RoomDetailScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = if (uiState.isFreeNow) "Available" else "Occupied",
+                                    text = if (uiState.isFreeNow) "Free now" else "Occupied now",
                                     style = MaterialTheme.typography.titleMedium,
                                 )
-                                if (uiState.isFreeNow && uiState.freeUntil != null) {
-                                    Text(
-                                        text = "Free until ${uiState.freeUntil.format(timeFormatter)}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                } else if (uiState.isFreeNow) {
-                                    Text(
-                                        text = "Free for the rest of the day",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                }
+                                Text(
+                                    text = when {
+                                        uiState.isFreeNow && uiState.freeUntil != null ->
+                                            "Free until ${uiState.freeUntil.format(timeFormatter)}"
+                                        uiState.isFreeNow -> "Free all day"
+                                        uiState.occupiedUntil != null ->
+                                            "Occupied until ${uiState.occupiedUntil.format(timeFormatter)}"
+                                        else -> "Occupied now"
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
                             }
                         }
                     }
 
                     item {
                         Text(
-                            text = "Schedule – ${uiState.queryDateTime.format(dateFormatter)}",
+                            text = "Schedule - ${uiState.queryDateTime.format(dateFormatter)}",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(16.dp),
                         )
@@ -158,6 +161,7 @@ internal fun RoomDetailScreen(
                         ) { event ->
                             ScheduleCard(
                                 event = event,
+                                displayTitle = meaningfulTitle(event.title, event.eventType),
                                 modifier = Modifier.padding(
                                     horizontal = 16.dp,
                                     vertical = 4.dp,
@@ -170,3 +174,19 @@ internal fun RoomDetailScreen(
         }
     }
 }
+
+private fun meaningfulTitle(title: String, eventType: String): String? {
+    val normalizedTitle = normalizeForComparison(title)
+    val normalizedType = normalizeForComparison(eventType)
+    if (normalizedTitle.isBlank() || normalizedTitle == "unknown" || normalizedTitle == normalizedType) {
+        return null
+    }
+    return title.trim()
+}
+
+private fun normalizeForComparison(value: String): String =
+    Normalizer.normalize(value, Normalizer.Form.NFD)
+        .replace(Regex("\\p{M}+"), "")
+        .replace("ß", "ss")
+        .lowercase(Locale.ROOT)
+        .trim()

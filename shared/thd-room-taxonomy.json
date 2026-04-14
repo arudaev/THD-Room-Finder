@@ -1,0 +1,727 @@
+{
+  "version": 1,
+  "campuses": [
+    {
+      "key": "deggendorf",
+      "label": "Deggendorf",
+      "sortOrder": 0,
+      "aliases": [
+        "deggendorf",
+        "main campus"
+      ]
+    },
+    {
+      "key": "pfarrkirchen_ecri",
+      "label": "Pfarrkirchen / ECRI",
+      "sortOrder": 1,
+      "aliases": [
+        "pfarrkirchen",
+        "ecri",
+        "european campus rottal-inn"
+      ]
+    },
+    {
+      "key": "cham",
+      "label": "Cham",
+      "sortOrder": 2,
+      "aliases": [
+        "cham",
+        "badstrasse",
+        "badstrasse campus"
+      ]
+    },
+    {
+      "key": "other_sites",
+      "label": "Other sites",
+      "sortOrder": 3,
+      "aliases": [
+        "other site",
+        "external"
+      ]
+    }
+  ],
+  "sites": [
+    {
+      "key": "deggendorf_main",
+      "campusKey": "deggendorf",
+      "label": "Main campus",
+      "sortOrder": 0,
+      "aliases": [
+        "main campus",
+        "deggendorf"
+      ]
+    },
+    {
+      "key": "deggs",
+      "campusKey": "deggendorf",
+      "label": "Deggs",
+      "sortOrder": 1,
+      "aliases": [
+        "deggs",
+        "degg's",
+        "asw"
+      ]
+    },
+    {
+      "key": "land_au",
+      "campusKey": "deggendorf",
+      "label": "Land-Au",
+      "sortOrder": 2,
+      "aliases": [
+        "land-au",
+        "land au",
+        "dms",
+        "gib",
+        "la 25",
+        "la 27",
+        "tcw"
+      ]
+    },
+    {
+      "key": "veilchengasse",
+      "campusKey": "deggendorf",
+      "label": "Veilchengasse",
+      "sortOrder": 3,
+      "aliases": [
+        "veilchengasse"
+      ]
+    },
+    {
+      "key": "am_stadtpark",
+      "campusKey": "deggendorf",
+      "label": "Am Stadtpark",
+      "sortOrder": 4,
+      "aliases": [
+        "am stadtpark",
+        "am ",
+        "am 1.",
+        "am 2.",
+        "am 3."
+      ]
+    },
+    {
+      "key": "pfarrkirchen_campus",
+      "campusKey": "pfarrkirchen_ecri",
+      "label": "ECRI",
+      "sortOrder": 0,
+      "aliases": [
+        "pfarrkirchen",
+        "ecri",
+        "ec",
+        "ec.b"
+      ]
+    },
+    {
+      "key": "cham_campus",
+      "campusKey": "cham",
+      "label": "Cham campus",
+      "sortOrder": 0,
+      "aliases": [
+        "cham",
+        "badstrasse"
+      ]
+    },
+    {
+      "key": "other_sites_general",
+      "campusKey": "other_sites",
+      "label": "Other sites",
+      "sortOrder": 0,
+      "aliases": [
+        "other site",
+        "external"
+      ]
+    }
+  ],
+  "buildings": [
+    {
+      "key": "deggendorf_a",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "A",
+      "patterns": [
+        "^a\\s*\\d",
+        "geb\\.\\s*a\\b",
+        "^a:"
+      ],
+      "aliases": [
+        "a"
+      ]
+    },
+    {
+      "key": "deggendorf_b",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "B",
+      "patterns": [
+        "^b\\s*\\d",
+        "geb\\.\\s*b\\b"
+      ],
+      "aliases": [
+        "b"
+      ]
+    },
+    {
+      "key": "deggendorf_c",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "C",
+      "patterns": [
+        "^c\\s*\\d",
+        "geb\\.\\s*c\\b"
+      ],
+      "aliases": [
+        "c"
+      ]
+    },
+    {
+      "key": "deggendorf_d",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "D",
+      "patterns": [
+        "^d\\s*\\d",
+        "geb\\.\\s*d\\b"
+      ],
+      "aliases": [
+        "d"
+      ]
+    },
+    {
+      "key": "deggendorf_e",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "E",
+      "patterns": [
+        "^e\\s*\\d",
+        "geb\\.\\s*e\\b",
+        "^e-stopper\\b"
+      ],
+      "aliases": [
+        "e"
+      ]
+    },
+    {
+      "key": "deggendorf_f",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "F",
+      "patterns": [
+        "geb\\.\\s*f\\b"
+      ],
+      "aliases": [
+        "f"
+      ]
+    },
+    {
+      "key": "deggendorf_g",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "G",
+      "patterns": [
+        "geb\\.\\s*g\\b"
+      ],
+      "aliases": [
+        "g"
+      ]
+    },
+    {
+      "key": "deggendorf_h",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "H",
+      "patterns": [
+        "geb\\.\\s*h\\b"
+      ],
+      "aliases": [
+        "h"
+      ]
+    },
+    {
+      "key": "deggendorf_i",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "I",
+      "patterns": [
+        "^i\\s*\\d",
+        "geb\\.\\s*i\\b",
+        "^besprechungsraum\\s+i\\b",
+        "^foyer\\s+i\\b"
+      ],
+      "aliases": [
+        "i"
+      ]
+    },
+    {
+      "key": "deggendorf_j",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "J",
+      "patterns": [
+        "^j\\s*\\d",
+        "geb\\.\\s*j\\b"
+      ],
+      "aliases": [
+        "j"
+      ]
+    },
+    {
+      "key": "deggendorf_k",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "K",
+      "patterns": [
+        "geb\\.\\s*k\\b"
+      ],
+      "aliases": [
+        "k"
+      ]
+    },
+    {
+      "key": "deggendorf_l",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "L",
+      "patterns": [
+        "geb\\.\\s*l\\b"
+      ],
+      "aliases": [
+        "l"
+      ]
+    },
+    {
+      "key": "deggendorf_itc_2_plus",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "ITC 2+",
+      "patterns": [
+        "^itc\\s*2\\+"
+      ],
+      "aliases": [
+        "itc 2+"
+      ]
+    },
+    {
+      "key": "deggendorf_itc_2",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "ITC 2",
+      "patterns": [
+        "^itc\\s*2\\b(?!\\+)"
+      ],
+      "aliases": [
+        "itc 2"
+      ]
+    },
+    {
+      "key": "deggendorf_sp",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "SP",
+      "patterns": [
+        "^sp\\s*\\d"
+      ],
+      "aliases": [
+        "sp"
+      ]
+    },
+    {
+      "key": "deggendorf_mensa",
+      "campusKey": "deggendorf",
+      "siteKey": "deggendorf_main",
+      "label": "Mensa",
+      "patterns": [
+        "^mensa\\b"
+      ],
+      "aliases": [
+        "mensa"
+      ]
+    },
+    {
+      "key": "deggendorf_deggs",
+      "campusKey": "deggendorf",
+      "siteKey": "deggs",
+      "label": "Deggs",
+      "patterns": [
+        "^deggs\\s*\\d",
+        "^degg'?s\\b"
+      ],
+      "aliases": [
+        "deggs",
+        "degg's"
+      ]
+    },
+    {
+      "key": "deggendorf_dms",
+      "campusKey": "deggendorf",
+      "siteKey": "land_au",
+      "label": "DMS",
+      "patterns": [
+        "^dms\\b"
+      ],
+      "aliases": [
+        "dms"
+      ]
+    },
+    {
+      "key": "deggendorf_gib",
+      "campusKey": "deggendorf",
+      "siteKey": "land_au",
+      "label": "GiB",
+      "patterns": [
+        "^gib\\b"
+      ],
+      "aliases": [
+        "gib"
+      ]
+    },
+    {
+      "key": "deggendorf_la_25",
+      "campusKey": "deggendorf",
+      "siteKey": "land_au",
+      "label": "LA 25",
+      "patterns": [
+        "^la\\s*25[- ]"
+      ],
+      "aliases": [
+        "la 25"
+      ]
+    },
+    {
+      "key": "deggendorf_la_27",
+      "campusKey": "deggendorf",
+      "siteKey": "land_au",
+      "label": "LA 27",
+      "patterns": [
+        "^la\\s*27[- ]"
+      ],
+      "aliases": [
+        "la 27"
+      ]
+    },
+    {
+      "key": "deggendorf_tcw",
+      "campusKey": "deggendorf",
+      "siteKey": "land_au",
+      "label": "TCW",
+      "patterns": [
+        "^tcw\\b"
+      ],
+      "aliases": [
+        "tcw"
+      ]
+    },
+    {
+      "key": "deggendorf_veilchengasse",
+      "campusKey": "deggendorf",
+      "siteKey": "veilchengasse",
+      "label": "Veilchengasse",
+      "patterns": [
+        "veilchengasse"
+      ],
+      "aliases": [
+        "veilchengasse"
+      ]
+    },
+    {
+      "key": "deggendorf_am_stadtpark",
+      "campusKey": "deggendorf",
+      "siteKey": "am_stadtpark",
+      "label": "Am Stadtpark",
+      "patterns": [
+        "^am\\s*\\d",
+        "am stadtpark"
+      ],
+      "aliases": [
+        "am stadtpark",
+        "am"
+      ]
+    },
+    {
+      "key": "pfarrkirchen_ec_b",
+      "campusKey": "pfarrkirchen_ecri",
+      "siteKey": "pfarrkirchen_campus",
+      "label": "EC.B",
+      "patterns": [
+        "^ec\\.b\\b"
+      ],
+      "aliases": [
+        "ec.b"
+      ]
+    },
+    {
+      "key": "pfarrkirchen_ec",
+      "campusKey": "pfarrkirchen_ecri",
+      "siteKey": "pfarrkirchen_campus",
+      "label": "EC",
+      "patterns": [
+        "^ec\\s",
+        "^ec\\b(?!\\.b)"
+      ],
+      "aliases": [
+        "ec"
+      ]
+    },
+    {
+      "key": "cham_a",
+      "campusKey": "cham",
+      "siteKey": "cham_campus",
+      "label": "A",
+      "patterns": [
+        "^a\\s*\\d.*badstrasse",
+        "^a\\s*\\d.*badstra",
+        "^a\\s*\\d.*cham"
+      ],
+      "aliases": [
+        "a",
+        "badstrasse a"
+      ]
+    },
+    {
+      "key": "cham_b",
+      "campusKey": "cham",
+      "siteKey": "cham_campus",
+      "label": "B",
+      "patterns": [
+        "^b\\s*\\d.*badstrasse",
+        "^b\\s*\\d.*badstra",
+        "^b\\s*\\d.*cham"
+      ],
+      "aliases": [
+        "b",
+        "badstrasse b"
+      ]
+    }
+  ],
+  "roomCodePatterns": [
+    "^(ITC\\s*2\\+\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(ITC\\s*2\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(EC\\.B\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(EC\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(LA\\s*\\d+[- ]\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(Deggs\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(DMS\\s*[A-Z]?\\d+(?:\\.\\d+)*)",
+    "^(GiB\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(TCW\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(SP\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^(AM\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)",
+    "^([A-L]\\s*\\d+(?:\\.\\d+)*(?:\\s*[A-Za-z](?=\\s*\\(|$))?)"
+  ],
+  "roomKinds": [
+    {
+      "key": "lecture_hall",
+      "label": "Lecture hall",
+      "keywords": [
+        "hoersaal",
+        "vorlesungssaal",
+        "hs "
+      ]
+    },
+    {
+      "key": "computer_room",
+      "label": "Computer room",
+      "keywords": [
+        "computerraum",
+        "edv",
+        "cyber resilience"
+      ]
+    },
+    {
+      "key": "lab",
+      "label": "Lab",
+      "keywords": [
+        "labor",
+        " lab",
+        "embedded / iot",
+        "sensor lab",
+        "it lab",
+        "hpc",
+        "robotik",
+        "bim/cad",
+        "light lab",
+        "ecolab"
+      ]
+    },
+    {
+      "key": "seminar_room",
+      "label": "Seminar room",
+      "keywords": [
+        "seminarraum",
+        "seminar-/edv-raum",
+        "seminar room"
+      ]
+    },
+    {
+      "key": "classroom",
+      "label": "Classroom",
+      "keywords": [
+        "classroom"
+      ]
+    },
+    {
+      "key": "meeting_room",
+      "label": "Meeting room",
+      "keywords": [
+        "besprechungsraum",
+        "konferenz",
+        "shared office",
+        "office"
+      ]
+    },
+    {
+      "key": "foyer",
+      "label": "Foyer",
+      "keywords": [
+        "foyer"
+      ]
+    },
+    {
+      "key": "cafeteria",
+      "label": "Cafeteria",
+      "keywords": [
+        "mensa",
+        "cafeteria"
+      ]
+    },
+    {
+      "key": "outdoor_area",
+      "label": "Outdoor area",
+      "keywords": [
+        "vorplatz",
+        "outdoor"
+      ]
+    },
+    {
+      "key": "sports_facility",
+      "label": "Sports facility",
+      "keywords": [
+        "turnhalle",
+        "bewegungsraum",
+        "studio / werkstatt"
+      ]
+    },
+    {
+      "key": "library",
+      "label": "Library",
+      "keywords": [
+        "bibliothek",
+        "library"
+      ]
+    },
+    {
+      "key": "event_venue",
+      "label": "Event venue",
+      "keywords": [
+        "kulturraum",
+        "begegnungsstaette",
+        "pavillon",
+        "stadthalle"
+      ]
+    },
+    {
+      "key": "workspace",
+      "label": "Workspace",
+      "keywords": [
+        "co-working",
+        "coworking",
+        "silentbox"
+      ]
+    },
+    {
+      "key": "unknown",
+      "label": "Room",
+      "keywords": []
+    }
+  ],
+  "visibilityRules": [
+    {
+      "key": "placeholder",
+      "visibilityClass": "exclude_default",
+      "patterns": [
+        "^--+$",
+        "^\\d{2,3}\\.\\d+\\.\\d+$"
+      ]
+    },
+    {
+      "key": "exclude_misc",
+      "visibilityClass": "exclude_default",
+      "patterns": [
+        "vorplatz",
+        "turnhalle",
+        "mensa",
+        "cafeteria",
+        "bibliothek",
+        "library",
+        "stadthalle",
+        "fernsehstudio",
+        "glashaus",
+        "dig\\. infodisplay",
+        "e-stopper",
+        "silentbox"
+      ]
+    },
+    {
+      "key": "secondary_venues",
+      "visibilityClass": "secondary_venue",
+      "patterns": [
+        "besprechungsraum",
+        "konferenzsaal",
+        "kulturraum",
+        "foyer",
+        "begegnungsstaette",
+        "pavillon",
+        "coworking",
+        "co-working",
+        "workspace",
+        "shared office"
+      ]
+    },
+    {
+      "key": "teaching_keywords",
+      "visibilityClass": "teaching_room",
+      "patterns": [
+        "hoersaal",
+        "vorlesungssaal",
+        "seminarraum",
+        "seminar-/edv-raum",
+        "edv",
+        "computerraum",
+        "labor",
+        " lab",
+        "werkstatt"
+      ]
+    },
+    {
+      "key": "coded_room",
+      "visibilityClass": "teaching_room",
+      "patterns": [
+        "^[a-z]{1,6}[\\s:+-]*\\d"
+      ]
+    }
+  ],
+  "exceptionRules": [
+    {
+      "pattern": "^vorplatz\\s+geb\\.\\s+([a-l])$",
+      "buildingLabel": "$1",
+      "roomKindKey": "outdoor_area",
+      "visibilityClass": "exclude_default"
+    },
+    {
+      "pattern": "^konferenzsaal\\b",
+      "roomKindKey": "event_venue",
+      "visibilityClass": "secondary_venue"
+    },
+    {
+      "pattern": "^kulturraum\\b",
+      "roomKindKey": "event_venue",
+      "visibilityClass": "secondary_venue"
+    },
+    {
+      "pattern": "^turnhalle\\s+schulzentrum\\b",
+      "campusKey": "other_sites",
+      "siteKey": "other_sites_general",
+      "buildingLabel": "Schulzentrum",
+      "roomKindKey": "sports_facility",
+      "visibilityClass": "exclude_default"
+    }
+  ]
+}

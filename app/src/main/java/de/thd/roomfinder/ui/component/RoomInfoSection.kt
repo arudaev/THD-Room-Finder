@@ -10,50 +10,54 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.thd.roomfinder.domain.model.Room
-import de.thd.roomfinder.ui.theme.THDRoomFinderTheme
+import de.thd.roomfinder.domain.presentation.StudentFacingRoomPresentation
+
 @Composable
 internal fun RoomInfoSection(
-    room: Room,
+    roomPresentation: StudentFacingRoomPresentation,
     modifier: Modifier = Modifier,
 ) {
+    val room = roomPresentation.room
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(
-            text = room.name,
+            text = roomPresentation.primaryLabel,
             style = MaterialTheme.typography.headlineMedium,
         )
 
         Text(
-            text = buildString {
-                append("Building ${room.building}")
-                room.floor?.let { append(" · Floor $it") }
-            },
+            text = roomPresentation.secondaryLabel,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        if (room.seatsRegular > 0 || room.seatsExam > 0) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (room.seatsRegular > 0) {
-                    Text(
-                        text = "${room.seatsRegular} regular seats",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-                if (room.seatsExam > 0) {
-                    Text(
-                        text = "${room.seatsExam} exam seats",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
+        if (roomPresentation.location.detailPath.isNotBlank()) {
+            Text(
+                text = roomPresentation.location.detailPath,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        Text(
+            text = "Original THabella label: ${roomPresentation.rawLabel}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        val details = buildDetails(room)
+        if (details.isNotEmpty()) {
+            Text(
+                text = details.joinToString(" · "),
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
 
         if (room.facilities.isNotEmpty()) {
@@ -88,25 +92,8 @@ internal fun RoomInfoSection(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun RoomInfoSectionPreview() {
-    THDRoomFinderTheme {
-        RoomInfoSection(
-            room = Room(
-                id = 1,
-                ident = "I112",
-                name = "I 112",
-                building = "I",
-                floor = 1,
-                displayName = "I 112",
-                seatsRegular = 40,
-                seatsExam = 20,
-                facilities = listOf("Beamer", "Whiteboard", "Mikrofon"),
-                bookable = true,
-                inChargeName = "Prof. Dr. Müller",
-                inChargeEmail = "mueller@th-deg.de",
-            ),
-        )
-    }
+private fun buildDetails(room: Room): List<String> = buildList {
+    room.floor?.let { add("Floor $it") }
+    if (room.seatsRegular > 0) add("${room.seatsRegular} seats")
+    if (room.seatsExam > 0) add("${room.seatsExam} exam seats")
 }

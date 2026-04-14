@@ -23,6 +23,7 @@ internal fun RoomDto.toDomainModel(): Room {
             "${it.firstname.orEmpty()} ${it.lastname.orEmpty()}".trim()
         }?.takeIf { it.isNotBlank() },
         inChargeEmail = inCharge?.email?.takeIf { it.isNotBlank() },
+        untisLongname = untisLongname?.takeIf { it.isNotBlank() },
     )
 }
 

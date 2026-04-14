@@ -23,6 +23,7 @@ internal fun Room.toEntity(): RoomEntity = RoomEntity(
     bookable = bookable,
     inChargeName = inChargeName,
     inChargeEmail = inChargeEmail,
+    untisLongname = untisLongname,
 )
 
 internal fun RoomEntity.toDomainModel(): Room = Room(
@@ -39,6 +40,7 @@ internal fun RoomEntity.toDomainModel(): Room = Room(
     bookable = bookable,
     inChargeName = inChargeName,
     inChargeEmail = inChargeEmail,
+    untisLongname = untisLongname,
 )
 
 internal fun ScheduledEvent.toEntity(dateKey: String): ScheduledEventEntity =

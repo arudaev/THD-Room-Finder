@@ -20,6 +20,7 @@ object TestFixtures {
         bookable: Boolean = true,
         inChargeName: String? = "Max Mueller",
         inChargeEmail: String? = "max.mueller@th-deg.de",
+        untisLongname: String? = null,
     ): Room = Room(
         id = id,
         ident = ident,
@@ -33,6 +34,7 @@ object TestFixtures {
         bookable = bookable,
         inChargeName = inChargeName,
         inChargeEmail = inChargeEmail,
+        untisLongname = untisLongname,
     )
 
     fun event(
