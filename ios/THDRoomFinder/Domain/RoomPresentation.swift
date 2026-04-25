@@ -172,7 +172,7 @@ final class RoomPresentationFormatter {
     private let roomCodePatterns: [NSRegularExpression]
     private let buildingRules: [CompiledBuildingRule]
 
-    init() {
+    convenience init() {
         self.init(taxonomy: RoomPresentationFormatter.loadTaxonomy())
     }
 
