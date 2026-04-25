@@ -28,6 +28,9 @@ struct ThabellaAPIClient {
         return response.flatMap { $0.toDomainModels() }.sorted { $0.startDateTime < $1.startDateTime }
     }
 
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+
     private func post<Response: Decodable, RequestBody: Encodable>(
         url: URL,
         requestBody: RequestBody
@@ -35,7 +38,7 @@ struct ThabellaAPIClient {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(requestBody)
+        request.httpBody = try Self.encoder.encode(requestBody)
 
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse,
@@ -43,8 +46,7 @@ struct ThabellaAPIClient {
             throw URLError(.badServerResponse)
         }
 
-        let decoder = JSONDecoder()
-        return try decoder.decode(Response.self, from: data)
+        return try Self.decoder.decode(Response.self, from: data)
     }
 
     private static let remoteDateFormatter: DateFormatter = {

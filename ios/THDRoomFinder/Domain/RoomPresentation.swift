@@ -100,6 +100,18 @@ struct NormalizedRoomLocation: Hashable {
     let friendlyLabel: String
     let sortKey: String
     let detailPath: String
+
+    func withSortKey(_ newSortKey: String) -> NormalizedRoomLocation {
+        NormalizedRoomLocation(
+            campusKey: campusKey, campus: campus,
+            siteKey: siteKey, site: site,
+            buildingKey: buildingKey, building: building,
+            groupKey: groupKey, groupLabel: groupLabel,
+            roomCode: roomCode, roomKind: roomKind,
+            visibilityClass: visibilityClass, friendlyLabel: friendlyLabel,
+            sortKey: newSortKey, detailPath: detailPath
+        )
+    }
 }
 
 struct StudentFacingRoomPresentation: Hashable {
@@ -109,6 +121,14 @@ struct StudentFacingRoomPresentation: Hashable {
     let secondaryLabel: String
     let friendlyRoomKind: String
     let rawLabel: String
+
+    func withLocation(_ newLocation: NormalizedRoomLocation) -> StudentFacingRoomPresentation {
+        StudentFacingRoomPresentation(
+            room: room, location: newLocation,
+            primaryLabel: primaryLabel, secondaryLabel: secondaryLabel,
+            friendlyRoomKind: friendlyRoomKind, rawLabel: rawLabel
+        )
+    }
 }
 
 struct PresentedFreeRoom: Identifiable, Hashable {
@@ -175,14 +195,14 @@ final class RoomPresentationFormatter {
             .map(present)
             .filter { visibilityMode.includes($0.presentation.location.visibilityClass) }
 
+        let countByCampus = Dictionary(
+            visibleByMode.map { ($0.presentation.location.campusKey, 1) },
+            uniquingKeysWith: +
+        )
         let campusFilters = taxonomy.campuses
             .sorted(by: { $0.sortOrder < $1.sortOrder })
             .map { campus in
-                RoomFilterOption(
-                    key: campus.key,
-                    label: campus.label,
-                    count: visibleByMode.filter { $0.presentation.location.campusKey == campus.key }.count
-                )
+                RoomFilterOption(key: campus.key, label: campus.label, count: countByCampus[campus.key] ?? 0)
             }
 
         let roomsForCampus = visibleByMode.filter { $0.presentation.location.campusKey == selectedCampusKey }
@@ -288,31 +308,10 @@ final class RoomPresentationFormatter {
             ? "00|9999|\(presentation.primaryLabel.lowercased())"
             : "01|\(descendingFreeUntilKey)|\(presentation.primaryLabel.lowercased())"
 
+        let sortKey = "\(sectionSortKey(for: presentation.location))|\(availabilitySortKey)"
         return PresentedFreeRoom(
             freeRoom: freeRoom,
-            presentation: StudentFacingRoomPresentation(
-                room: presentation.room,
-                location: NormalizedRoomLocation(
-                    campusKey: presentation.location.campusKey,
-                    campus: presentation.location.campus,
-                    siteKey: presentation.location.siteKey,
-                    site: presentation.location.site,
-                    buildingKey: presentation.location.buildingKey,
-                    building: presentation.location.building,
-                    groupKey: presentation.location.groupKey,
-                    groupLabel: presentation.location.groupLabel,
-                    roomCode: presentation.location.roomCode,
-                    roomKind: presentation.location.roomKind,
-                    visibilityClass: presentation.location.visibilityClass,
-                    friendlyLabel: presentation.location.friendlyLabel,
-                    sortKey: "\(sectionSortKey(for: presentation.location))|\(availabilitySortKey)",
-                    detailPath: presentation.location.detailPath
-                ),
-                primaryLabel: presentation.primaryLabel,
-                secondaryLabel: presentation.secondaryLabel,
-                friendlyRoomKind: presentation.friendlyRoomKind,
-                rawLabel: presentation.rawLabel
-            ),
+            presentation: presentation.withLocation(presentation.location.withSortKey(sortKey)),
             availabilityLabel: availabilityLabel(freeUntil: freeRoom.freeUntil)
         )
     }

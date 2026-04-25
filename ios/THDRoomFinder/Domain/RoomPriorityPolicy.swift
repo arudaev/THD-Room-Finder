@@ -50,15 +50,9 @@ enum RoomPriorityPolicy {
     }
 
     private static func searchableText(for room: Room) -> String {
-        [
-            room.name,
-            room.displayName,
-            room.building,
-            room.untisLongname ?? "",
-            room.facilities.joined(separator: " "),
-        ]
-        .joined(separator: " ")
-        .normalizeForMatching()
+        [room.name, room.displayName, room.building, room.untisLongname ?? "", room.facilities.joined(separator: " ")]
+            .joined(separator: " ")
+            .normalizedForMatching()
     }
 
     private static func containsWord(_ word: String, in text: String) -> Bool {
@@ -69,12 +63,17 @@ enum RoomPriorityPolicy {
 }
 
 private extension String {
-    func normalizeForMatching() -> String {
-        lowercased()
-            .replacingOccurrences(of: "ä", with: "ae")
-            .replacingOccurrences(of: "ö", with: "oe")
-            .replacingOccurrences(of: "ü", with: "ue")
-            .replacingOccurrences(of: "ß", with: "ss")
+    func normalizedForMatching() -> String {
+        replacingOccurrences(of: "\u{00C4}", with: "Ae")
+            .replacingOccurrences(of: "\u{00D6}", with: "Oe")
+            .replacingOccurrences(of: "\u{00DC}", with: "Ue")
+            .replacingOccurrences(of: "\u{00E4}", with: "ae")
+            .replacingOccurrences(of: "\u{00F6}", with: "oe")
+            .replacingOccurrences(of: "\u{00FC}", with: "ue")
+            .replacingOccurrences(of: "\u{00DF}", with: "ss")
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
