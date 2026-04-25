@@ -126,7 +126,9 @@ class RoomPresentationFormatter(
 
     private val campusesByKey = taxonomy.campuses.associateBy { it.key }
     private val sitesByKey = taxonomy.sites.associateBy { it.key }
-    private val roomKinds = taxonomy.roomKinds.map { CompiledRoomKind(it) }
+    private val roomKinds = taxonomy.roomKinds.map { rule ->
+        CompiledRoomKind(rule, rule.keywords.map(::normalizeForMatching))
+    }
     private val visibilityRules = taxonomy.visibilityRules.map { CompiledVisibilityRule(it) }
     private val exceptionRules = taxonomy.exceptionRules.map { CompiledExceptionRule(it) }
     private val roomCodePatterns = taxonomy.roomCodePatterns.map {
@@ -151,14 +153,11 @@ class RoomPresentationFormatter(
             .map { present(it) }
             .filter { visibilityMode.includes(it.presentation.location.visibilityClass) }
 
+        val countByCampus = visibleByMode.groupingBy { it.presentation.location.campusKey }.eachCount()
         val campusFilters = taxonomy.campuses
             .sortedBy { it.sortOrder }
             .map { campus ->
-                RoomFilterOption(
-                    key = campus.key,
-                    label = campus.label,
-                    count = visibleByMode.count { it.presentation.location.campusKey == campus.key },
-                )
+                RoomFilterOption(key = campus.key, label = campus.label, count = countByCampus[campus.key] ?: 0)
             }
 
         val roomsForCampus = visibleByMode.filter {
@@ -534,14 +533,8 @@ class RoomPresentationFormatter(
 
     private data class CompiledRoomKind(
         val rule: TaxonomyRoomKind,
-    ) {
-        val keywords: List<String> = rule.keywords.map { keyword ->
-            Normalizer.normalize(keyword, Normalizer.Form.NFD)
-                .replace(Regex("\\p{M}+"), "")
-                .replace("ß", "ss")
-                .lowercase(Locale.ROOT)
-        }
-    }
+        val keywords: List<String>,
+    )
 
     private data class CompiledVisibilityRule(
         val rule: TaxonomyVisibilityRule,

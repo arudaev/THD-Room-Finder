@@ -67,31 +67,16 @@ class RoomDetailViewModel @Inject constructor(
                 return@launch
             }
 
-            val events = getRoomScheduleUseCase(room.ident, queryDateTime)
-                .getOrDefault(emptyList())
-
-            val isOccupied = events.any {
-                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
-            }
-            val currentEvent = events.firstOrNull {
-                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
-            }
-            val freeUntil = if (!isOccupied) {
-                events
-                    .filter { it.startDateTime > queryDateTime }
-                    .minByOrNull { it.startDateTime }
-                    ?.startDateTime
-            } else {
-                null
-            }
+            val events = getRoomScheduleUseCase(room.ident, queryDateTime).getOrDefault(emptyList())
+            val occupancy = computeOccupancy(events, queryDateTime)
 
             _uiState.value = RoomDetailUiState(
                 isLoading = false,
                 roomPresentation = roomPresentationFormatter.present(room),
                 events = events,
-                isFreeNow = !isOccupied,
-                freeUntil = freeUntil,
-                occupiedUntil = currentEvent?.endDateTime,
+                isFreeNow = !occupancy.isOccupied,
+                freeUntil = occupancy.freeUntil,
+                occupiedUntil = occupancy.occupiedUntil,
                 queryDateTime = queryDateTime,
             )
         }
@@ -111,27 +96,36 @@ class RoomDetailViewModel @Inject constructor(
         val queryDateTime = _uiState.value.queryDateTime
 
         getRoomScheduleUseCase(room.ident, queryDateTime).onSuccess { events ->
-            val isOccupied = events.any {
-                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
-            }
-            val currentEvent = events.firstOrNull {
-                it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime
-            }
-            val freeUntil = if (!isOccupied) {
-                events
-                    .filter { it.startDateTime > queryDateTime }
-                    .minByOrNull { it.startDateTime }
-                    ?.startDateTime
-            } else {
-                null
-            }
-
-            _uiState.value = _uiState.value.copy(
+            val occupancy = computeOccupancy(events, queryDateTime)
+            val current = _uiState.value
+            if (events == current.events &&
+                !occupancy.isOccupied == current.isFreeNow &&
+                occupancy.freeUntil == current.freeUntil &&
+                occupancy.occupiedUntil == current.occupiedUntil
+            ) return@onSuccess
+            _uiState.value = current.copy(
                 events = events,
-                isFreeNow = !isOccupied,
-                freeUntil = freeUntil,
-                occupiedUntil = currentEvent?.endDateTime,
+                isFreeNow = !occupancy.isOccupied,
+                freeUntil = occupancy.freeUntil,
+                occupiedUntil = occupancy.occupiedUntil,
             )
         }
+    }
+
+    private data class OccupancySnapshot(
+        val isOccupied: Boolean,
+        val freeUntil: LocalDateTime?,
+        val occupiedUntil: LocalDateTime?,
+    )
+
+    private fun computeOccupancy(events: List<ScheduledEvent>, queryDateTime: LocalDateTime): OccupancySnapshot {
+        val currentEvent = events.firstOrNull { it.startDateTime <= queryDateTime && it.endDateTime > queryDateTime }
+        val isOccupied = currentEvent != null
+        val freeUntil = if (!isOccupied) {
+            events.filter { it.startDateTime > queryDateTime }.minByOrNull { it.startDateTime }?.startDateTime
+        } else {
+            null
+        }
+        return OccupancySnapshot(isOccupied, freeUntil, currentEvent?.endDateTime)
     }
 }

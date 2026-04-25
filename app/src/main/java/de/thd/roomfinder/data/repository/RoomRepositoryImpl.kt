@@ -38,9 +38,9 @@ internal class RoomRepositoryImpl @Inject constructor(
     private var cachedRooms: List<Room>? = null
 
     override suspend fun getAllRooms(): Result<List<Room>> {
-        // Check local cache freshness
         val metadata = cacheMetadataDao.get(ROOMS_CACHE_KEY)
         if (metadata != null && isFresh(metadata.timestamp, ROOMS_TTL_MS)) {
+            cachedRooms?.let { return Result.success(it) }
             val localRooms = roomDao.getAllRooms().map { it.toDomainModel() }
             if (localRooms.isNotEmpty()) {
                 cachedRooms = localRooms
@@ -48,7 +48,6 @@ internal class RoomRepositoryImpl @Inject constructor(
             }
         }
 
-        // Try network
         return runCatching {
             apiService.findRooms().map { it.toDomainModel() }
         }.onSuccess { rooms ->
@@ -59,7 +58,6 @@ internal class RoomRepositoryImpl @Inject constructor(
                 CacheMetadataEntity(ROOMS_CACHE_KEY, System.currentTimeMillis()),
             )
         }.recoverCatching { networkError ->
-            // Network failed — try local fallback
             val localRooms = roomDao.getAllRooms().map { it.toDomainModel() }
             if (localRooms.isNotEmpty()) {
                 cachedRooms = localRooms
@@ -90,15 +88,11 @@ internal class RoomRepositoryImpl @Inject constructor(
         val dateKey = dateTime.format(dateFormatter)
         val cacheKey = "$EVENTS_CACHE_PREFIX$dateKey"
 
-        // Check local cache freshness
         val metadata = cacheMetadataDao.get(cacheKey)
         if (metadata != null && isFresh(metadata.timestamp, EVENTS_TTL_MS)) {
-            val localEvents = scheduledEventDao.getEventsByDate(dateKey)
-                .map { it.toDomainModel() }
-            return Result.success(localEvents)
+            return Result.success(scheduledEventDao.getEventsByDate(dateKey).map { it.toDomainModel() })
         }
 
-        // Try network
         return runCatching {
             val formatted = dateTime.format(dateTimeFormatter)
             apiService.findPeriodsByDate(
@@ -112,14 +106,8 @@ internal class RoomRepositoryImpl @Inject constructor(
                 CacheMetadataEntity(cacheKey, System.currentTimeMillis()),
             )
         }.recoverCatching { networkError ->
-            // Network failed — try local fallback
-            val localEvents = scheduledEventDao.getEventsByDate(dateKey)
-                .map { it.toDomainModel() }
-            if (localEvents.isNotEmpty()) {
-                localEvents
-            } else {
-                throw networkError
-            }
+            val localEvents = scheduledEventDao.getEventsByDate(dateKey).map { it.toDomainModel() }
+            if (localEvents.isNotEmpty()) localEvents else throw networkError
         }
     }
 

@@ -12,6 +12,7 @@ import de.thd.roomfinder.domain.presentation.RoomPresentationFormatter
 import de.thd.roomfinder.domain.presentation.RoomVisibilityMode
 import de.thd.roomfinder.domain.usecase.GetFreeRoomsUseCase
 import de.thd.roomfinder.util.Constants
+import de.thd.roomfinder.util.Constants.DEFAULT_CAMPUS_KEY
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +28,7 @@ data class RoomListUiState(
     val sections: List<RoomListSection> = emptyList(),
     val campusFilters: List<RoomFilterOption> = emptyList(),
     val groupFilters: List<RoomFilterOption> = emptyList(),
-    val selectedCampusKey: String = "deggendorf",
+    val selectedCampusKey: String = DEFAULT_CAMPUS_KEY,
     val selectedGroupKey: String? = null,
     val visibilityMode: RoomVisibilityMode = RoomVisibilityMode.TEACHING_ONLY,
     val selectedDateTime: LocalDateTime = LocalDateTime.now(),
@@ -57,12 +58,7 @@ class RoomListViewModel @Inject constructor(
             getFreeRoomsUseCase(dateTime).fold(
                 onSuccess = { freeRooms ->
                     _uiState.value = rebuildPresentation(
-                        current = _uiState.value.copy(
-                            isLoading = false,
-                            freeRooms = freeRooms,
-                        ),
-                    ).copy(
-                        isLoading = false,
+                        current = _uiState.value.copy(isLoading = false, freeRooms = freeRooms),
                     )
                 },
                 onFailure = { error ->
@@ -182,11 +178,7 @@ class RoomListViewModel @Inject constructor(
         requestedCampusKey: String,
     ): String {
         val knownKeys = presentation.campusFilters.mapNotNull { it.key }.toSet()
-        return if (requestedCampusKey in knownKeys) {
-            requestedCampusKey
-        } else {
-            "deggendorf"
-        }
+        return if (requestedCampusKey in knownKeys) requestedCampusKey else DEFAULT_CAMPUS_KEY
     }
 
     private fun sanitizeGroupKey(
