@@ -172,7 +172,11 @@ final class RoomPresentationFormatter {
     private let roomCodePatterns: [NSRegularExpression]
     private let buildingRules: [CompiledBuildingRule]
 
-    init(taxonomy: RoomTaxonomy = RoomPresentationFormatter.loadTaxonomy()) {
+    init() {
+        self.init(taxonomy: RoomPresentationFormatter.loadTaxonomy())
+    }
+
+    private init(taxonomy: RoomTaxonomy) {
         self.taxonomy = taxonomy
         self.campusesByKey = Dictionary(uniqueKeysWithValues: taxonomy.campuses.map { ($0.key, $0) })
         self.sitesByKey = Dictionary(uniqueKeysWithValues: taxonomy.sites.map { ($0.key, $0) })

@@ -22,8 +22,8 @@ actor RoomRepository: RoomRepositoryProviding {
 
     private let apiClient: ThabellaAPIClient
     private let cacheStore: RoomCacheStore
-    private let roomCacheTTL: TimeInterval = Self.roomsTTL
-    private let eventsCacheTTL: TimeInterval = Self.eventsTTL
+    private let roomCacheTTL: TimeInterval = RoomRepository.roomsTTL
+    private let eventsCacheTTL: TimeInterval = RoomRepository.eventsTTL
     private var inMemoryRooms: [Room]?
 
     init(
