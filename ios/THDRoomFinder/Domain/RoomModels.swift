@@ -36,16 +36,22 @@ struct ScheduledEvent: Identifiable, Codable, Hashable {
 
 struct RoomListQuery: Hashable {
     let selectedDate: Date
-    let selectedBuilding: String?
+    let selectedCampusKey: String
+    let selectedGroupKey: String?
+    let visibilityMode: RoomVisibilityMode
     let isCustomTime: Bool
 
     init(
         selectedDate: Date = Date(),
-        selectedBuilding: String? = nil,
+        selectedCampusKey: String = "deggendorf",
+        selectedGroupKey: String? = nil,
+        visibilityMode: RoomVisibilityMode = .teachingOnly,
         isCustomTime: Bool = false
     ) {
         self.selectedDate = selectedDate
-        self.selectedBuilding = selectedBuilding
+        self.selectedCampusKey = selectedCampusKey
+        self.selectedGroupKey = selectedGroupKey
+        self.visibilityMode = visibilityMode
         self.isCustomTime = isCustomTime
     }
 }

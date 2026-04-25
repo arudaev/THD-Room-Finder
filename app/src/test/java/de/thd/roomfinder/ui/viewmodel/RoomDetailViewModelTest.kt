@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import de.thd.roomfinder.TestFixtures
 import de.thd.roomfinder.data.repository.FakeRoomRepository
+import de.thd.roomfinder.domain.presentation.RoomPresentationFormatter
 import de.thd.roomfinder.domain.usecase.GetRoomScheduleUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +30,7 @@ class RoomDetailViewModelTest {
 
     private lateinit var fakeRepository: FakeRoomRepository
     private lateinit var useCase: GetRoomScheduleUseCase
+    private lateinit var formatter: RoomPresentationFormatter
     private val testDispatcher = StandardTestDispatcher()
 
     private val queryDateTime = LocalDateTime.of(2025, 1, 15, 10, 30)
@@ -39,6 +41,7 @@ class RoomDetailViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeRoomRepository()
         useCase = GetRoomScheduleUseCase(fakeRepository)
+        formatter = RoomPresentationFormatter.fromRepositoryRoot()
     }
 
     @After
@@ -53,12 +56,18 @@ class RoomDetailViewModelTest {
                 "dateTimeEpoch" to queryEpoch,
             ),
         )
-        return RoomDetailViewModel(savedStateHandle, fakeRepository, useCase)
+        return RoomDetailViewModel(savedStateHandle, fakeRepository, useCase, formatter)
     }
 
     @Test
-    fun `loads room and schedule from arguments`() = runTest(testDispatcher) {
-        val room = TestFixtures.room(id = 1, ident = "I112")
+    fun `loads room presentation and schedule from arguments`() = runTest(testDispatcher) {
+        val room = TestFixtures.room(
+            id = 1,
+            ident = "I112",
+            name = "ITC 2+ 1.31 (Labor Cyber Resilience)",
+            building = "ITC 2+",
+            displayName = "Labor Cyber Resilience",
+        )
         fakeRepository.roomsResult = Result.success(listOf(room))
         fakeRepository.eventsResult = Result.success(
             listOf(
@@ -71,41 +80,21 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel(roomId = 1)
-        runCurrent()
-        val state = viewModel.uiState.value
+        try {
+            runCurrent()
+            val state = viewModel.uiState.value
 
-        assertFalse(state.isLoading)
-        assertNotNull(state.room)
-        assertEquals("I112", state.room!!.ident)
-        assertEquals(1, state.events.size)
-
-        viewModel.viewModelScope.cancel()
+            assertFalse(state.isLoading)
+            assertNotNull(state.roomPresentation)
+            assertEquals("ITC 2+ 1.31", state.roomPresentation!!.primaryLabel)
+            assertEquals(1, state.events.size)
+        } finally {
+            viewModel.viewModelScope.cancel()
+        }
     }
 
     @Test
-    fun `isFreeNow is true when no ongoing event`() = runTest(testDispatcher) {
-        val room = TestFixtures.room(id = 1, ident = "I112")
-        fakeRepository.roomsResult = Result.success(listOf(room))
-        fakeRepository.eventsResult = Result.success(
-            listOf(
-                TestFixtures.event(
-                    roomIdent = "I112",
-                    startDateTime = LocalDateTime.of(2025, 1, 15, 14, 0),
-                    durationMinutes = 90,
-                ),
-            ),
-        )
-
-        val viewModel = createViewModel()
-        runCurrent()
-
-        assertTrue(viewModel.uiState.value.isFreeNow)
-
-        viewModel.viewModelScope.cancel()
-    }
-
-    @Test
-    fun `isFreeNow is false when room is occupied`() = runTest(testDispatcher) {
+    fun `occupied rooms expose occupiedUntil instead of freeUntil`() = runTest(testDispatcher) {
         val room = TestFixtures.room(id = 1, ident = "I112")
         fakeRepository.roomsResult = Result.success(listOf(room))
         fakeRepository.eventsResult = Result.success(
@@ -119,15 +108,22 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        runCurrent()
+        try {
+            runCurrent()
 
-        assertFalse(viewModel.uiState.value.isFreeNow)
-
-        viewModel.viewModelScope.cancel()
+            assertFalse(viewModel.uiState.value.isFreeNow)
+            assertNull(viewModel.uiState.value.freeUntil)
+            assertEquals(
+                LocalDateTime.of(2025, 1, 15, 11, 30),
+                viewModel.uiState.value.occupiedUntil,
+            )
+        } finally {
+            viewModel.viewModelScope.cancel()
+        }
     }
 
     @Test
-    fun `freeUntil is next event start when room is free`() = runTest(testDispatcher) {
+    fun `free rooms expose next freeUntil`() = runTest(testDispatcher) {
         val room = TestFixtures.room(id = 1, ident = "I112")
         fakeRepository.roomsResult = Result.success(listOf(room))
         val nextEventStart = LocalDateTime.of(2025, 1, 15, 14, 0)
@@ -142,65 +138,15 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        runCurrent()
+        try {
+            runCurrent()
 
-        assertTrue(viewModel.uiState.value.isFreeNow)
-        assertEquals(nextEventStart, viewModel.uiState.value.freeUntil)
-
-        viewModel.viewModelScope.cancel()
-    }
-
-    @Test
-    fun `freeUntil is null when room is occupied`() = runTest(testDispatcher) {
-        val room = TestFixtures.room(id = 1, ident = "I112")
-        fakeRepository.roomsResult = Result.success(listOf(room))
-        fakeRepository.eventsResult = Result.success(
-            listOf(
-                TestFixtures.event(
-                    roomIdent = "I112",
-                    startDateTime = LocalDateTime.of(2025, 1, 15, 10, 0),
-                    durationMinutes = 90,
-                ),
-            ),
-        )
-
-        val viewModel = createViewModel()
-        runCurrent()
-
-        assertFalse(viewModel.uiState.value.isFreeNow)
-        assertNull(viewModel.uiState.value.freeUntil)
-
-        viewModel.viewModelScope.cancel()
-    }
-
-    @Test
-    fun `freeUntil is null when no future events`() = runTest(testDispatcher) {
-        val room = TestFixtures.room(id = 1, ident = "I112")
-        fakeRepository.roomsResult = Result.success(listOf(room))
-        fakeRepository.eventsResult = Result.success(emptyList())
-
-        val viewModel = createViewModel()
-        runCurrent()
-
-        assertTrue(viewModel.uiState.value.isFreeNow)
-        assertNull(viewModel.uiState.value.freeUntil)
-
-        viewModel.viewModelScope.cancel()
-    }
-
-    @Test
-    fun `error when room not found`() = runTest(testDispatcher) {
-        fakeRepository.roomsResult = Result.success(emptyList())
-
-        val viewModel = createViewModel(roomId = 999)
-        runCurrent()
-        val state = viewModel.uiState.value
-
-        assertFalse(state.isLoading)
-        assertNotNull(state.errorMessage)
-        assertTrue(state.errorMessage!!.contains("not found"))
-
-        viewModel.viewModelScope.cancel()
+            assertTrue(viewModel.uiState.value.isFreeNow)
+            assertEquals(nextEventStart, viewModel.uiState.value.freeUntil)
+            assertNull(viewModel.uiState.value.occupiedUntil)
+        } finally {
+            viewModel.viewModelScope.cancel()
+        }
     }
 
     @Test
@@ -216,12 +162,31 @@ class RoomDetailViewModelTest {
         )
 
         val viewModel = createViewModel()
-        runCurrent()
-        val state = viewModel.uiState.value
+        try {
+            runCurrent()
+            val state = viewModel.uiState.value
 
-        assertEquals(2, state.events.size)
-        assertTrue(state.events.all { it.roomIdent == "I112" })
+            assertEquals(2, state.events.size)
+            assertTrue(state.events.all { it.roomIdent == "I112" })
+        } finally {
+            viewModel.viewModelScope.cancel()
+        }
+    }
 
-        viewModel.viewModelScope.cancel()
+    @Test
+    fun `error when room not found`() = runTest(testDispatcher) {
+        fakeRepository.roomsResult = Result.success(emptyList())
+
+        val viewModel = createViewModel(roomId = 999)
+        try {
+            runCurrent()
+            val state = viewModel.uiState.value
+
+            assertFalse(state.isLoading)
+            assertNotNull(state.errorMessage)
+            assertTrue(state.errorMessage!!.contains("not found"))
+        } finally {
+            viewModel.viewModelScope.cancel()
+        }
     }
 }

@@ -8,15 +8,17 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.thd.roomfinder.ui.theme.THDRoomFinderTheme
+import de.thd.roomfinder.domain.presentation.RoomFilterOption
 
 @Composable
-internal fun BuildingFilterRow(
-    buildings: List<String>,
-    selectedBuilding: String?,
-    onBuildingSelected: (String?) -> Unit,
+internal fun RoomFilterChipRow(
+    label: String,
+    options: List<RoomFilterOption>,
+    selectedKey: String?,
+    allLabel: String,
+    onSelectionChanged: (String?) -> Unit,
+    showAllOption: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
@@ -24,31 +26,23 @@ internal fun BuildingFilterRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item {
+        if (showAllOption) {
+            item {
+                FilterChip(
+                    selected = selectedKey == null,
+                    onClick = { onSelectionChanged(null) },
+                    label = { Text(allLabel) },
+                )
+            }
+        }
+        items(options, key = { it.key ?: "${label}_${it.label}" }) { option ->
             FilterChip(
-                selected = selectedBuilding == null,
-                onClick = { onBuildingSelected(null) },
-                label = { Text("All") },
+                selected = selectedKey == option.key,
+                onClick = { onSelectionChanged(option.key) },
+                label = {
+                    Text("${option.label} (${option.count})")
+                },
             )
         }
-        items(buildings) { building ->
-            FilterChip(
-                selected = selectedBuilding == building,
-                onClick = { onBuildingSelected(building) },
-                label = { Text(building) },
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BuildingFilterRowPreview() {
-    THDRoomFinderTheme {
-        BuildingFilterRow(
-            buildings = listOf("A", "B", "C", "D", "I", "ITC"),
-            selectedBuilding = "I",
-            onBuildingSelected = {},
-        )
     }
 }

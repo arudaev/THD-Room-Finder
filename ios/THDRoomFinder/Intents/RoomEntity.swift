@@ -1,30 +1,22 @@
 import AppIntents
 import Foundation
 
-enum BuildingIntentValue: String, AppEnum, CaseIterable {
-    case A
-    case B
-    case C
-    case D
-    case E
-    case I
-    case ITC
-    case J
+enum CampusIntentValue: String, AppEnum, CaseIterable {
+    case deggendorf
+    case pfarrkirchenECRI = "pfarrkirchen_ecri"
+    case cham
+    case otherSites = "other_sites"
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        "Building"
+        "Campus"
     }
 
-    static var caseDisplayRepresentations: [BuildingIntentValue: DisplayRepresentation] {
+    static var caseDisplayRepresentations: [CampusIntentValue: DisplayRepresentation] {
         [
-            .A: "A",
-            .B: "B",
-            .C: "C",
-            .D: "D",
-            .E: "E",
-            .I: "I",
-            .ITC: "ITC",
-            .J: "J",
+            .deggendorf: "Deggendorf",
+            .pfarrkirchenECRI: "Pfarrkirchen / ECRI",
+            .cham: "Cham",
+            .otherSites: "Other sites",
         ]
     }
 }
@@ -41,9 +33,10 @@ struct RoomEntity: AppEntity, Identifiable {
     static var defaultQuery = RoomEntityQuery()
 
     var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(
-            title: "\(room.displayName)",
-            subtitle: "\(room.building)"
+        let presentation = RoomPresentationFormatter.shared.present(room)
+        return DisplayRepresentation(
+            title: "\(presentation.primaryLabel)",
+            subtitle: "\(presentation.secondaryLabel)"
         )
     }
 }
@@ -70,14 +63,8 @@ struct RoomEntityQuery: EntityQuery {
     }
 
     private func sortRooms(lhs: Room, rhs: Room) -> Bool {
-        let lhsPriority = RoomPriorityPolicy.isPriority(lhs)
-        let rhsPriority = RoomPriorityPolicy.isPriority(rhs)
-        if lhsPriority != rhsPriority {
-            return lhsPriority && !rhsPriority
-        }
-        if lhs.building != rhs.building {
-            return lhs.building < rhs.building
-        }
-        return lhs.name < rhs.name
+        let lhsPresentation = RoomPresentationFormatter.shared.present(lhs)
+        let rhsPresentation = RoomPresentationFormatter.shared.present(rhs)
+        return lhsPresentation.location.sortKey < rhsPresentation.location.sortKey
     }
 }

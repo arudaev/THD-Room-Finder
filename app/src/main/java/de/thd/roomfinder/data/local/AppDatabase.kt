@@ -15,7 +15,7 @@ import de.thd.roomfinder.data.local.entity.ScheduledEventEntity
         ScheduledEventEntity::class,
         CacheMetadataEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

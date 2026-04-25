@@ -17,7 +17,6 @@ final class AppRouter: ObservableObject {
     func showRoomDetail(roomID: Int, selectedDate: Date) {
         let roomListQuery = RoomListQuery(
             selectedDate: selectedDate,
-            selectedBuilding: nil,
             isCustomTime: true
         )
         path = [

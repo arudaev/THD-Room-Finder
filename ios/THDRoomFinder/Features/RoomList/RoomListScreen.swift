@@ -4,9 +4,13 @@ import SwiftUI
 struct RoomListViewState: Equatable {
     var isLoading = true
     var freeRooms: [FreeRoom] = []
-    var filteredRooms: [FreeRoom] = []
-    var buildings: [String] = []
-    var selectedBuilding: String?
+    var visibleRooms: [PresentedFreeRoom] = []
+    var sections: [RoomPresentationSection] = []
+    var campusFilters: [RoomFilterOption] = []
+    var groupFilters: [RoomFilterOption] = []
+    var selectedCampusKey = "deggendorf"
+    var selectedGroupKey: String?
+    var visibilityMode: RoomVisibilityMode = .teachingOnly
     var selectedDate = Date()
     var isCustomTime = false
     var errorMessage: String?
@@ -17,16 +21,21 @@ final class RoomListViewModel: ObservableObject {
     @Published private(set) var state: RoomListViewState
 
     private let repository: any RoomRepositoryProviding
+    private let formatter: RoomPresentationFormatter
     private var refreshTask: Task<Void, Never>?
 
     init(
         repository: any RoomRepositoryProviding,
+        formatter: RoomPresentationFormatter = .shared,
         initialQuery: RoomListQuery
     ) {
         self.repository = repository
+        self.formatter = formatter
         self.state = RoomListViewState(
             isLoading: true,
-            selectedBuilding: initialQuery.selectedBuilding,
+            selectedCampusKey: initialQuery.selectedCampusKey,
+            selectedGroupKey: initialQuery.selectedGroupKey,
+            visibilityMode: initialQuery.visibilityMode,
             selectedDate: initialQuery.selectedDate,
             isCustomTime: initialQuery.isCustomTime
         )
@@ -45,7 +54,14 @@ final class RoomListViewModel: ObservableObject {
 
         do {
             let freeRooms = try await repository.freeRooms(at: state.selectedDate)
-            applyLoadedRooms(freeRooms, selectedDate: state.selectedDate)
+            state = rebuildPresentation(
+                from: state,
+                freeRooms: freeRooms,
+                selectedCampusKey: state.selectedCampusKey,
+                selectedGroupKey: state.selectedGroupKey,
+                visibilityMode: state.visibilityMode
+            )
+            state.isLoading = false
         } catch {
             state.isLoading = false
             state.errorMessage = "Failed to load free rooms: \(error.localizedDescription)"
@@ -54,14 +70,41 @@ final class RoomListViewModel: ObservableObject {
 
     func apply(query: RoomListQuery) async {
         state.selectedDate = query.selectedDate
-        state.selectedBuilding = query.selectedBuilding
+        state.selectedCampusKey = query.selectedCampusKey
+        state.selectedGroupKey = query.selectedGroupKey
+        state.visibilityMode = query.visibilityMode
         state.isCustomTime = query.isCustomTime
         await loadFreeRooms()
     }
 
-    func selectBuilding(_ building: String?) {
-        state.selectedBuilding = building
-        state.filteredRooms = filterRooms(state.freeRooms, selectedBuilding: building)
+    func selectCampus(_ campusKey: String) {
+        state = rebuildPresentation(
+            from: state,
+            freeRooms: state.freeRooms,
+            selectedCampusKey: campusKey,
+            selectedGroupKey: nil,
+            visibilityMode: state.visibilityMode
+        )
+    }
+
+    func selectGroup(_ groupKey: String?) {
+        state = rebuildPresentation(
+            from: state,
+            freeRooms: state.freeRooms,
+            selectedCampusKey: state.selectedCampusKey,
+            selectedGroupKey: groupKey,
+            visibilityMode: state.visibilityMode
+        )
+    }
+
+    func selectVisibilityMode(_ visibilityMode: RoomVisibilityMode) {
+        state = rebuildPresentation(
+            from: state,
+            freeRooms: state.freeRooms,
+            selectedCampusKey: state.selectedCampusKey,
+            selectedGroupKey: state.selectedGroupKey,
+            visibilityMode: visibilityMode
+        )
     }
 
     func setDate(_ date: Date) async {
@@ -89,25 +132,42 @@ final class RoomListViewModel: ObservableObject {
     private func refreshSilently() async {
         let effectiveDate = state.isCustomTime ? state.selectedDate : Date()
         guard let freeRooms = try? await repository.freeRooms(at: effectiveDate) else { return }
-        applyLoadedRooms(freeRooms, selectedDate: effectiveDate)
+        state = rebuildPresentation(
+            from: state,
+            freeRooms: freeRooms,
+            selectedCampusKey: state.selectedCampusKey,
+            selectedGroupKey: state.selectedGroupKey,
+            visibilityMode: state.visibilityMode
+        )
+        state.selectedDate = effectiveDate
     }
 
-    private func applyLoadedRooms(_ freeRooms: [FreeRoom], selectedDate: Date) {
-        let buildings = Array(Set(freeRooms.map { $0.room.building })).sorted()
-        let filteredRooms = filterRooms(freeRooms, selectedBuilding: state.selectedBuilding)
+    private func rebuildPresentation(
+        from state: RoomListViewState,
+        freeRooms: [FreeRoom],
+        selectedCampusKey: String,
+        selectedGroupKey: String?,
+        visibilityMode: RoomVisibilityMode
+    ) -> RoomListViewState {
+        let presentation = formatter.buildRoomListPresentation(
+            freeRooms: freeRooms,
+            selectedCampusKey: selectedCampusKey,
+            selectedGroupKey: selectedGroupKey,
+            visibilityMode: visibilityMode
+        )
 
-        state.isLoading = false
-        state.freeRooms = freeRooms
-        state.filteredRooms = filteredRooms
-        state.buildings = buildings
-        state.selectedDate = selectedDate
-    }
-
-    private func filterRooms(_ freeRooms: [FreeRoom], selectedBuilding: String?) -> [FreeRoom] {
-        guard let selectedBuilding else {
-            return freeRooms
+        var newState = state
+        newState.freeRooms = freeRooms
+        newState.visibleRooms = presentation.visibleRooms
+        newState.sections = presentation.sections
+        newState.campusFilters = presentation.campusFilters
+        newState.groupFilters = presentation.groupFilters
+        newState.selectedCampusKey = selectedCampusKey
+        newState.selectedGroupKey = selectedGroupKey.flatMap { key in
+            presentation.groupFilters.contains(where: { $0.key == key }) ? key : nil
         }
-        return freeRooms.filter { $0.room.building == selectedBuilding }
+        newState.visibilityMode = visibilityMode
+        return newState
     }
 }
 
@@ -119,11 +179,16 @@ struct RoomListScene: View {
 
     init(
         repository: any RoomRepositoryProviding,
+        formatter: RoomPresentationFormatter = .shared,
         initialQuery: RoomListQuery,
         onRoomSelected: @escaping (Room, Date) -> Void
     ) {
         _viewModel = StateObject(
-            wrappedValue: RoomListViewModel(repository: repository, initialQuery: initialQuery)
+            wrappedValue: RoomListViewModel(
+                repository: repository,
+                formatter: formatter,
+                initialQuery: initialQuery
+            )
         )
         self.onRoomSelected = onRoomSelected
     }
@@ -172,23 +237,44 @@ struct RoomListScene: View {
                         onResetToNow: { Task { await viewModel.resetToNow() } }
                     )
 
-                    BuildingFilterBar(
-                        buildings: viewModel.state.buildings,
-                        selectedBuilding: viewModel.state.selectedBuilding,
-                        onBuildingSelected: viewModel.selectBuilding
+                    FilterOptionBar(
+                        options: viewModel.state.campusFilters,
+                        selectedKey: viewModel.state.selectedCampusKey,
+                        allLabel: "",
+                        showsAllOption: false,
+                        onSelectionChanged: { key in
+                            if let key {
+                                viewModel.selectCampus(key)
+                            }
+                        }
                     )
 
-                    if viewModel.state.filteredRooms.isEmpty {
+                    if !viewModel.state.groupFilters.isEmpty {
+                        FilterOptionBar(
+                            options: viewModel.state.groupFilters,
+                            selectedKey: viewModel.state.selectedGroupKey,
+                            allLabel: "All buildings and sites",
+                            showsAllOption: true,
+                            onSelectionChanged: viewModel.selectGroup
+                        )
+                    }
+
+                    VisibilityModeBar(
+                        selectedMode: viewModel.state.visibilityMode,
+                        onModeSelected: viewModel.selectVisibilityMode
+                    )
+
+                    if viewModel.state.sections.isEmpty {
                         RoomListEmptyStateCard(message: emptyMessage)
                     } else {
-                        LazyVStack(spacing: 14) {
-                            ForEach(viewModel.state.filteredRooms) { freeRoom in
-                                Button {
-                                    onRoomSelected(freeRoom.room, viewModel.state.selectedDate)
-                                } label: {
-                                    RoomCardView(freeRoom: freeRoom)
-                                }
-                                .buttonStyle(.plain)
+                        LazyVStack(alignment: .leading, spacing: 18) {
+                            ForEach(viewModel.state.sections, id: \.groupKey) { section in
+                                RoomListSectionView(
+                                    section: section,
+                                    onRoomSelected: { freeRoom in
+                                        onRoomSelected(freeRoom.freeRoom.room, viewModel.state.selectedDate)
+                                    }
+                                )
                             }
                         }
                         .padding(.horizontal, 20)
@@ -203,13 +289,40 @@ struct RoomListScene: View {
     }
 
     private var emptyMessage: String {
-        if let selectedBuilding = viewModel.state.selectedBuilding {
-            return "No free rooms in building \(selectedBuilding) for the selected time."
+        let campusLabel = viewModel.state.campusFilters.first(where: { $0.key == viewModel.state.selectedCampusKey })?.label ?? "Deggendorf"
+        if let selectedGroupKey = viewModel.state.selectedGroupKey,
+           let groupLabel = viewModel.state.groupFilters.first(where: { $0.key == selectedGroupKey })?.label {
+            return "No free rooms match \(groupLabel) right now."
         }
         if viewModel.state.isCustomTime {
-            return "No free rooms at the selected time."
+            return "No free rooms match \(campusLabel) at the selected time."
         }
-        return "No free rooms are available right now."
+        return "No free rooms match \(campusLabel) right now."
+    }
+}
+
+private struct RoomListSectionView: View {
+    let section: RoomPresentationSection
+    let onRoomSelected: (PresentedFreeRoom) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(section.groupLabel)
+                .font(.title3.weight(.semibold))
+
+            Text(section.campusLabel)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            ForEach(section.rooms) { freeRoom in
+                Button {
+                    onRoomSelected(freeRoom)
+                } label: {
+                    RoomCardView(presentedRoom: freeRoom)
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 }
 
@@ -224,7 +337,7 @@ private struct RoomListSummaryCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("\(state.filteredRooms.count)")
+            Text("\(state.visibleRooms.count)")
                 .font(.system(size: 58, weight: .bold, design: .rounded))
 
             Text(state.isCustomTime ? "rooms free at the selected time" : "rooms free right now")
@@ -238,7 +351,11 @@ private struct RoomListSummaryCard: View {
                 RoomListMetaPill(icon: "clock", title: selectedTimeText)
                 RoomListMetaPill(
                     icon: "building.2",
-                    title: state.selectedBuilding.map { "Building \($0)" } ?? "All buildings"
+                    title: selectedCampusLabel
+                )
+                RoomListMetaPill(
+                    icon: "line.3.horizontal.decrease.circle",
+                    title: state.visibilityMode.label
                 )
             }
 
@@ -256,7 +373,7 @@ private struct RoomListSummaryCard: View {
         if state.isCustomTime {
             return "Browsing a scheduled snapshot instead of the live feed."
         }
-        return "Live results update against the current time when you refresh."
+        return "Deggendorf teaching rooms stay front and center until you switch campus or visibility."
     }
 
     private var selectedTimeText: String {
@@ -266,6 +383,10 @@ private struct RoomListSummaryCard: View {
             )
         }
         return "Now"
+    }
+
+    private var selectedCampusLabel: String {
+        state.campusFilters.first(where: { $0.key == state.selectedCampusKey })?.label ?? "Deggendorf"
     }
 }
 
@@ -299,6 +420,24 @@ private struct RoomListResetButton: View {
     var body: some View {
         Button("Back to Now", action: action)
             .buttonStyle(.bordered)
+    }
+}
+
+private struct VisibilityModeBar: View {
+    let selectedMode: RoomVisibilityMode
+    let onModeSelected: (RoomVisibilityMode) -> Void
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ForEach(RoomVisibilityMode.allCases, id: \.self) { mode in
+                SelectionChip(
+                    title: mode.label,
+                    isSelected: selectedMode == mode,
+                    action: { onModeSelected(mode) }
+                )
+            }
+        }
+        .padding(.horizontal, 20)
     }
 }
 
@@ -376,28 +515,5 @@ private struct RoomTimePickerSheet: View {
             }
         }
         .presentationDetents([.medium])
-    }
-}
-
-#Preview("Room List") {
-    NavigationStack {
-        ZStack {
-            RoomFinderScreenBackground()
-
-            RoomListSummaryCard(
-                state: RoomListViewState(
-                    isLoading: false,
-                    freeRooms: [],
-                    filteredRooms: [],
-                    buildings: ["A", "B", "C"],
-                    selectedBuilding: "B",
-                    selectedDate: .now,
-                    isCustomTime: true,
-                    errorMessage: nil
-                ),
-                onResetToNow: {}
-            )
-            .padding()
-        }
     }
 }

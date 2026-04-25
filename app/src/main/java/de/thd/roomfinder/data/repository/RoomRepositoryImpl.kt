@@ -1,5 +1,6 @@
 package de.thd.roomfinder.data.repository
 
+import de.thd.roomfinder.data.AppDateFormats
 import de.thd.roomfinder.data.local.dao.CacheMetadataDao
 import de.thd.roomfinder.data.local.dao.RoomDao
 import de.thd.roomfinder.data.local.dao.ScheduledEventDao
@@ -14,7 +15,6 @@ import de.thd.roomfinder.domain.model.Room
 import de.thd.roomfinder.domain.model.ScheduledEvent
 import de.thd.roomfinder.domain.repository.RoomRepository
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,14 +33,12 @@ internal class RoomRepositoryImpl @Inject constructor(
         internal const val EVENTS_TTL_MS = 5 * 60 * 1000L
     }
 
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     private var cachedRooms: List<Room>? = null
 
     override suspend fun getAllRooms(): Result<List<Room>> {
-        // Check local cache freshness
         val metadata = cacheMetadataDao.get(ROOMS_CACHE_KEY)
         if (metadata != null && isFresh(metadata.timestamp, ROOMS_TTL_MS)) {
+            cachedRooms?.let { return Result.success(it) }
             val localRooms = roomDao.getAllRooms().map { it.toDomainModel() }
             if (localRooms.isNotEmpty()) {
                 cachedRooms = localRooms
@@ -48,7 +46,6 @@ internal class RoomRepositoryImpl @Inject constructor(
             }
         }
 
-        // Try network
         return runCatching {
             apiService.findRooms().map { it.toDomainModel() }
         }.onSuccess { rooms ->
@@ -59,7 +56,6 @@ internal class RoomRepositoryImpl @Inject constructor(
                 CacheMetadataEntity(ROOMS_CACHE_KEY, System.currentTimeMillis()),
             )
         }.recoverCatching { networkError ->
-            // Network failed — try local fallback
             val localRooms = roomDao.getAllRooms().map { it.toDomainModel() }
             if (localRooms.isNotEmpty()) {
                 cachedRooms = localRooms
@@ -87,20 +83,16 @@ internal class RoomRepositoryImpl @Inject constructor(
     override suspend fun getScheduledEvents(
         dateTime: LocalDateTime,
     ): Result<List<ScheduledEvent>> {
-        val dateKey = dateTime.format(dateFormatter)
+        val dateKey = dateTime.format(AppDateFormats.DATE_KEY)
         val cacheKey = "$EVENTS_CACHE_PREFIX$dateKey"
 
-        // Check local cache freshness
         val metadata = cacheMetadataDao.get(cacheKey)
         if (metadata != null && isFresh(metadata.timestamp, EVENTS_TTL_MS)) {
-            val localEvents = scheduledEventDao.getEventsByDate(dateKey)
-                .map { it.toDomainModel() }
-            return Result.success(localEvents)
+            return Result.success(scheduledEventDao.getEventsByDate(dateKey).map { it.toDomainModel() })
         }
 
-        // Try network
         return runCatching {
-            val formatted = dateTime.format(dateTimeFormatter)
+            val formatted = dateTime.format(AppDateFormats.EVENT_DATE_TIME)
             apiService.findPeriodsByDate(
                 dateTime = formatted,
                 body = FindByDateRequestBody(sqlDate = formatted),
@@ -112,14 +104,8 @@ internal class RoomRepositoryImpl @Inject constructor(
                 CacheMetadataEntity(cacheKey, System.currentTimeMillis()),
             )
         }.recoverCatching { networkError ->
-            // Network failed — try local fallback
-            val localEvents = scheduledEventDao.getEventsByDate(dateKey)
-                .map { it.toDomainModel() }
-            if (localEvents.isNotEmpty()) {
-                localEvents
-            } else {
-                throw networkError
-            }
+            val localEvents = scheduledEventDao.getEventsByDate(dateKey).map { it.toDomainModel() }
+            if (localEvents.isNotEmpty()) localEvents else throw networkError
         }
     }
 

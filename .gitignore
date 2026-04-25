@@ -8,6 +8,8 @@
 
 # Java class files
 *.class
+*.pyc
+__pycache__/
 
 # Generated files
 bin/
@@ -62,3 +64,4 @@ Desktop.ini
 # Crash logs
 crash-logs/
 nul
+.env

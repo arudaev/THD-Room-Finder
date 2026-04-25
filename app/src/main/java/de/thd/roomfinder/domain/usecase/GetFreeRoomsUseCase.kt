@@ -21,17 +21,15 @@ class GetFreeRoomsUseCase @Inject constructor(
             .map { it.roomIdent }
             .toSet()
 
+        val futureEventsByRoom = events
+            .filter { it.startDateTime > dateTime }
+            .groupBy { it.roomIdent }
+
         val freeRooms = rooms
             .filter { it.ident !in occupiedIdents }
             .map { room ->
-                val nextEvent = events
-                    .filter { it.roomIdent == room.ident && it.startDateTime > dateTime }
-                    .minByOrNull { it.startDateTime }
-
-                FreeRoom(
-                    room = room,
-                    freeUntil = nextEvent?.startDateTime,
-                )
+                val nextEvent = futureEventsByRoom[room.ident]?.minByOrNull { it.startDateTime }
+                FreeRoom(room = room, freeUntil = nextEvent?.startDateTime)
             }
             .sortedWith(
                 compareByDescending<FreeRoom> { RoomPriorityPolicy.isPriority(it.room) }

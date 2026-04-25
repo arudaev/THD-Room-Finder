@@ -1,39 +1,39 @@
 import SwiftUI
 
-struct BuildingFilterBar: View {
-    let buildings: [String]
-    let selectedBuilding: String?
-    let onBuildingSelected: (String?) -> Void
+struct FilterOptionBar: View {
+    let options: [RoomFilterOption]
+    let selectedKey: String?
+    let allLabel: String
+    let showsAllOption: Bool
+    let onSelectionChanged: (String?) -> Void
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            chipRow
+            HStack(spacing: 10) {
+                if showsAllOption {
+                    SelectionChip(
+                        title: allLabel,
+                        isSelected: selectedKey == nil,
+                        action: { onSelectionChanged(nil) }
+                    )
+                }
+
+                ForEach(options, id: \.label) { option in
+                    SelectionChip(
+                        title: "\(option.label) (\(option.count))",
+                        isSelected: selectedKey == option.key,
+                        action: { onSelectionChanged(option.key) }
+                    )
+                }
+            }
             .padding(.horizontal, 20)
             .padding(.vertical, 4)
         }
         .scrollIndicators(.hidden)
     }
-
-    private var chipRow: some View {
-        HStack(spacing: 10) {
-            FilterChip(
-                title: "All",
-                isSelected: selectedBuilding == nil,
-                action: { onBuildingSelected(nil) }
-            )
-
-            ForEach(buildings, id: \.self) { building in
-                FilterChip(
-                    title: building,
-                    isSelected: selectedBuilding == building,
-                    action: { onBuildingSelected(building) }
-                )
-            }
-        }
-    }
 }
 
-private struct FilterChip: View {
+struct SelectionChip: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
@@ -51,18 +51,5 @@ private struct FilterChip: View {
                 )
         }
         .buttonStyle(.plain)
-    }
-}
-
-#Preview("Building Filter Bar") {
-    ZStack {
-        RoomFinderScreenBackground()
-
-        BuildingFilterBar(
-            buildings: ["A", "B", "C", "D"],
-            selectedBuilding: "B",
-            onBuildingSelected: { _ in }
-        )
-        .padding()
     }
 }

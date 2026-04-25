@@ -3,10 +3,11 @@ import SwiftUI
 
 struct RoomDetailViewState: Equatable {
     var isLoading = true
-    var room: Room?
+    var roomPresentation: StudentFacingRoomPresentation?
     var events: [ScheduledEvent] = []
     var isFreeNow = false
     var freeUntil: Date?
+    var occupiedUntil: Date?
     var queryDate = Date()
     var errorMessage: String?
 }
@@ -16,14 +17,17 @@ final class RoomDetailViewModel: ObservableObject {
     @Published private(set) var state: RoomDetailViewState
 
     private let repository: any RoomRepositoryProviding
+    private let formatter: RoomPresentationFormatter
     private var roomID: Int
     private var refreshTask: Task<Void, Never>?
 
     init(
         repository: any RoomRepositoryProviding,
+        formatter: RoomPresentationFormatter = .shared,
         query: RoomDetailQuery
     ) {
         self.repository = repository
+        self.formatter = formatter
         self.roomID = query.roomID
         self.state = RoomDetailViewState(
             isLoading: true,
@@ -51,29 +55,33 @@ final class RoomDetailViewModel: ObservableObject {
         do {
             let room = try await repository.room(id: roomID)
             let events = (try? await repository.roomSchedule(for: room.ident, at: state.queryDate)) ?? []
-            let isOccupied = events.contains {
+            let currentEvent = events.first {
                 $0.startDateTime <= state.queryDate && $0.endDateTime > state.queryDate
             }
-            let freeUntil = isOccupied ? nil : events
-                .filter { $0.startDateTime > state.queryDate }
-                .min(by: { $0.startDateTime < $1.startDateTime })?
-                .startDateTime
+            let freeUntil = currentEvent == nil
+                ? events
+                    .filter { $0.startDateTime > state.queryDate }
+                    .min(by: { $0.startDateTime < $1.startDateTime })?
+                    .startDateTime
+                : nil
 
             state = RoomDetailViewState(
                 isLoading: false,
-                room: room,
+                roomPresentation: formatter.present(room),
                 events: events,
-                isFreeNow: !isOccupied,
+                isFreeNow: currentEvent == nil,
                 freeUntil: freeUntil,
+                occupiedUntil: currentEvent?.endDateTime,
                 queryDate: state.queryDate
             )
         } catch {
             state = RoomDetailViewState(
                 isLoading: false,
-                room: nil,
+                roomPresentation: nil,
                 events: [],
                 isFreeNow: false,
                 freeUntil: nil,
+                occupiedUntil: nil,
                 queryDate: state.queryDate,
                 errorMessage: "Room not found: \(error.localizedDescription)"
             )
@@ -91,22 +99,25 @@ final class RoomDetailViewModel: ObservableObject {
     }
 
     private func refreshSilently() async {
-        guard let room = state.room,
+        guard let room = state.roomPresentation?.room,
               let events = try? await repository.roomSchedule(for: room.ident, at: state.queryDate) else {
             return
         }
 
-        let isOccupied = events.contains {
+        let currentEvent = events.first {
             $0.startDateTime <= state.queryDate && $0.endDateTime > state.queryDate
         }
-        let freeUntil = isOccupied ? nil : events
-            .filter { $0.startDateTime > state.queryDate }
-            .min(by: { $0.startDateTime < $1.startDateTime })?
-            .startDateTime
+        let freeUntil = currentEvent == nil
+            ? events
+                .filter { $0.startDateTime > state.queryDate }
+                .min(by: { $0.startDateTime < $1.startDateTime })?
+                .startDateTime
+            : nil
 
         state.events = events
-        state.isFreeNow = !isOccupied
+        state.isFreeNow = currentEvent == nil
         state.freeUntil = freeUntil
+        state.occupiedUntil = currentEvent?.endDateTime
     }
 }
 
@@ -115,10 +126,11 @@ struct RoomDetailScene: View {
 
     init(
         repository: any RoomRepositoryProviding,
+        formatter: RoomPresentationFormatter = .shared,
         query: RoomDetailQuery
     ) {
         _viewModel = StateObject(
-            wrappedValue: RoomDetailViewModel(repository: repository, query: query)
+            wrappedValue: RoomDetailViewModel(repository: repository, formatter: formatter, query: query)
         )
     }
 
@@ -136,17 +148,19 @@ struct RoomDetailScene: View {
                     }
                     .padding(20)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let room = viewModel.state.room {
+                } else if let roomPresentation = viewModel.state.roomPresentation {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 18) {
-                            RoomInfoCard(room: room)
+                            RoomInfoCard(roomPresentation: roomPresentation)
 
                             AvailabilityCard(
                                 isFreeNow: viewModel.state.isFreeNow,
-                                freeUntil: viewModel.state.freeUntil
+                                freeUntil: viewModel.state.freeUntil,
+                                occupiedUntil: viewModel.state.occupiedUntil
                             )
 
                             RoomScheduleSection(
+                                formatter: .shared,
                                 queryDate: viewModel.state.queryDate,
                                 events: viewModel.state.events
                             )
@@ -159,28 +173,28 @@ struct RoomDetailScene: View {
                 }
             }
         }
-        .navigationTitle(viewModel.state.room?.displayName ?? "Room Details")
+        .navigationTitle(viewModel.state.roomPresentation?.primaryLabel ?? "Room Details")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 private struct RoomInfoCard: View {
-    let room: Room
+    let roomPresentation: StudentFacingRoomPresentation
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(room.displayName)
+                    Text(roomPresentation.primaryLabel)
                         .font(.title2.weight(.bold))
 
-                    Text("Building \(room.building)")
+                    Text(roomPresentation.secondaryLabel)
                         .foregroundStyle(.secondary)
                 }
 
                 Spacer(minLength: 12)
 
-                Text(room.building)
+                Text(roomPresentation.location.groupLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 10)
@@ -191,25 +205,33 @@ private struct RoomInfoCard: View {
                     )
             }
 
-            let details = buildDetails()
+            Text(roomPresentation.location.detailPath)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Text("Original THabella label: \(roomPresentation.rawLabel)")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            let details = buildDetails(roomPresentation.room)
             if !details.isEmpty {
                 Text(details.joined(separator: " | "))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
-            if !room.facilities.isEmpty {
+            if !roomPresentation.room.facilities.isEmpty {
                 RoomDetailFactBlock(
                     title: "Facilities",
-                    value: room.facilities.joined(separator: " | ")
+                    value: roomPresentation.room.facilities.joined(separator: " | ")
                 )
             }
 
-            if let inChargeName = room.inChargeName {
+            if let inChargeName = roomPresentation.room.inChargeName {
                 RoomDetailFactBlock(title: "In charge", value: inChargeName)
             }
 
-            if let inChargeEmail = room.inChargeEmail {
+            if let inChargeEmail = roomPresentation.room.inChargeEmail {
                 RoomDetailFactBlock(title: "Contact", value: inChargeEmail)
             }
         }
@@ -218,7 +240,7 @@ private struct RoomInfoCard: View {
         .roomFinderSurface(cornerRadius: 28, tint: Color.white.opacity(0.12))
     }
 
-    private func buildDetails() -> [String] {
+    private func buildDetails(_ room: Room) -> [String] {
         var details: [String] = []
         if let floor = room.floor {
             details.append("Floor \(floor)")
@@ -252,20 +274,18 @@ private struct RoomDetailFactBlock: View {
 private struct AvailabilityCard: View {
     let isFreeNow: Bool
     let freeUntil: Date?
+    let occupiedUntil: Date?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(isFreeNow ? "Available" : "Occupied")
+            Text(isFreeNow ? "Free now" : "Occupied now")
                 .font(.title3.weight(.semibold))
 
-            if isFreeNow, let freeUntil {
-                Text("Free until \(freeUntil.formatted(date: .omitted, time: .shortened))")
-                    .font(.subheadline)
-            } else if isFreeNow {
-                Text("Free for the rest of the day")
+            if isFreeNow {
+                Text(RoomPresentationFormatter.shared.availabilityLabel(freeUntil: freeUntil))
                     .font(.subheadline)
             } else {
-                Text("Currently in use at the selected time.")
+                Text(RoomPresentationFormatter.shared.occupiedLabel(until: occupiedUntil))
                     .font(.subheadline)
             }
         }
@@ -280,6 +300,7 @@ private struct AvailabilityCard: View {
 }
 
 private struct RoomScheduleSection: View {
+    let formatter: RoomPresentationFormatter
     let queryDate: Date
     let events: [ScheduledEvent]
 
@@ -304,7 +325,10 @@ private struct RoomScheduleSection: View {
             } else {
                 VStack(spacing: 12) {
                     ForEach(events) { event in
-                        ScheduleRow(event: event)
+                        ScheduleRow(
+                            formatter: formatter,
+                            event: event
+                        )
                     }
                 }
             }
@@ -313,21 +337,27 @@ private struct RoomScheduleSection: View {
 }
 
 private struct ScheduleRow: View {
+    let formatter: RoomPresentationFormatter
     let event: ScheduledEvent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(event.title)
-                .font(.headline)
-
-            Text(event.eventType)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
             Text(
                 "\(event.startDateTime.formatted(date: .omitted, time: .shortened)) - \(event.endDateTime.formatted(date: .omitted, time: .shortened))"
             )
-            .font(.subheadline.weight(.medium))
+            .font(.headline)
+
+            if !event.eventType.isEmpty, event.eventType != "Unknown" {
+                Text(event.eventType)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let title = formatter.meaningfulTitle(for: event) {
+                Text(title)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)

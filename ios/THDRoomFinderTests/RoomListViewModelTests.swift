@@ -3,8 +3,9 @@ import XCTest
 
 @MainActor
 final class RoomListViewModelTests: XCTestCase {
-    func testInitialQueryAppliesBuildingFilterAndPreservesOrder() async {
+    func testInitialQueryDefaultsToDeggendorfTeachingRooms() async {
         let mockRepository = MockRoomRepository()
+        let formatter = RoomPresentationFormatter.shared
         mockRepository.freeRoomsResult = [
             FreeRoom(
                 room: Room(
@@ -46,33 +47,34 @@ final class RoomListViewModelTests: XCTestCase {
 
         let viewModel = RoomListViewModel(
             repository: mockRepository,
+            formatter: formatter,
             initialQuery: RoomListQuery(
                 selectedDate: Date(timeIntervalSince1970: 1_736_934_000),
-                selectedBuilding: "A",
                 isCustomTime: true
             )
         )
 
         await viewModel.loadFreeRooms()
 
-        XCTAssertEqual(viewModel.state.selectedBuilding, "A")
-        XCTAssertTrue(viewModel.state.isCustomTime)
-        XCTAssertEqual(viewModel.state.filteredRooms.map(\.room.ident), ["A008", "A215"])
+        XCTAssertEqual(viewModel.state.selectedCampusKey, "deggendorf")
+        XCTAssertEqual(viewModel.state.visibilityMode, .teachingOnly)
+        XCTAssertEqual(viewModel.state.visibleRooms.map(\.presentation.primaryLabel), ["A008"])
     }
 
-    func testApplyQueryUpdatesSelectedDateAndBuilding() async {
+    func testApplyQueryUpdatesCampusAndVisibility() async {
         let mockRepository = MockRoomRepository()
+        let formatter = RoomPresentationFormatter.shared
         mockRepository.freeRoomsResult = [
             FreeRoom(
                 room: Room(
                     id: 3,
-                    ident: "B001",
-                    name: "B001",
-                    building: "B",
-                    floor: 0,
-                    displayName: "B001",
-                    seatsRegular: 30,
-                    seatsExam: 20,
+                    ident: "ecri106",
+                    name: "EC.B 1.06 a (Hoersaal)",
+                    building: "EC.B",
+                    floor: 1,
+                    displayName: "Hoersaal",
+                    seatsRegular: 100,
+                    seatsExam: 60,
                     facilities: [],
                     bookable: true,
                     inChargeName: nil,
@@ -85,6 +87,7 @@ final class RoomListViewModelTests: XCTestCase {
 
         let viewModel = RoomListViewModel(
             repository: mockRepository,
+            formatter: formatter,
             initialQuery: RoomListQuery()
         )
         let customDate = Date(timeIntervalSince1970: 1_736_950_200)
@@ -92,14 +95,16 @@ final class RoomListViewModelTests: XCTestCase {
         await viewModel.apply(
             query: RoomListQuery(
                 selectedDate: customDate,
-                selectedBuilding: "B",
+                selectedCampusKey: "pfarrkirchen_ecri",
+                visibilityMode: .showAll,
                 isCustomTime: true
             )
         )
 
         XCTAssertEqual(viewModel.state.selectedDate, customDate)
-        XCTAssertEqual(viewModel.state.selectedBuilding, "B")
-        XCTAssertEqual(viewModel.state.filteredRooms.map(\.room.ident), ["B001"])
+        XCTAssertEqual(viewModel.state.selectedCampusKey, "pfarrkirchen_ecri")
+        XCTAssertEqual(viewModel.state.visibilityMode, .showAll)
+        XCTAssertEqual(viewModel.state.visibleRooms.map(\.presentation.primaryLabel), ["EC.B 1.06 a"])
     }
 }
 

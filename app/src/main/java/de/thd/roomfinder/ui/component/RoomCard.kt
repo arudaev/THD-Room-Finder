@@ -11,19 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.thd.roomfinder.domain.model.FreeRoom
-import de.thd.roomfinder.domain.model.Room
-import de.thd.roomfinder.ui.theme.THDRoomFinderTheme
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+import de.thd.roomfinder.domain.presentation.PresentedFreeRoom
 
 @Composable
 internal fun RoomCard(
-    freeRoom: FreeRoom,
+    presentedRoom: PresentedFreeRoom,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -33,7 +26,7 @@ internal fun RoomCard(
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -41,95 +34,27 @@ internal fun RoomCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = freeRoom.room.displayName,
+                    text = presentedRoom.presentation.primaryLabel,
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = freeRoom.room.building,
+                    text = presentedRoom.presentation.location.groupLabel,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
-            val details = buildList {
-                freeRoom.room.floor?.let { add("Floor $it") }
-                if (freeRoom.room.seatsRegular > 0) add("${freeRoom.room.seatsRegular} seats")
-            }.joinToString(" · ")
-
-            if (details.isNotEmpty()) {
-                Text(
-                    text = details,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-
-            val availabilityText = if (freeRoom.freeUntil != null) {
-                "Free until ${freeRoom.freeUntil.format(timeFormatter)}"
-            } else {
-                "Free all day"
-            }
             Text(
-                text = availabilityText,
+                text = presentedRoom.presentation.secondaryLabel,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Text(
+                text = presentedRoom.availabilityLabel,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.tertiary,
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun RoomCardPreview() {
-    THDRoomFinderTheme {
-        RoomCard(
-            freeRoom = FreeRoom(
-                room = Room(
-                    id = 1,
-                    ident = "I112",
-                    name = "I 112",
-                    building = "I",
-                    floor = 1,
-                    displayName = "I 112",
-                    seatsRegular = 40,
-                    seatsExam = 20,
-                    facilities = listOf("Beamer", "Whiteboard"),
-                    bookable = true,
-                    inChargeName = null,
-                    inChargeEmail = null,
-                ),
-                freeUntil = LocalDateTime.of(2026, 2, 10, 14, 30),
-            ),
-            onClick = {},
-            modifier = Modifier.padding(16.dp),
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun RoomCardFreeAllDayPreview() {
-    THDRoomFinderTheme {
-        RoomCard(
-            freeRoom = FreeRoom(
-                room = Room(
-                    id = 2,
-                    ident = "A008",
-                    name = "A 008",
-                    building = "A",
-                    floor = 0,
-                    displayName = "A 008",
-                    seatsRegular = 60,
-                    seatsExam = 30,
-                    facilities = emptyList(),
-                    bookable = true,
-                    inChargeName = null,
-                    inChargeEmail = null,
-                ),
-                freeUntil = null,
-            ),
-            onClick = {},
-            modifier = Modifier.padding(16.dp),
-        )
     }
 }

@@ -8,14 +8,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import de.thd.roomfinder.util.Constants
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -127,5 +130,46 @@ class HomeViewModelTest {
         assertFalse(viewModel.uiState.value.isLoading)
 
         viewModel.viewModelScope.cancel()
+    }
+
+    @Test
+    fun `auto-refresh fires after interval and updates room count`() = runTest(testDispatcher) {
+        val rooms = List(3) { i -> TestFixtures.room(id = i, ident = "R$i") }
+        fakeRepository.roomsResult = Result.success(rooms)
+        fakeRepository.eventsResult = Result.success(emptyList())
+
+        val viewModel = HomeViewModel(useCase, fakeRepository)
+        runCurrent()
+        val initialCallCount = fakeRepository.getAllRoomsCallCount
+
+        advanceTimeBy(Constants.AUTO_REFRESH_INTERVAL_MS + 1)
+        runCurrent()
+
+        assertTrue(
+            "Expected a second getAllRooms call after interval, count was ${fakeRepository.getAllRoomsCallCount}",
+            fakeRepository.getAllRoomsCallCount > initialCallCount,
+        )
+
+        viewModel.viewModelScope.cancel()
+    }
+
+    @Test
+    fun `cancelling scope stops auto-refresh loop`() = runTest(testDispatcher) {
+        fakeRepository.roomsResult = Result.success(emptyList())
+        fakeRepository.eventsResult = Result.success(emptyList())
+
+        val viewModel = HomeViewModel(useCase, fakeRepository)
+        runCurrent()
+        viewModel.viewModelScope.cancel()
+        val callCountAfterCancel = fakeRepository.getAllRoomsCallCount
+
+        advanceTimeBy(Constants.AUTO_REFRESH_INTERVAL_MS * 3)
+        runCurrent()
+
+        assertEquals(
+            "No more calls expected after scope cancelled",
+            callCountAfterCancel,
+            fakeRepository.getAllRoomsCallCount,
+        )
     }
 }

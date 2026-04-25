@@ -42,15 +42,17 @@ internal fun RoomFinderNavHost(
             val uiState by viewModel.uiState.collectAsState()
             RoomListScreen(
                 uiState = uiState,
-                onBuildingSelected = viewModel::selectBuilding,
+                onCampusSelected = viewModel::selectCampus,
+                onGroupSelected = viewModel::selectGroup,
+                onVisibilityModeSelected = viewModel::selectVisibilityMode,
                 onDateTimeSelected = viewModel::setDateTime,
                 onResetToNow = viewModel::resetToNow,
-                onRoomClicked = { freeRoom ->
+                onRoomClicked = { presentedFreeRoom ->
                     val epoch = uiState.selectedDateTime
                         .atZone(ZoneId.systemDefault())
                         .toEpochSecond()
                     navController.navigate(
-                        Route.RoomDetail.createRoute(freeRoom.room.id, epoch),
+                        Route.RoomDetail.createRoute(presentedFreeRoom.freeRoom.room.id, epoch),
                     )
                 },
                 onRetry = viewModel::loadFreeRooms,

@@ -184,6 +184,28 @@ bash scripts/dev/android-test.sh test lint
 > [!NOTE]
 > Codespaces is supported as a backup environment, not the default workflow. iOS builds still require either a Mac with Xcode or GitHub Actions on `macos-latest`.
 
+### Audit THabella Content Locally
+
+If you want to inspect THabella's raw content and the exact normalized data shape the apps use, run:
+
+```bash
+python scripts/dev/export-thabella-snapshot.py
+```
+
+You can also choose a specific query time:
+
+```bash
+python scripts/dev/export-thabella-snapshot.py --date-time "2026-04-14 09:00"
+```
+
+By default the script writes into `build/thabella-snapshot/<timestamp>/` and creates:
+
+- `raw/` - untouched THabella room and period payloads
+- `normalized/` - cleaned rooms, events, and building summaries
+- `app/` - home, room-list, and per-room detail exports shaped like the apps
+- `audit/data-quality.json` - content-gap metrics and fallback-title samples
+- `summary.md` - a quick human-readable audit report
+
 ### iOS Build, Preview, and Install
 
 The repository includes a native SwiftUI iPhone project at `ios/THDRoomFinder.xcodeproj`.

@@ -4,8 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.thd.roomfinder.domain.model.FreeRoom
+import de.thd.roomfinder.domain.presentation.PresentedFreeRoom
+import de.thd.roomfinder.domain.presentation.RoomFilterOption
+import de.thd.roomfinder.domain.presentation.RoomListPresentation
+import de.thd.roomfinder.domain.presentation.RoomListSection
+import de.thd.roomfinder.domain.presentation.RoomPresentationFormatter
+import de.thd.roomfinder.domain.presentation.RoomVisibilityMode
 import de.thd.roomfinder.domain.usecase.GetFreeRoomsUseCase
 import de.thd.roomfinder.util.Constants
+import de.thd.roomfinder.util.Constants.DEFAULT_CAMPUS_KEY
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,9 +24,13 @@ import javax.inject.Inject
 data class RoomListUiState(
     val isLoading: Boolean = true,
     val freeRooms: List<FreeRoom> = emptyList(),
-    val filteredRooms: List<FreeRoom> = emptyList(),
-    val buildings: List<String> = emptyList(),
-    val selectedBuilding: String? = null,
+    val visibleRooms: List<PresentedFreeRoom> = emptyList(),
+    val sections: List<RoomListSection> = emptyList(),
+    val campusFilters: List<RoomFilterOption> = emptyList(),
+    val groupFilters: List<RoomFilterOption> = emptyList(),
+    val selectedCampusKey: String = DEFAULT_CAMPUS_KEY,
+    val selectedGroupKey: String? = null,
+    val visibilityMode: RoomVisibilityMode = RoomVisibilityMode.TEACHING_ONLY,
     val selectedDateTime: LocalDateTime = LocalDateTime.now(),
     val isCustomTime: Boolean = false,
     val errorMessage: String? = null,
@@ -28,6 +39,7 @@ data class RoomListUiState(
 @HiltViewModel
 class RoomListViewModel @Inject constructor(
     private val getFreeRoomsUseCase: GetFreeRoomsUseCase,
+    private val roomPresentationFormatter: RoomPresentationFormatter,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RoomListUiState())
@@ -45,23 +57,8 @@ class RoomListViewModel @Inject constructor(
 
             getFreeRoomsUseCase(dateTime).fold(
                 onSuccess = { freeRooms ->
-                    val buildings = freeRooms
-                        .map { it.room.building }
-                        .distinct()
-                        .sorted()
-
-                    val selectedBuilding = _uiState.value.selectedBuilding
-                    val filtered = if (selectedBuilding == null) {
-                        freeRooms
-                    } else {
-                        freeRooms.filter { it.room.building == selectedBuilding }
-                    }
-
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        freeRooms = freeRooms,
-                        filteredRooms = filtered,
-                        buildings = buildings,
+                    _uiState.value = rebuildPresentation(
+                        current = _uiState.value.copy(isLoading = false, freeRooms = freeRooms),
                     )
                 },
                 onFailure = { error ->
@@ -74,16 +71,25 @@ class RoomListViewModel @Inject constructor(
         }
     }
 
-    fun selectBuilding(building: String?) {
-        val current = _uiState.value
-        val filtered = if (building == null) {
-            current.freeRooms
-        } else {
-            current.freeRooms.filter { it.room.building == building }
-        }
-        _uiState.value = current.copy(
-            selectedBuilding = building,
-            filteredRooms = filtered,
+    fun selectCampus(campusKey: String) {
+        _uiState.value = rebuildPresentation(
+            current = _uiState.value,
+            selectedCampusKey = campusKey,
+            selectedGroupKey = null,
+        )
+    }
+
+    fun selectGroup(groupKey: String?) {
+        _uiState.value = rebuildPresentation(
+            current = _uiState.value,
+            selectedGroupKey = groupKey,
+        )
+    }
+
+    fun selectVisibilityMode(visibilityMode: RoomVisibilityMode) {
+        _uiState.value = rebuildPresentation(
+            current = _uiState.value,
+            visibilityMode = visibilityMode,
         )
     }
 
@@ -121,24 +127,67 @@ class RoomListViewModel @Inject constructor(
         }
 
         getFreeRoomsUseCase(dateTime).onSuccess { freeRooms ->
-            val buildings = freeRooms
-                .map { it.room.building }
-                .distinct()
-                .sorted()
-
-            val selectedBuilding = _uiState.value.selectedBuilding
-            val filtered = if (selectedBuilding == null) {
-                freeRooms
-            } else {
-                freeRooms.filter { it.room.building == selectedBuilding }
-            }
-
-            _uiState.value = _uiState.value.copy(
-                freeRooms = freeRooms,
-                filteredRooms = filtered,
-                buildings = buildings,
+            _uiState.value = rebuildPresentation(
+                current = _uiState.value.copy(
+                    freeRooms = freeRooms,
+                ),
+            ).copy(
                 selectedDateTime = dateTime,
             )
+        }
+    }
+
+    private fun rebuildPresentation(
+        current: RoomListUiState,
+        selectedCampusKey: String = current.selectedCampusKey,
+        selectedGroupKey: String? = current.selectedGroupKey,
+        visibilityMode: RoomVisibilityMode = current.visibilityMode,
+    ): RoomListUiState {
+        val initialPresentation = roomPresentationFormatter.buildRoomListPresentation(
+            freeRooms = current.freeRooms,
+            selectedCampusKey = selectedCampusKey,
+            selectedGroupKey = selectedGroupKey,
+            visibilityMode = visibilityMode,
+        )
+        val safeCampusKey = sanitizeCampusKey(initialPresentation, selectedCampusKey)
+        val safeGroupKey = sanitizeGroupKey(initialPresentation, selectedGroupKey)
+        val presentation = if (safeCampusKey == selectedCampusKey && safeGroupKey == selectedGroupKey) {
+            initialPresentation
+        } else {
+            roomPresentationFormatter.buildRoomListPresentation(
+                freeRooms = current.freeRooms,
+                selectedCampusKey = safeCampusKey,
+                selectedGroupKey = safeGroupKey,
+                visibilityMode = visibilityMode,
+            )
+        }
+
+        return current.copy(
+            visibleRooms = presentation.visibleRooms,
+            sections = presentation.sections,
+            campusFilters = presentation.campusFilters,
+            groupFilters = presentation.groupFilters,
+            selectedCampusKey = safeCampusKey,
+            selectedGroupKey = safeGroupKey,
+            visibilityMode = visibilityMode,
+        )
+    }
+
+    private fun sanitizeCampusKey(
+        presentation: RoomListPresentation,
+        requestedCampusKey: String,
+    ): String {
+        val knownKeys = presentation.campusFilters.mapNotNull { it.key }.toSet()
+        return if (requestedCampusKey in knownKeys) requestedCampusKey else DEFAULT_CAMPUS_KEY
+    }
+
+    private fun sanitizeGroupKey(
+        presentation: RoomListPresentation,
+        requestedGroupKey: String?,
+    ): String? {
+        if (requestedGroupKey == null) return null
+        return requestedGroupKey.takeIf { key ->
+            presentation.groupFilters.any { it.key == key }
         }
     }
 }

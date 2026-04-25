@@ -17,10 +17,13 @@ actor RoomRepository: RoomRepositoryProviding {
         static let eventsPrefix = "events_"
     }
 
+    private static let roomsTTL: TimeInterval = 24 * 60 * 60
+    private static let eventsTTL: TimeInterval = 5 * 60
+
     private let apiClient: ThabellaAPIClient
     private let cacheStore: RoomCacheStore
-    private let roomCacheTTL: TimeInterval = 24 * 60 * 60
-    private let eventsCacheTTL: TimeInterval = 5 * 60
+    private let roomCacheTTL: TimeInterval = RoomRepository.roomsTTL
+    private let eventsCacheTTL: TimeInterval = RoomRepository.eventsTTL
     private var inMemoryRooms: [Room]?
 
     init(
@@ -34,6 +37,7 @@ actor RoomRepository: RoomRepositoryProviding {
     func allRooms() async throws -> [Room] {
         if let lastUpdated = try await cacheStore.metadata(for: CacheKey.rooms),
            isFresh(lastUpdated, ttl: roomCacheTTL) {
+            if let rooms = inMemoryRooms, !rooms.isEmpty { return rooms }
             let cachedRooms = try await cacheStore.loadRooms()
             if !cachedRooms.isEmpty {
                 inMemoryRooms = cachedRooms
@@ -100,14 +104,15 @@ actor RoomRepository: RoomRepositoryProviding {
                 .filter { $0.startDateTime <= date && $0.endDateTime > date }
                 .map(\.roomIdent)
         )
+        let futureEventsByRoom = Dictionary(
+            grouping: events.filter { $0.startDateTime > date },
+            by: \.roomIdent
+        )
 
         return rooms
             .filter { !occupiedIdents.contains($0.ident) }
             .map { room in
-                let nextEvent = events
-                    .filter { $0.roomIdent == room.ident && $0.startDateTime > date }
-                    .min(by: { $0.startDateTime < $1.startDateTime })
-
+                let nextEvent = futureEventsByRoom[room.ident]?.min(by: { $0.startDateTime < $1.startDateTime })
                 return FreeRoom(room: room, freeUntil: nextEvent?.startDateTime)
             }
             .sorted(by: Self.freeRoomComparator)

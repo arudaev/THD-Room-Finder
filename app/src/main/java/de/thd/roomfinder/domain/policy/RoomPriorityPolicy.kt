@@ -1,11 +1,11 @@
 package de.thd.roomfinder.domain.policy
 
 import de.thd.roomfinder.domain.model.Room
-import java.util.Locale
+import de.thd.roomfinder.domain.normalizeForMatching
 
 internal object RoomPriorityPolicy {
 
-    private val mainCampusBuildings = setOf("A", "B", "C", "D", "E", "I", "ITC", "J")
+    internal val mainCampusBuildings = setOf("A", "B", "C", "D", "E", "I", "ITC", "J")
     private val excludedMarkers = listOf(
         "besprechungsraum",
         "vorplatz",
@@ -41,16 +41,9 @@ internal object RoomPriorityPolicy {
     }
 
     private fun Room.searchableText(): String =
-        listOf(name, displayName, building, facilities.joinToString(" "))
+        listOf(name, displayName, building, untisLongname.orEmpty(), facilities.joinToString(" "))
             .joinToString(" ")
             .normalizeForMatching()
-
-    private fun String.normalizeForMatching(): String =
-        lowercase(Locale.ROOT)
-            .replace("ä", "ae")
-            .replace("ö", "oe")
-            .replace("ü", "ue")
-            .replace("ß", "ss")
 
     private fun containsWord(text: String, word: String): Boolean =
         Regex("""(^|\W)${Regex.escape(word)}($|\W)""").containsMatchIn(text)

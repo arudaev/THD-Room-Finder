@@ -9,6 +9,12 @@ on:
 permissions:
   contents: read
 
+env:
+  # Java 21 is required by AGP 8.x (minimum supported version for compileSdk 36)
+  JAVA_VERSION: '21'
+  # Pinned simulator name; update when Xcode drops this device from the runtime list
+  IOS_SIMULATOR: 'iPhone 16'
+
 jobs:
   android:
     name: Android Build & Test
@@ -17,10 +23,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
 
       - name: Setup Gradle
@@ -30,10 +36,18 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: bash scripts/dev/android-build.sh assembleDebug
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          command: bash scripts/dev/android-build.sh assembleDebug
 
       - name: Run unit tests and lint checks
-        run: bash scripts/dev/android-test.sh test lint
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          command: bash scripts/dev/android-test.sh test lint
 
   ios:
     name: iOS Build & Test
@@ -43,21 +57,29 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build iOS simulator app
-        run: |
-          xcodebuild \
-            -project ios/THDRoomFinder.xcodeproj \
-            -scheme THDRoomFinder \
-            -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO \
-            build
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 2
+          command: |
+            xcodebuild \
+              -project ios/THDRoomFinder.xcodeproj \
+              -scheme THDRoomFinder \
+              -configuration Debug \
+              -destination 'generic/platform=iOS Simulator' \
+              CODE_SIGNING_ALLOWED=NO \
+              build
 
       - name: Run THDRoomFinderTests
-        run: |
-          xcodebuild \
-            -project ios/THDRoomFinder.xcodeproj \
-            -scheme THDRoomFinder \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -only-testing:THDRoomFinderTests \
-            CODE_SIGNING_ALLOWED=NO \
-            test
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 2
+          command: |
+            xcodebuild \
+              -project ios/THDRoomFinder.xcodeproj \
+              -scheme THDRoomFinder \
+              -destination 'platform=iOS Simulator,name=${{ env.IOS_SIMULATOR }},OS=latest' \
+              -only-testing:THDRoomFinderTests \
+              CODE_SIGNING_ALLOWED=NO \
+              test

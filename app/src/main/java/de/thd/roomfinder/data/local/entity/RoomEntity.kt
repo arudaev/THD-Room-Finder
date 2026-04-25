@@ -17,4 +17,5 @@ data class RoomEntity(
     val bookable: Boolean,
     val inChargeName: String?,
     val inChargeEmail: String?,
+    val untisLongname: String?,
 )

@@ -1,12 +1,9 @@
 package de.thd.roomfinder.data.mapper
 
+import de.thd.roomfinder.data.AppDateFormats
 import de.thd.roomfinder.data.remote.dto.PeriodDto
 import de.thd.roomfinder.domain.model.ScheduledEvent
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private val DATE_TIME_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
 /**
  * Maps a single PeriodDto to a list of ScheduledEvents.
@@ -15,7 +12,7 @@ private val DATE_TIME_FORMATTER: DateTimeFormatter =
  */
 internal fun PeriodDto.toDomainModels(): List<ScheduledEvent> {
     val start = try {
-        LocalDateTime.parse(startDateTime, DATE_TIME_FORMATTER)
+        LocalDateTime.parse(startDateTime, AppDateFormats.EVENT_DATE_TIME)
     } catch (_: Exception) {
         return emptyList()
     }
