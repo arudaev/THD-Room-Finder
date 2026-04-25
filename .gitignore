@@ -64,3 +64,4 @@ Desktop.ini
 # Crash logs
 crash-logs/
 nul
+.env
