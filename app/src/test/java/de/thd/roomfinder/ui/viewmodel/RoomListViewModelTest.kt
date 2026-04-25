@@ -9,7 +9,9 @@ import de.thd.roomfinder.domain.usecase.GetFreeRoomsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
+import de.thd.roomfinder.util.Constants
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -161,6 +163,54 @@ class RoomListViewModelTest {
             )
         } finally {
             viewModel.viewModelScope.cancel()
+        }
+    }
+
+    @Test
+    fun `auto-refresh fires after interval and triggers a second use case call`() = runTest(testDispatcher) {
+        fakeRepository.roomsResult = Result.success(
+            listOf(TestFixtures.room(id = 1, ident = "A008", name = "A008 - Labor", building = "A", displayName = "Labor")),
+        )
+        fakeRepository.eventsResult = Result.success(emptyList())
+
+        val viewModel = RoomListViewModel(useCase, formatter)
+        try {
+            runCurrent()
+            val callsAfterInit = fakeRepository.getScheduledEventsCallCount
+
+            advanceTimeBy(Constants.AUTO_REFRESH_INTERVAL_MS + 1)
+            runCurrent()
+
+            assertTrue(
+                "Expected a second getScheduledEvents call after interval, count was ${fakeRepository.getScheduledEventsCallCount}",
+                fakeRepository.getScheduledEventsCallCount > callsAfterInit,
+            )
+        } finally {
+            viewModel.viewModelScope.cancel()
+        }
+    }
+
+    @Test
+    fun `cancelling scope stops auto-refresh loop`() = runTest(testDispatcher) {
+        fakeRepository.roomsResult = Result.success(emptyList())
+        fakeRepository.eventsResult = Result.success(emptyList())
+
+        val viewModel = RoomListViewModel(useCase, formatter)
+        try {
+            runCurrent()
+            viewModel.viewModelScope.cancel()
+            val callCountAfterCancel = fakeRepository.getScheduledEventsCallCount
+
+            advanceTimeBy(Constants.AUTO_REFRESH_INTERVAL_MS * 3)
+            runCurrent()
+
+            assertEquals(
+                "No more calls expected after scope cancelled",
+                callCountAfterCancel,
+                fakeRepository.getScheduledEventsCallCount,
+            )
+        } finally {
+            // scope already cancelled
         }
     }
 

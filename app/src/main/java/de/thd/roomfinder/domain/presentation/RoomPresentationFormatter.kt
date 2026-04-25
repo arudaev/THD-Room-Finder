@@ -4,13 +4,11 @@ import android.content.Context
 import de.thd.roomfinder.domain.model.FreeRoom
 import de.thd.roomfinder.domain.model.Room
 import de.thd.roomfinder.domain.model.ScheduledEvent
+import de.thd.roomfinder.domain.normalizeForMatching
 import java.io.File
-import java.text.Normalizer
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 enum class RoomVisibilityClass {
@@ -127,7 +125,7 @@ class RoomPresentationFormatter(
     private val campusesByKey = taxonomy.campuses.associateBy { it.key }
     private val sitesByKey = taxonomy.sites.associateBy { it.key }
     private val roomKinds = taxonomy.roomKinds.map { rule ->
-        CompiledRoomKind(rule, rule.keywords.map(::normalizeForMatching))
+        CompiledRoomKind(rule, rule.keywords.map { it.normalizeForMatching() })
     }
     private val visibilityRules = taxonomy.visibilityRules.map { CompiledVisibilityRule(it) }
     private val exceptionRules = taxonomy.exceptionRules.map { CompiledExceptionRule(it) }
@@ -142,6 +140,9 @@ class RoomPresentationFormatter(
             },
         )
     }
+
+    fun mainCampusBuildingLabels(): List<String> =
+        taxonomy.buildings.filter { it.isMainCampus }.map { it.label }
 
     fun buildRoomListPresentation(
         freeRooms: List<FreeRoom>,
@@ -206,7 +207,7 @@ class RoomPresentationFormatter(
 
     fun present(room: Room): StudentFacingRoomPresentation {
         val rawLabel = room.name.trim().ifBlank { room.displayName.ifBlank { "Unknown room" } }
-        val normalizedLabel = normalizeForMatching(rawLabel)
+        val normalizedLabel = rawLabel.normalizeForMatching()
         val roomCode = extractRoomCode(rawLabel)
         val exceptionMatch = exceptionRules.firstOrNull { it.regex.containsMatchIn(normalizedLabel) }
         val buildingRule = matchBuildingRule(normalizedLabel, roomCode)
@@ -290,8 +291,8 @@ class RoomPresentationFormatter(
     }
 
     fun meaningfulTitle(event: ScheduledEvent): String? {
-        val normalizedTitle = normalizeForMatching(event.title)
-        val normalizedType = normalizeForMatching(event.eventType)
+        val normalizedTitle = event.title.normalizeForMatching()
+        val normalizedType = event.eventType.normalizeForMatching()
         if (normalizedTitle.isBlank() || normalizedTitle == "unknown" || normalizedTitle == normalizedType) {
             return null
         }
@@ -333,14 +334,12 @@ class RoomPresentationFormatter(
     ): RoomKind {
         exceptionMatch?.rule?.roomKindKey?.let { return RoomKind.fromRaw(it) }
 
-        val searchableText = normalizeForMatching(
-            listOf(
-                room.name,
-                room.displayName,
-                room.untisLongname.orEmpty(),
-                room.facilities.joinToString(" "),
-            ).joinToString(" "),
-        )
+        val searchableText = listOf(
+            room.name,
+            room.displayName,
+            room.untisLongname.orEmpty(),
+            room.facilities.joinToString(" "),
+        ).joinToString(" ").normalizeForMatching()
 
         roomKinds.firstOrNull { compiled ->
             compiled.rule.key != RoomKind.UNKNOWN.rawKey &&
@@ -447,7 +446,7 @@ class RoomPresentationFormatter(
             buildingRules.filter { it.rule.campusKey == prioritizedCampus } +
                 buildingRules.filter { it.rule.campusKey != prioritizedCampus }
         }
-        val normalizedRoomCode = roomCode?.let(::normalizeForMatching)
+        val normalizedRoomCode = roomCode?.normalizeForMatching()
         return orderedRules.firstOrNull { compiled ->
             compiled.patterns.any { regex ->
                 regex.containsMatchIn(normalizedLabel) ||
@@ -510,22 +509,6 @@ class RoomPresentationFormatter(
         groupLabel.lowercase(Locale.ROOT),
     )
 
-    private fun normalizeForMatching(value: String): String {
-        val transliterated = value
-            .replace("\u00c4", "Ae")
-            .replace("\u00d6", "Oe")
-            .replace("\u00dc", "Ue")
-            .replace("\u00e4", "ae")
-            .replace("\u00f6", "oe")
-            .replace("\u00fc", "ue")
-            .replace("\u00df", "ss")
-        val decomposed = Normalizer.normalize(transliterated, Normalizer.Form.NFD)
-        return decomposed
-            .replace(Regex("\\p{M}+"), "")
-            .lowercase(Locale.ROOT)
-            .trim()
-    }
-
     private data class CompiledBuildingRule(
         val rule: TaxonomyBuilding,
         val patterns: List<Regex>,
@@ -551,65 +534,3 @@ class RoomPresentationFormatter(
     }
 }
 
-@Serializable
-data class RoomTaxonomy(
-    val version: Int,
-    val campuses: List<TaxonomyCampus>,
-    val sites: List<TaxonomySite>,
-    val buildings: List<TaxonomyBuilding>,
-    val roomCodePatterns: List<String>,
-    val roomKinds: List<TaxonomyRoomKind>,
-    val visibilityRules: List<TaxonomyVisibilityRule>,
-    val exceptionRules: List<TaxonomyExceptionRule>,
-)
-
-@Serializable
-data class TaxonomyCampus(
-    val key: String,
-    val label: String,
-    val sortOrder: Int,
-    val aliases: List<String>,
-)
-
-@Serializable
-data class TaxonomySite(
-    val key: String,
-    val campusKey: String,
-    val label: String,
-    val sortOrder: Int,
-    val aliases: List<String>,
-)
-
-@Serializable
-data class TaxonomyBuilding(
-    val key: String,
-    val campusKey: String,
-    val siteKey: String,
-    val label: String,
-    val patterns: List<String>,
-    val aliases: List<String>,
-)
-
-@Serializable
-data class TaxonomyRoomKind(
-    val key: String,
-    val label: String,
-    val keywords: List<String>,
-)
-
-@Serializable
-data class TaxonomyVisibilityRule(
-    val key: String,
-    val visibilityClass: String,
-    val patterns: List<String>,
-)
-
-@Serializable
-data class TaxonomyExceptionRule(
-    val pattern: String,
-    val buildingLabel: String? = null,
-    val roomKindKey: String? = null,
-    val visibilityClass: String? = null,
-    val campusKey: String? = null,
-    val siteKey: String? = null,
-)

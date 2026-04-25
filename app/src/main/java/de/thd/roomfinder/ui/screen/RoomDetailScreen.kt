@@ -26,15 +26,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import de.thd.roomfinder.ui.UiDateFormats
 import de.thd.roomfinder.ui.component.RoomInfoSection
 import de.thd.roomfinder.ui.component.ScheduleCard
 import de.thd.roomfinder.ui.viewmodel.RoomDetailUiState
 import java.text.Normalizer
-import java.time.format.DateTimeFormatter
 import java.util.Locale
-
-private val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM")
-private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,10 +122,10 @@ internal fun RoomDetailScreen(
                                 Text(
                                     text = when {
                                         uiState.isFreeNow && uiState.freeUntil != null ->
-                                            "Free until ${uiState.freeUntil.format(timeFormatter)}"
+                                            "Free until ${uiState.freeUntil.format(UiDateFormats.TIME)}"
                                         uiState.isFreeNow -> "Free all day"
                                         uiState.occupiedUntil != null ->
-                                            "Occupied until ${uiState.occupiedUntil.format(timeFormatter)}"
+                                            "Occupied until ${uiState.occupiedUntil.format(UiDateFormats.TIME)}"
                                         else -> "Occupied now"
                                     },
                                     style = MaterialTheme.typography.bodyMedium,
@@ -139,7 +136,7 @@ internal fun RoomDetailScreen(
 
                     item {
                         Text(
-                            text = "Schedule - ${uiState.queryDateTime.format(dateFormatter)}",
+                            text = "Schedule - ${uiState.queryDateTime.format(UiDateFormats.DATE_HEADER)}",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(16.dp),
                         )

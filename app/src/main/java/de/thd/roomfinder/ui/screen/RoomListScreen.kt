@@ -38,12 +38,10 @@ import de.thd.roomfinder.domain.presentation.RoomListSection
 import de.thd.roomfinder.domain.presentation.RoomVisibilityMode
 import de.thd.roomfinder.ui.component.DateTimePickerDialog
 import de.thd.roomfinder.ui.component.RoomCard
+import de.thd.roomfinder.ui.UiDateFormats
 import de.thd.roomfinder.ui.component.RoomFilterChipRow
 import de.thd.roomfinder.ui.viewmodel.RoomListUiState
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private val dateTimeDisplayFormatter = DateTimeFormatter.ofPattern("EEE, d MMM - HH:mm")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -150,7 +148,7 @@ internal fun RoomListScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
-                                        text = uiState.selectedDateTime.format(dateTimeDisplayFormatter),
+                                        text = uiState.selectedDateTime.format(UiDateFormats.DATE_TIME_PICKER),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     )

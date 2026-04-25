@@ -1,14 +1,11 @@
 package de.thd.roomfinder.data.local.mapper
 
+import de.thd.roomfinder.data.AppDateFormats
 import de.thd.roomfinder.data.local.entity.RoomEntity
 import de.thd.roomfinder.data.local.entity.ScheduledEventEntity
 import de.thd.roomfinder.domain.model.Room
 import de.thd.roomfinder.domain.model.ScheduledEvent
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private val DATE_TIME_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
 internal fun Room.toEntity(): RoomEntity = RoomEntity(
     id = id,
@@ -48,8 +45,8 @@ internal fun ScheduledEvent.toEntity(dateKey: String): ScheduledEventEntity =
         eventId = id,
         roomIdent = roomIdent,
         roomName = roomName,
-        startDateTime = startDateTime.format(DATE_TIME_FORMATTER),
-        endDateTime = endDateTime.format(DATE_TIME_FORMATTER),
+        startDateTime = startDateTime.format(AppDateFormats.EVENT_DATE_TIME),
+        endDateTime = endDateTime.format(AppDateFormats.EVENT_DATE_TIME),
         durationMinutes = durationMinutes,
         eventType = eventType,
         title = title,
@@ -60,8 +57,8 @@ internal fun ScheduledEventEntity.toDomainModel(): ScheduledEvent = ScheduledEve
     id = eventId,
     roomIdent = roomIdent,
     roomName = roomName,
-    startDateTime = LocalDateTime.parse(startDateTime, DATE_TIME_FORMATTER),
-    endDateTime = LocalDateTime.parse(endDateTime, DATE_TIME_FORMATTER),
+    startDateTime = LocalDateTime.parse(startDateTime, AppDateFormats.EVENT_DATE_TIME),
+    endDateTime = LocalDateTime.parse(endDateTime, AppDateFormats.EVENT_DATE_TIME),
     durationMinutes = durationMinutes,
     eventType = eventType,
     title = title,

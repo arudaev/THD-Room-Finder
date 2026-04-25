@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "thd-room-taxonomy.schema.json",
+  "title": "THD Room Taxonomy",
+  "description": "Canonical room/building metadata shared by Android and iOS. Drives RoomPresentationFormatter on both platforms.",
+  "type": "object",
+  "required": ["version", "campuses", "sites", "buildings", "roomCodePatterns", "roomKinds", "visibilityRules", "exceptionRules"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Schema version. Increment when breaking changes are made."
+    },
+    "campuses": {
+      "type": "array",
+      "description": "Top-level campus groupings (Deggendorf, Pfarrkirchen/ECRI, Cham, Other).",
+      "items": { "$ref": "#/$defs/campus" }
+    },
+    "sites": {
+      "type": "array",
+      "description": "Sub-campus sites. Each site belongs to exactly one campus.",
+      "items": { "$ref": "#/$defs/site" }
+    },
+    "buildings": {
+      "type": "array",
+      "description": "Individual buildings. Each building belongs to exactly one site.",
+      "items": { "$ref": "#/$defs/building" }
+    },
+    "roomCodePatterns": {
+      "type": "array",
+      "description": "Ordered list of regexes (ECMA-262 / Java syntax, case-insensitive). Applied left-to-right against the raw room name to extract a canonical room code (e.g. 'A 008', 'I112'). First match wins.",
+      "items": { "type": "string" }
+    },
+    "roomKinds": {
+      "type": "array",
+      "description": "Room-type classification rules. Matched against the normalised searchable text for a room.",
+      "items": { "$ref": "#/$defs/roomKind" }
+    },
+    "visibilityRules": {
+      "type": "array",
+      "description": "Ordered list of visibility classification rules. First matching rule wins.",
+      "items": { "$ref": "#/$defs/visibilityRule" }
+    },
+    "exceptionRules": {
+      "type": "array",
+      "description": "Room-level overrides applied before any general rules. Matched against the normalised room label.",
+      "items": { "$ref": "#/$defs/exceptionRule" }
+    }
+  },
+  "$defs": {
+    "campus": {
+      "type": "object",
+      "required": ["key", "label", "sortOrder", "aliases"],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Machine-readable identifier used as campusKey in sites and as the selectedCampusKey filter value."
+        },
+        "label": { "type": "string", "description": "Human-readable campus name shown in the UI." },
+        "sortOrder": { "type": "integer", "description": "Ascending display order in campus filter chips." },
+        "aliases": {
+          "type": "array",
+          "description": "Lowercase normalised strings used to match campus names from room data.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "site": {
+      "type": "object",
+      "required": ["key", "campusKey", "label", "sortOrder", "aliases"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "campusKey": { "type": "string", "description": "References campus.key." },
+        "label": { "type": "string" },
+        "sortOrder": { "type": "integer", "description": "Ascending display order within a campus." },
+        "aliases": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "building": {
+      "type": "object",
+      "required": ["key", "campusKey", "siteKey", "label", "patterns", "aliases"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "Machine-readable identifier used as groupKey in room list sections." },
+        "campusKey": { "type": "string", "description": "References campus.key." },
+        "siteKey": { "type": "string", "description": "References site.key." },
+        "label": { "type": "string", "description": "Display label for the building (e.g. 'A', 'ITC 2+')." },
+        "isMainCampus": {
+          "type": "boolean",
+          "default": false,
+          "description": "True for Deggendorf main-campus buildings covered by RoomPriorityPolicy. Kept in sync with RoomPriorityPolicy.mainCampusBuildings via a unit test."
+        },
+        "patterns": {
+          "type": "array",
+          "description": "Regexes matched against the normalised room label to assign a room to this building. Evaluated in order; first match wins across all buildings.",
+          "items": { "type": "string" }
+        },
+        "aliases": {
+          "type": "array",
+          "description": "Lowercase shorthand names for the building used in campus hint matching.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "roomKind": {
+      "type": "object",
+      "required": ["key", "label", "keywords"],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Machine-readable kind identifier (e.g. 'lecture_hall'). Must match a RoomKind enum rawKey on both platforms."
+        },
+        "label": { "type": "string", "description": "Human-readable kind label shown in room cards." },
+        "keywords": {
+          "type": "array",
+          "description": "Lowercase normalised keywords. A room matches this kind if any keyword appears in its searchable text.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "visibilityRule": {
+      "type": "object",
+      "required": ["key", "visibilityClass", "patterns"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "Unique rule identifier for debugging." },
+        "visibilityClass": {
+          "type": "string",
+          "enum": ["teaching_room", "secondary_venue", "exclude_default", "unknown"],
+          "description": "Visibility class assigned when any pattern matches."
+        },
+        "patterns": {
+          "type": "array",
+          "description": "Regexes (case-insensitive) matched against the normalised room label.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "exceptionRule": {
+      "type": "object",
+      "required": ["pattern"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "Case-insensitive regex matched against the normalised room label. All other fields override the general classification when this rule fires."
+        },
+        "buildingLabel": { "type": ["string", "null"] },
+        "roomKindKey": {
+          "type": ["string", "null"],
+          "description": "If set, overrides the inferred RoomKind. Must be a valid roomKind.key."
+        },
+        "visibilityClass": {
+          "type": ["string", "null"],
+          "enum": ["teaching_room", "secondary_venue", "exclude_default", "unknown", null]
+        },
+        "campusKey": {
+          "type": ["string", "null"],
+          "description": "If set, overrides the inferred campus. Must be a valid campus.key."
+        },
+        "siteKey": {
+          "type": ["string", "null"],
+          "description": "If set, overrides the inferred site. Must be a valid site.key."
+        }
+      }
+    }
+  }
+}

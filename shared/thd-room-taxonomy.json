@@ -1,4 +1,5 @@
 {
+  "$schema": "./thd-room-taxonomy.schema.json",
   "version": 1,
   "campuses": [
     {
@@ -138,6 +139,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "A",
+      "isMainCampus": true,
       "patterns": [
         "^a\\s*\\d",
         "geb\\.\\s*a\\b",
@@ -152,6 +154,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "B",
+      "isMainCampus": true,
       "patterns": [
         "^b\\s*\\d",
         "geb\\.\\s*b\\b"
@@ -165,6 +168,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "C",
+      "isMainCampus": true,
       "patterns": [
         "^c\\s*\\d",
         "geb\\.\\s*c\\b"
@@ -178,6 +182,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "D",
+      "isMainCampus": true,
       "patterns": [
         "^d\\s*\\d",
         "geb\\.\\s*d\\b"
@@ -191,6 +196,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "E",
+      "isMainCampus": true,
       "patterns": [
         "^e\\s*\\d",
         "geb\\.\\s*e\\b",
@@ -241,6 +247,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "I",
+      "isMainCampus": true,
       "patterns": [
         "^i\\s*\\d",
         "geb\\.\\s*i\\b",
@@ -256,6 +263,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "J",
+      "isMainCampus": true,
       "patterns": [
         "^j\\s*\\d",
         "geb\\.\\s*j\\b"
@@ -293,6 +301,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "ITC 2+",
+      "isMainCampus": true,
       "patterns": [
         "^itc\\s*2\\+"
       ],
@@ -305,6 +314,7 @@
       "campusKey": "deggendorf",
       "siteKey": "deggendorf_main",
       "label": "ITC 2",
+      "isMainCampus": true,
       "patterns": [
         "^itc\\s*2\\b(?!\\+)"
       ],

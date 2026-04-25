@@ -13,10 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.thd.roomfinder.domain.model.ScheduledEvent
+import de.thd.roomfinder.ui.UiDateFormats
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @Composable
 internal fun ScheduleCard(
@@ -39,7 +37,7 @@ internal fun ScheduleCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "${event.startDateTime.format(timeFormatter)} - ${event.endDateTime.format(timeFormatter)}",
+                    text = "${event.startDateTime.format(UiDateFormats.TIME)} - ${event.endDateTime.format(UiDateFormats.TIME)}",
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Text(

@@ -1,6 +1,7 @@
 package de.thd.roomfinder.domain.policy
 
 import de.thd.roomfinder.TestFixtures
+import de.thd.roomfinder.domain.presentation.RoomPresentationFormatter
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -60,5 +61,34 @@ class RoomPriorityPolicyTest {
         )
 
         assertFalse(RoomPriorityPolicy.isPriority(room))
+    }
+
+    @Test
+    fun `priority policy covers every isMainCampus building in the taxonomy`() {
+        val formatter = RoomPresentationFormatter.fromRepositoryRoot()
+        // Each taxonomy label like "ITC 2" maps to room.building = "ITC" (letters-only prefix)
+        val taxonomyCodes = formatter.mainCampusBuildingLabels()
+            .map { label -> label.substringBefore(" ").filter { it.isLetter() } }
+            .toSet()
+
+        val missingFromPolicy = taxonomyCodes - RoomPriorityPolicy.mainCampusBuildings
+        assertTrue(
+            "Taxonomy has isMainCampus buildings missing from policy: $missingFromPolicy",
+            missingFromPolicy.isEmpty(),
+        )
+    }
+
+    @Test
+    fun `policy buildings all exist in taxonomy as isMainCampus entries`() {
+        val formatter = RoomPresentationFormatter.fromRepositoryRoot()
+        val taxonomyCodes = formatter.mainCampusBuildingLabels()
+            .map { label -> label.substringBefore(" ").filter { it.isLetter() } }
+            .toSet()
+
+        val policyNotInTaxonomy = RoomPriorityPolicy.mainCampusBuildings - taxonomyCodes
+        assertTrue(
+            "Policy has buildings not in taxonomy: $policyNotInTaxonomy — add isMainCampus=true to taxonomy",
+            policyNotInTaxonomy.isEmpty(),
+        )
     }
 }

@@ -119,6 +119,58 @@ class PeriodMapperTest {
         assertEquals(42, events[0].id)
     }
 
+    @Test
+    fun `parses midnight boundary (00 00) correctly`() {
+        val dto = periodDto(startDateTime = "2025-03-30 00:00", duration = 60)
+        val events = dto.toDomainModels()
+
+        assertEquals(1, events.size)
+        assertEquals(
+            LocalDateTime.of(2025, 3, 30, 0, 0),
+            events[0].startDateTime,
+        )
+        assertEquals(
+            LocalDateTime.of(2025, 3, 30, 1, 0),
+            events[0].endDateTime,
+        )
+    }
+
+    @Test
+    fun `parses event that straddles midnight correctly`() {
+        val dto = periodDto(startDateTime = "2025-01-15 23:30", duration = 90)
+        val events = dto.toDomainModels()
+
+        assertEquals(1, events.size)
+        assertEquals(
+            LocalDateTime.of(2025, 1, 16, 1, 0),
+            events[0].endDateTime,
+        )
+    }
+
+    @Test
+    fun `returns empty list for date-only string missing time part`() {
+        val dto = periodDto(startDateTime = "2025-01-15")
+        val events = dto.toDomainModels()
+
+        assertTrue(events.isEmpty())
+    }
+
+    @Test
+    fun `returns empty list for empty string`() {
+        val dto = periodDto(startDateTime = "")
+        val events = dto.toDomainModels()
+
+        assertTrue(events.isEmpty())
+    }
+
+    @Test
+    fun `returns empty list for time-only string missing date part`() {
+        val dto = periodDto(startDateTime = "10:00")
+        val events = dto.toDomainModels()
+
+        assertTrue(events.isEmpty())
+    }
+
     private fun periodDto(
         id: Int = 1,
         startDateTime: String = "2025-01-15 10:00",

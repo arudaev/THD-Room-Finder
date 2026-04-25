@@ -17,10 +17,13 @@ actor RoomRepository: RoomRepositoryProviding {
         static let eventsPrefix = "events_"
     }
 
+    private static let roomsTTL: TimeInterval = 24 * 60 * 60
+    private static let eventsTTL: TimeInterval = 5 * 60
+
     private let apiClient: ThabellaAPIClient
     private let cacheStore: RoomCacheStore
-    private let roomCacheTTL: TimeInterval = 24 * 60 * 60
-    private let eventsCacheTTL: TimeInterval = 5 * 60
+    private let roomCacheTTL: TimeInterval = Self.roomsTTL
+    private let eventsCacheTTL: TimeInterval = Self.eventsTTL
     private var inMemoryRooms: [Room]?
 
     init(

@@ -22,12 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.thd.roomfinder.R
+import de.thd.roomfinder.ui.UiDateFormats
 import de.thd.roomfinder.ui.theme.THDRoomFinderTheme
 import de.thd.roomfinder.ui.viewmodel.HomeUiState
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,7 +87,7 @@ internal fun HomeScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            text = "As of ${uiState.currentTime.format(timeFormatter)}",
+                            text = "As of ${uiState.currentTime.format(UiDateFormats.TIME)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
