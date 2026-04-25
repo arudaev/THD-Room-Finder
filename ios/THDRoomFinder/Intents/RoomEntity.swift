@@ -34,7 +34,7 @@ struct RoomEntity: AppEntity, Identifiable {
 
     var displayRepresentation: DisplayRepresentation {
         let presentation = RoomPresentationFormatter.shared.present(room)
-        DisplayRepresentation(
+        return DisplayRepresentation(
             title: "\(presentation.primaryLabel)",
             subtitle: "\(presentation.secondaryLabel)"
         )
