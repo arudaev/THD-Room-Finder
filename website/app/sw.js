@@ -1,10 +1,12 @@
-const VERSION = 'thd-v4';
+const VERSION = 'thd-v6';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const SHELL = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/adaptive.css',
+  '/adaptive.js',
   '/api.js',
   '/logic.js',
   '/app.js',

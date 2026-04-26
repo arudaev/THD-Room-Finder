@@ -6,7 +6,10 @@
   <title>THD Room Finder</title>
   <meta name="description" content="Find free study rooms at THD Deggendorf in real time. No login required.">
   <meta name="application-name" content="THD Room Finder">
-  <meta name="theme-color" content="#1565C0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FDFCFF">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111318">
+  <meta name="theme-color" content="#FDFCFF">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -196,7 +199,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       font-family: var(--md-font);
-      letter-spacing: 0.00625rem;
+      letter-spacing: 0;
       cursor: pointer;
       transition: box-shadow 0.15s;
       -webkit-tap-highlight-color: transparent;
@@ -215,7 +218,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       font-family: var(--md-font);
-      letter-spacing: 0.00625rem;
+      letter-spacing: 0;
       cursor: pointer;
       transition: box-shadow 0.15s;
       -webkit-tap-highlight-color: transparent;
@@ -308,9 +311,9 @@
     }
     .home-count { text-align: center; }
     .count-num {
-      font-size: clamp(4.5rem, 22vw, 8rem);
+      font-size: 7rem;
       font-weight: 300;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
       line-height: 1;
       color: var(--md-primary);
     }
@@ -346,7 +349,7 @@
       font-size: 0.75rem;
       font-weight: 500;
       color: var(--md-on-surface-variant);
-      letter-spacing: 0.05em;
+      letter-spacing: 0;
       padding: 0 1rem 0.4rem;
       text-transform: uppercase;
     }
@@ -572,7 +575,13 @@
       padding: 0.15rem 0.5rem;
       border-radius: var(--md-radius-s);
     }
+
+    @media (max-width: 600px) {
+      .count-num { font-size: 5rem; }
+    }
   </style>
+  <link rel="stylesheet" href="adaptive.css">
+  <script defer src="adaptive.js"></script>
 </head>
 <body>
   <header id="header">
