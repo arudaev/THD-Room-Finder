@@ -2,6 +2,16 @@
   "outputDirectory": "website/app",
   "buildCommand": "",
   "installCommand": "",
+  "github": {
+    "silent": true,
+    "autoJobCancelation": true
+  },
+  "functions": {
+    "api/*.js": {
+      "regions": ["fra1"],
+      "maxDuration": 10
+    }
+  },
   "headers": [
     {
       "source": "/api/(.*)",
