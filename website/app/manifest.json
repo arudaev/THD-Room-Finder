@@ -2,7 +2,7 @@
   "name": "THD Room Finder",
   "short_name": "Room Finder",
   "description": "Find free study rooms at THD Deggendorf in real time. No login required.",
-  "start_url": "/app/",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#1565C0",

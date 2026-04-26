@@ -1,12 +1,12 @@
-const CACHE = 'thd-v1';
+const CACHE = 'thd-v2';
 const SHELL = [
-  '/app/',
-  '/app/index.html',
-  '/app/manifest.json',
-  '/app/api.js',
-  '/app/logic.js',
-  '/app/app.js',
-  '/app/icons/icon.svg',
+  './',
+  './index.html',
+  './manifest.json',
+  './api.js',
+  './logic.js',
+  './app.js',
+  './icons/icon.svg',
 ];
 
 self.addEventListener('install', e => {
@@ -26,11 +26,7 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Only handle requests within this SW's scope
   if (!e.request.url.startsWith(self.registration.scope)) return;
-  // Pass API calls through (browser HTTP cache + localStorage handle caching)
-  if (new URL(e.request.url).pathname.startsWith('/api/')) return;
-
   e.respondWith(
     caches.match(e.request).then(cached => cached ?? fetch(e.request))
   );

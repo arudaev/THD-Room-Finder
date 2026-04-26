@@ -89,19 +89,19 @@ function route() {
 function viewHome() {
   const count = state.freeRooms?.length ?? 0;
   const total = state.rooms?.length ?? 0;
-  const pct = total > 0 ? Math.round(count / total * 100) : 0;
   const updated = state.lastUpdated ? fmt(state.lastUpdated) : '–';
 
   return `
     <div class="home-view">
       <div class="home-count">
         <div class="count-num">${count}</div>
-        <div class="count-label">rooms free right now</div>
-        <div class="count-sub">out of ${total} total · updated ${updated}</div>
-        <div class="pct-bar"><div class="pct-fill" style="width:${pct}%"></div></div>
+        <div class="count-label">rooms available right now</div>
+        <div class="count-sub">out of ${total} total rooms</div>
+        <div class="count-sub-time">As of ${updated}</div>
       </div>
       <div class="home-actions">
-        <a class="btn-primary" href="#rooms">Find a Free Room</a>
+        <a class="btn-filled" href="#rooms">Find a Free Room</a>
+        <button class="btn-tonal" data-action="retry">Refresh</button>
       </div>
     </div>`;
 }
@@ -126,13 +126,21 @@ function viewRoomList() {
     ? `<div class="empty-state">No free rooms${state.selectedBuilding !== 'All' ? ` in building ${esc(state.selectedBuilding)}` : ''}</div>`
     : rooms.map(roomCard).join('');
 
+  const campusLabel = state.selectedBuilding === 'All' ? 'All buildings' : `Building ${esc(state.selectedBuilding)}`;
+
   return `
     <div class="list-view">
-      <div class="chip-row">${chips}</div>
+      <div class="filter-section">
+        <div class="chip-row">${chips}</div>
+      </div>
       <div class="time-row">
         <input type="datetime-local" class="time-input" value="${toDateTimeLocal(state.queryTime)}" data-action="set-time" aria-label="Query time">
         ${customBadge}
         <span class="updated-note">Updated ${updated}</span>
+      </div>
+      <div class="summary-card">
+        <div class="summary-count">${rooms.length} free rooms</div>
+        <div class="summary-sub">${campusLabel}</div>
       </div>
       <div class="room-cards">${cards}</div>
     </div>`;
@@ -141,18 +149,20 @@ function viewRoomList() {
 function roomCard({ room, freeUntil }) {
   const badge = freeUntil
     ? `<span class="badge badge-free">Until ${fmt(freeUntil)}</span>`
-    : `<span class="badge badge-allday">Free all day</span>`;
+    : `<span class="badge badge-allday">All day</span>`;
   const meta = [
     room.building,
     room.floor !== null ? `Floor ${room.floor}` : null,
     room.seatsRegular > 0 ? `${room.seatsRegular} seats` : null,
   ].filter(Boolean).join(' · ');
+  const availText = freeUntil ? `Free until ${fmt(freeUntil)}` : 'Free all day';
 
   return `
     <a class="room-card" href="#room/${encodeURIComponent(room.ident)}">
       <div class="room-card-left">
         <div class="room-name">${esc(room.name)}</div>
         <div class="room-meta">${esc(meta)}</div>
+        <div class="room-avail">${availText}</div>
       </div>
       <div class="room-card-right">${badge}</div>
     </a>`;
@@ -167,11 +177,20 @@ function viewRoomDetail(ident) {
   const current = schedule.find(e => e.startDateTime <= now && e.endDateTime > now);
   const next    = schedule.find(e => e.startDateTime > now);
 
-  const statusCard = current
-    ? `<div class="status-card occupied">Occupied · Free at ${fmt(current.endDateTime)}</div>`
-    : next
-    ? `<div class="status-card free">Free until ${fmt(next.startDateTime)}</div>`
-    : `<div class="status-card free">Free for the rest of the day</div>`;
+  let statusClass, statusTitle, statusSub;
+  if (current) {
+    statusClass = 'occupied';
+    statusTitle = 'Occupied now';
+    statusSub   = `Occupied until ${fmt(current.endDateTime)}`;
+  } else if (next) {
+    statusClass = 'free';
+    statusTitle = 'Free now';
+    statusSub   = `Free until ${fmt(next.startDateTime)}`;
+  } else {
+    statusClass = 'free';
+    statusTitle = 'Free now';
+    statusSub   = 'Free all day';
+  }
 
   const infoRows = [
     ['Building', room.building],
@@ -190,8 +209,10 @@ function viewRoomDetail(ident) {
       </div>`)
     .join('');
 
+  const scheduleDate = fmt(now, { weekday: 'short', month: 'short', day: 'numeric' });
+
   const eventRows = schedule.length === 0
-    ? `<div class="schedule-empty">No events today</div>`
+    ? `<div class="schedule-empty">No events scheduled</div>`
     : schedule.map(e => {
         const active = e.startDateTime <= now && e.endDateTime > now ? ' active' : '';
         return `
@@ -206,11 +227,14 @@ function viewRoomDetail(ident) {
 
   return `
     <div class="detail-view">
-      ${statusCard}
-      <section class="info-section">${infoRows}</section>
+      <div class="status-card ${statusClass}">
+        <div class="status-title">${statusTitle}</div>
+        <div class="status-sub">${statusSub}</div>
+      </div>
+      <section class="info-card">${infoRows}</section>
       <section class="schedule-section">
-        <h2 class="schedule-title">Today's Schedule</h2>
-        <div class="schedule-list">${eventRows}</div>
+        <h2 class="schedule-title">Schedule — ${scheduleDate}</h2>
+        <div class="schedule-card">${eventRows}</div>
       </section>
     </div>`;
 }
@@ -221,7 +245,7 @@ function renderHeader(r) {
   if (r.view === 'home') {
     header.innerHTML = `
       <div class="header-brand">
-        <svg width="20" height="20" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+        <svg width="24" height="24" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
           <rect width="108" height="108" fill="#1565C0" rx="24"/>
           <path fill="#FFFFFF" d="M30 38L30 78L66 78L66 38L48 26Z"/>
           <path fill="#FFFFFF" fill-opacity="0.7" d="M48 26L30 38L66 38Z"/>
@@ -237,7 +261,7 @@ function renderHeader(r) {
       : 'Free Rooms';
     header.innerHTML = `
       <a class="header-back" href="#${backTo}" aria-label="Back">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
           <path d="M15 18l-6-6 6-6"/>
         </svg>
@@ -261,7 +285,7 @@ function render() {
     app.innerHTML = `
       <div class="error-view">
         <p class="error-msg">${esc(state.error)}</p>
-        <button class="btn-primary" data-action="retry">Retry</button>
+        <button class="btn-filled" data-action="retry">Retry</button>
       </div>`;
     return;
   }
@@ -295,7 +319,6 @@ document.body.addEventListener('change', e => {
   if (e.target.dataset.action === 'set-time' && e.target.value) {
     state.queryTime = new Date(e.target.value);
     state.isCustomTime = true;
-    // Recompute free rooms for the new time (events already fetched for the day)
     if (state.rooms && state.events) {
       state.freeRooms = computeFreeRooms(state.rooms, state.events, state.queryTime);
       render();

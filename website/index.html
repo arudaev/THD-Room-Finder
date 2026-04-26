@@ -13,77 +13,99 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://arudaev.github.io/THD-Room-Finder/og-banner.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #F7F3EE;
-      --surface:  #FFFFFF;
-      --border:   #E4DDD5;
-      --text:     #1C1B1F;
-      --muted:    #6B6560;
-      --btn-primary:    #5D4E37;
-      --btn-primary-fg: #FFFFFF;
-      --btn-secondary:    #EDE0D4;
-      --btn-secondary-fg: #5D4E37;
-      --font: 'Inter', system-ui, sans-serif;
+      --md-primary:              #1565C0;
+      --md-on-primary:           #FFFFFF;
+      --md-primary-container:    #D3E4FF;
+      --md-on-primary-container: #001C3B;
+      --md-secondary:            #546E7A;
+      --md-on-secondary:         #FFFFFF;
+      --md-secondary-container:    #D6E4EF;
+      --md-on-secondary-container: #0D1D26;
+      --md-surface:              #FDFCFF;
+      --md-on-surface:           #1C1B1F;
+      --md-on-surface-variant:   #44464F;
+      --md-outline:              #74777F;
+      --md-outline-variant:      #C4C6D0;
+      --md-bg:                   #F4F6FA;
+      --md-surface-1:            #EEF1FA;
+      --md-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --md-radius-l:  16px;
+      --md-radius-xl: 28px;
+      --md-shadow-1: 0 1px 2px rgba(0,0,0,.12), 0 1px 3px 1px rgba(0,0,0,.08);
+      --md-shadow-2: 0 1px 2px rgba(0,0,0,.15), 0 2px 6px 2px rgba(0,0,0,.10);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg:       #141210;
-        --surface:  #1F1D1B;
-        --border:   #2E2B28;
-        --text:     #E8E0D8;
-        --muted:    #9E9690;
-        --btn-primary:    #D4B896;
-        --btn-primary-fg: #2C2016;
-        --btn-secondary:    #2A2420;
-        --btn-secondary-fg: #D4B896;
+        --md-primary:              #90CAF9;
+        --md-on-primary:           #003063;
+        --md-primary-container:    #00458D;
+        --md-on-primary-container: #D3E4FF;
+        --md-secondary:            #B0BEC5;
+        --md-on-secondary:         #1E333E;
+        --md-secondary-container:    #354A55;
+        --md-on-secondary-container: #D6E4EF;
+        --md-surface:              #1C1B1F;
+        --md-on-surface:           #E6E1E5;
+        --md-on-surface-variant:   #C4C6D0;
+        --md-outline:              #8E9099;
+        --md-outline-variant:      #44464F;
+        --md-bg:                   #111318;
+        --md-surface-1:            #21242C;
+        --md-shadow-1: 0 1px 2px rgba(0,0,0,.3),  0 1px 3px 1px rgba(0,0,0,.2);
+        --md-shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
       }
     }
 
     html { scroll-behavior: smooth; }
     body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
+      font-family: var(--md-font);
+      background: var(--md-bg);
+      color: var(--md-on-surface);
       overflow-x: hidden;
     }
 
-    /* ── NAV ─────────────────────────────── */
+    /* ── Top App Bar ─────────────────────────── */
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.1rem 2rem;
-      border-bottom: 1px solid var(--border);
+      padding: 0 1rem;
+      height: 64px;
+      background: var(--md-surface);
+      border-bottom: 1px solid var(--md-outline-variant);
     }
     .nav-brand {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
+      font-size: 1.375rem;
+      font-weight: 500;
+      color: var(--md-on-surface);
       text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     .nav-gh {
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      color: var(--muted);
+      color: var(--md-on-surface-variant);
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: 0.875rem;
       font-weight: 500;
-      transition: color 0.15s;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--md-radius-xl);
+      transition: background 0.1s, color 0.1s;
     }
-    .nav-gh:hover { color: var(--text); }
+    .nav-gh:hover {
+      background: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
+      color: var(--md-on-surface);
+    }
 
-    /* ── HERO ────────────────────────────── */
+    /* ── Hero ────────────────────────────────── */
     .hero {
       display: flex;
       align-items: center;
@@ -94,34 +116,35 @@
     .hero-inner {
       max-width: 560px;
       width: 100%;
+      animation: fade-up 0.4s ease both;
     }
 
-    /* app icon */
     .app-icon {
       width: 80px; height: 80px;
       border-radius: 20px;
       display: block;
       margin: 0 auto 2rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      box-shadow: var(--md-shadow-2);
     }
 
     h1 {
       font-size: clamp(1.9rem, 5vw, 2.75rem);
-      font-weight: 600;
-      letter-spacing: -0.02em;
+      font-weight: 400;
+      letter-spacing: -0.01em;
       line-height: 1.15;
       margin-bottom: 1rem;
-      color: var(--text);
+      color: var(--md-on-surface);
     }
 
     .hero-sub {
       font-size: 1rem;
-      color: var(--muted);
+      color: var(--md-on-surface-variant);
       line-height: 1.7;
       max-width: 420px;
       margin: 0 auto 2.5rem;
     }
 
+    /* ── Stats ────────────────────────────────── */
     .stat-row {
       display: flex;
       justify-content: center;
@@ -131,21 +154,22 @@
     }
     .stat { text-align: center; }
     .stat-num {
-      font-size: 1.4rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--md-primary);
       line-height: 1;
     }
     .stat-label {
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--md-on-surface-variant);
+      margin-top: 0.3rem;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
     }
 
+    /* ── CTAs ─────────────────────────────────── */
     .cta-row {
       display: flex;
       gap: 0.75rem;
@@ -153,49 +177,42 @@
       flex-wrap: wrap;
       margin-bottom: 2rem;
     }
-    .btn-web {
+
+    .btn-filled {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      background: var(--btn-primary);
-      color: var(--btn-primary-fg);
-      font-size: 0.95rem;
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+      font-size: 0.875rem;
       font-weight: 500;
-      padding: 0.8rem 1.75rem;
-      border-radius: 999px;
+      font-family: var(--md-font);
+      letter-spacing: 0.00625rem;
+      padding: 0.625rem 1.5rem;
+      border-radius: var(--md-radius-xl);
       text-decoration: none;
-      transition: opacity 0.15s;
+      transition: box-shadow 0.15s;
     }
-    .btn-web:hover { opacity: 0.85; }
-    .btn-dl {
+    .btn-filled:hover { box-shadow: var(--md-shadow-1); }
+
+    .btn-tonal {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      background: var(--btn-secondary);
-      color: var(--btn-secondary-fg);
-      font-size: 0.95rem;
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      font-size: 0.875rem;
       font-weight: 500;
-      padding: 0.8rem 1.75rem;
-      border-radius: 999px;
+      font-family: var(--md-font);
+      letter-spacing: 0.00625rem;
+      padding: 0.625rem 1.5rem;
+      border-radius: var(--md-radius-xl);
       text-decoration: none;
-      transition: opacity 0.15s;
+      transition: box-shadow 0.15s;
     }
-    .btn-dl:hover { opacity: 0.85; }
-    .btn-gh {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      background: var(--btn-secondary);
-      color: var(--btn-secondary-fg);
-      font-size: 0.95rem;
-      font-weight: 500;
-      padding: 0.8rem 1.65rem;
-      border-radius: 999px;
-      text-decoration: none;
-      transition: opacity 0.15s;
-    }
-    .btn-gh:hover { opacity: 0.8; }
-    .ver { font-size: 0.75rem; opacity: 0.6; margin-left: 0.15rem; }
+    .btn-tonal:hover { box-shadow: var(--md-shadow-1); }
+
+    .ver { font-size: 0.75rem; opacity: 0.6; margin-left: 0.1rem; }
 
     .meta-row {
       display: flex;
@@ -203,11 +220,11 @@
       flex-wrap: wrap;
       gap: 1.25rem;
       font-size: 0.8rem;
-      color: var(--muted);
+      color: var(--md-on-surface-variant);
     }
     .meta-item { display: flex; align-items: center; gap: 0.35rem; }
 
-    /* ── FEATURES ────────────────────────── */
+    /* ── Features ─────────────────────────────── */
     .features {
       padding: 4rem 1.5rem 5rem;
       max-width: 920px;
@@ -216,58 +233,60 @@
     .sec-head { text-align: center; margin-bottom: 2.5rem; }
     .sec-head h2 {
       font-size: clamp(1.3rem, 3vw, 1.75rem);
-      font-weight: 600;
-      letter-spacing: -0.015em;
+      font-weight: 400;
+      letter-spacing: -0.01em;
       margin-bottom: 0.4rem;
+      color: var(--md-on-surface);
     }
-    .sec-head p { color: var(--muted); font-size: 0.95rem; }
+    .sec-head p { color: var(--md-on-surface-variant); font-size: 0.9375rem; }
 
     .grid-4 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 1rem;
     }
+
+    /* M3 ElevatedCard */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: var(--md-surface);
+      border-radius: var(--md-radius-l);
+      box-shadow: var(--md-shadow-1);
       padding: 1.5rem;
     }
     .card-icon {
-      width: 38px; height: 38px;
-      background: var(--bg);
-      border-radius: 10px;
+      width: 40px; height: 40px;
+      background: var(--md-primary-container);
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 0.9rem;
     }
     .card-icon svg {
-      width: 18px; height: 18px;
-      stroke: var(--muted); fill: none;
+      width: 20px; height: 20px;
+      stroke: var(--md-on-primary-container); fill: none;
       stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
     }
-    .card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
-    .card p  { font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
+    .card h3 { font-size: 0.9375rem; font-weight: 500; margin-bottom: 0.4rem; }
+    .card p  { font-size: 0.8125rem; color: var(--md-on-surface-variant); line-height: 1.65; }
 
-    /* ── FOOTER ──────────────────────────── */
+    /* ── Footer ────────────────────────────────── */
     footer {
       text-align: center;
       padding: 2rem 1.5rem;
-      font-size: 0.82rem;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
+      font-size: 0.8125rem;
+      color: var(--md-on-surface-variant);
+      border-top: 1px solid var(--md-outline-variant);
     }
     .ft-links { display: flex; gap: 1.25rem; justify-content: center; margin-top: 0.5rem; }
-    footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--text); }
+    footer a { color: var(--md-on-surface-variant); text-decoration: none; }
+    footer a:hover { color: var(--md-on-surface); }
 
     @keyframes fade-up {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .hero-inner { animation: fade-up 0.4s ease both; }
 
     @media (max-width: 600px) {
-      nav { padding: 1rem 1.25rem; }
+      nav { padding: 0 1rem; }
       .hero { padding: 3.5rem 1.25rem 3rem; }
       .features { padding: 3rem 1.25rem 4rem; }
       .grid-4 { grid-template-columns: 1fr 1fr; }
@@ -282,14 +301,17 @@
 
 <nav>
   <a href="#" class="nav-brand">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-      <polyline points="9 22 9 12 15 12 15 22"/>
+    <svg width="24" height="24" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+      <rect width="108" height="108" fill="#1565C0" rx="24"/>
+      <path fill="#FFFFFF" d="M30 38L30 78L66 78L66 38L48 26Z"/>
+      <path fill="#FFFFFF" fill-opacity="0.7" d="M48 26L30 38L66 38Z"/>
+      <circle cx="68" cy="60" r="9" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
     </svg>
     THD Room Finder
   </a>
-  <a href="https://github.com/arudaev/THD-Room-Finder" class="nav-gh" target="_blank" rel="noopener">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+  <a href="https://github.com/HlexNC/THD-Room-Finder" class="nav-gh" target="_blank" rel="noopener">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
     </svg>
     GitHub
@@ -300,18 +322,13 @@
   <div class="hero-inner">
     <svg class="app-icon" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="THD Room Finder icon">
       <rect width="108" height="108" fill="#1565C0" rx="24"/>
-      <!-- Building body -->
       <path fill="#FFFFFF" d="M30,38 L30,78 L66,78 L66,38 L48,26 Z"/>
-      <!-- Roof accent -->
       <path fill="rgba(255,255,255,0.7)" d="M48,26 L30,38 L66,38 Z"/>
-      <!-- Door -->
       <rect fill="#1565C0" x="44" y="62" width="8" height="16"/>
-      <!-- Windows -->
       <rect fill="#1565C0" x="35" y="44" width="8" height="8"/>
       <rect fill="#1565C0" x="53" y="44" width="8" height="8"/>
       <rect fill="#1565C0" x="35" y="56" width="8" height="4"/>
       <rect fill="#1565C0" x="53" y="56" width="8" height="4"/>
-      <!-- Magnifying glass -->
       <circle cx="68" cy="60" r="9" fill="none" stroke="#FFFFFF" stroke-width="3"/>
       <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
     </svg>
@@ -335,24 +352,23 @@
       </div>
     </div>
     <div class="cta-row">
-      <a href="https://thd-room-finder.vercel.app/app/" class="btn-web" id="web-btn">
+      <a href="https://thd-room-finder.vercel.app/" class="btn-filled">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
         Use in Browser
       </a>
-      <a href="https://github.com/arudaev/THD-Room-Finder/releases/latest" id="dl-btn" class="btn-dl" target="_blank" rel="noopener">
+      <a href="https://github.com/HlexNC/THD-Room-Finder/releases/latest" id="dl-btn" class="btn-tonal" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
           <polyline points="7 10 12 15 17 10"/>
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        Download APK
-        <span class="ver" id="ver"></span>
+        Download APK<span class="ver" id="ver"></span>
       </a>
-      <a href="https://github.com/arudaev/THD-Room-Finder" class="btn-gh" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+      <a href="https://github.com/HlexNC/THD-Room-Finder" class="btn-tonal" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
         </svg>
         View Source
@@ -363,7 +379,7 @@
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/>
         </svg>
-        Android 8.0+
+        Android 8.0+ &amp; iOS 16+
       </span>
       <span class="meta-item">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -419,10 +435,10 @@
 </section>
 
 <footer>
-  <p>THD Room Finder &mdash; For students at Technische Hochschule Deggendorf</p>
+  <p>THD Room Finder — For students at Technische Hochschule Deggendorf</p>
   <div class="ft-links">
-    <a href="https://github.com/arudaev/THD-Room-Finder" target="_blank" rel="noopener">GitHub</a>
-    <a href="https://github.com/arudaev/THD-Room-Finder/releases" target="_blank" rel="noopener">Releases</a>
+    <a href="https://github.com/HlexNC/THD-Room-Finder" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/HlexNC/THD-Room-Finder/releases" target="_blank" rel="noopener">Releases</a>
     <a href="https://www.thd.de" target="_blank" rel="noopener">THD Website</a>
   </div>
 </footer>
@@ -432,13 +448,13 @@
   const btn = document.getElementById('dl-btn');
   const ver = document.getElementById('ver');
   try {
-    const r = await fetch('https://api.github.com/repos/arudaev/THD-Room-Finder/releases/latest');
+    const r = await fetch('https://api.github.com/repos/HlexNC/THD-Room-Finder/releases/latest');
     if (!r.ok) return;
     const d = await r.json();
     const apk = d.assets?.find(a => a.name.endsWith('.apk'));
     if (apk) btn.href = apk.browser_download_url;
     else if (d.html_url) btn.href = d.html_url;
-    if (d.tag_name) ver.textContent = d.tag_name;
+    if (d.tag_name) ver.textContent = ' ' + d.tag_name;
   } catch { /* keep fallback */ }
 })();
 </script>

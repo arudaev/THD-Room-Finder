@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "website",
+  "outputDirectory": "website/app",
   "buildCommand": "",
   "installCommand": "",
   "headers": [

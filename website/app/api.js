@@ -1,5 +1,6 @@
-const ROOMS_TTL_MS  = 24 * 60 * 60 * 1000; // 24 h — matches Vercel CDN s-maxage
-const EVENTS_TTL_MS =  5 * 60 * 1000;       //  5 min — matches Vercel CDN s-maxage
+const ROOMS_TTL_MS  = 24 * 60 * 60 * 1000;
+const EVENTS_TTL_MS =  5 * 60 * 1000;
+const API_BASE = 'https://thd-room-finder.vercel.app';
 
 export function toSqlDate(date) {
   const p = n => String(n).padStart(2, '0');
@@ -32,7 +33,7 @@ export async function fetchRooms() {
 
   let res;
   try {
-    res = await fetch('/api/rooms');
+    res = await fetch(`${API_BASE}/api/rooms`);
   } catch {
     if (cached) return cached.data; // network down — serve stale
     throw new Error('No internet connection and no cached room data.');
@@ -57,7 +58,7 @@ export async function fetchPeriods(sqlDate) {
 
   let res;
   try {
-    res = await fetch(`/api/periods?date=${encodeURIComponent(sqlDate)}`);
+    res = await fetch(`${API_BASE}/api/periods?date=${encodeURIComponent(sqlDate)}`);
   } catch {
     if (cached) return cached.data;
     throw new Error('No internet connection and no cached schedule data.');
