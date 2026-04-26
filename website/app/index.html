@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>THD Room Finder</title>
+  <meta name="description" content="Find free study rooms at THD Deggendorf in real time. No login required.">
+  <meta name="theme-color" content="#1565C0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Room Finder">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #F7F3EE;
+      --surface:    #FFFFFF;
+      --border:     #E4DDD5;
+      --text:       #1C1B1F;
+      --muted:      #6B6560;
+      --primary:    #5D4E37;
+      --primary-fg: #FFFFFF;
+      --secondary:     #EDE0D4;
+      --secondary-fg:  #5D4E37;
+      --green:      #1B5E20;
+      --green-bg:   #E8F5E9;
+      --red:        #B71C1C;
+      --red-bg:     #FFEBEE;
+      --blue:       #0D47A1;
+      --blue-bg:    #E3F2FD;
+      --font:       'Inter', system-ui, sans-serif;
+      --radius:     12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:         #141210;
+        --surface:    #1F1D1B;
+        --border:     #2E2B28;
+        --text:       #E8E0D8;
+        --muted:      #9E9690;
+        --primary:    #D4B896;
+        --primary-fg: #2C2016;
+        --secondary:     #2A2420;
+        --secondary-fg:  #D4B896;
+        --green:      #A5D6A7;
+        --green-bg:   #1B2E1E;
+        --red:        #EF9A9A;
+        --red-bg:     #2D1212;
+        --blue:       #90CAF9;
+        --blue-bg:    #0D1E2E;
+      }
+    }
+
+    html { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────────── */
+    #header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1rem;
+      padding-top: calc(0.875rem + env(safe-area-inset-top, 0px));
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .header-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--text);
+      border-radius: 8px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .header-back:hover { background: var(--border); }
+    .header-title {
+      font-weight: 600;
+      font-size: 1rem;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── Scrollable main ──────────────────────── */
+    #app {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+
+    /* ── Buttons ──────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: var(--primary-fg);
+      border: none;
+      border-radius: 999px;
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      font-family: var(--font);
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+
+    /* ── Spinner ──────────────────────────────── */
+    .spinner-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 50vh;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ────────────────────────────────── */
+    .error-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    .error-msg { color: var(--red); font-size: 0.9rem; max-width: 300px; line-height: 1.5; }
+
+    /* ── Empty state ──────────────────────────── */
+    .empty-state {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── Home view ────────────────────────────── */
+    .home-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      padding: 2rem 1.5rem;
+      gap: 2.5rem;
+    }
+    .home-count { text-align: center; }
+    .count-num {
+      font-size: clamp(4.5rem, 22vw, 8rem);
+      font-weight: 600;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      color: var(--primary);
+    }
+    .count-label {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-top: 0.5rem;
+      color: var(--text);
+    }
+    .count-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+    .pct-bar {
+      width: 160px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 999px;
+      margin: 1rem auto 0;
+      overflow: hidden;
+    }
+    .pct-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+    .home-actions { width: 100%; display: flex; justify-content: center; }
+
+    /* ── Room list view ───────────────────────── */
+    .list-view { display: flex; flex-direction: column; }
+
+    .chip-row {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding: 0.75rem 1rem;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .chip-row::-webkit-scrollbar { display: none; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: var(--font);
+      flex-shrink: 0;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .chip.active {
+      background: var(--primary);
+      color: var(--primary-fg);
+      border-color: transparent;
+    }
+
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 1rem 0.75rem;
+      flex-wrap: wrap;
+    }
+    .time-input {
+      font-size: 0.82rem;
+      font-family: var(--font);
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .time-custom-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--blue);
+      background: var(--blue-bg);
+      padding: 0.25rem 0.5rem 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+    .time-reset {
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--blue);
+      font-size: 0.85rem;
+      padding: 0;
+      line-height: 1;
+      font-family: var(--font);
+    }
+    .updated-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* ── Room cards ───────────────────────────── */
+    .room-cards { display: flex; flex-direction: column; }
+
+    .room-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: background 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .room-card:active { background: var(--border); }
+    .room-card-left { flex: 1; min-width: 0; }
+    .room-card-right { flex-shrink: 0; }
+    .room-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .room-meta { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+
+    .badge {
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .badge-free   { background: var(--green-bg); color: var(--green); }
+    .badge-allday { background: var(--blue-bg);  color: var(--blue);  }
+
+    /* ── Room detail view ─────────────────────── */
+    .detail-view { padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    .status-card {
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .status-card.free     { background: var(--green-bg); color: var(--green); }
+    .status-card.occupied { background: var(--red-bg);   color: var(--red);   }
+
+    .info-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .info-row {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      align-items: baseline;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label {
+      color: var(--muted);
+      flex-shrink: 0;
+      min-width: 80px;
+    }
+    .info-value { word-break: break-word; }
+    .info-value a { color: var(--primary); }
+
+    .schedule-section { display: flex; flex-direction: column; gap: 0.5rem; }
+    .schedule-title {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .schedule-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .schedule-empty {
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .event-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .event-row:last-child { border-bottom: none; }
+    .event-row.active { background: var(--red-bg); }
+    .event-time {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      min-width: 112px;
+      flex-shrink: 0;
+      font-size: 0.82rem;
+    }
+    .event-info { display: flex; align-items: center; gap: 0.5rem; flex: 1; flex-wrap: wrap; }
+    .event-type { font-weight: 500; }
+    .event-duration {
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--border);
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <header id="header">
+    <div class="header-brand">
+      <svg width="20" height="20" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+        <rect width="108" height="108" fill="#1565C0" rx="24"/>
+        <path fill="#FFFFFF" d="M30 38L30 78L66 78L66 38L48 26Z"/>
+        <path fill="#FFFFFF" fill-opacity="0.7" d="M48 26L30 38L66 38Z"/>
+        <circle cx="68" cy="60" r="9" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+      THD Room Finder
+    </div>
+  </header>
+  <main id="app"></main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

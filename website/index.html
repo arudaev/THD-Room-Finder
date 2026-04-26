@@ -153,12 +153,26 @@
       flex-wrap: wrap;
       margin-bottom: 2rem;
     }
-    .btn-dl {
+    .btn-web {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       background: var(--btn-primary);
       color: var(--btn-primary-fg);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.8rem 1.75rem;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-web:hover { opacity: 0.85; }
+    .btn-dl {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--btn-secondary);
+      color: var(--btn-secondary-fg);
       font-size: 0.95rem;
       font-weight: 500;
       padding: 0.8rem 1.75rem;
@@ -321,6 +335,13 @@
       </div>
     </div>
     <div class="cta-row">
+      <a href="https://thd-room-finder.vercel.app/app/" class="btn-web" id="web-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Use in Browser
+      </a>
       <a href="https://github.com/arudaev/THD-Room-Finder/releases/latest" id="dl-btn" class="btn-dl" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
