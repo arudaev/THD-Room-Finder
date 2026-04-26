@@ -65,3 +65,5 @@ Desktop.ini
 crash-logs/
 nul
 .env
+.vercel/.env*.local
+.vercel/output/

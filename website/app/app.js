@@ -15,6 +15,31 @@ const state = {
 };
 
 let refreshTimer = null;
+let deferredInstallPrompt = null;
+
+function isStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function isIosDevice() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(ua) || (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
+}
+
+function shouldShowInstallButton() {
+  return !isStandaloneMode() && (deferredInstallPrompt || isIosDevice());
+}
+
+function updateInstallControls() {
+  document.querySelectorAll('[data-action="install"]').forEach(button => {
+    button.hidden = !shouldShowInstallButton();
+  });
+}
+
+function setInstallSheetVisible(visible) {
+  const sheet = document.getElementById('installSheet');
+  if (sheet) sheet.hidden = !visible;
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function fmt(date, opts = { hour: '2-digit', minute: '2-digit' }) {
@@ -101,6 +126,7 @@ function viewHome() {
       </div>
       <div class="home-actions">
         <a class="btn-filled" href="#rooms">Find a Free Room</a>
+        <button class="btn-tonal" data-action="install" hidden>Install app</button>
         <button class="btn-tonal" data-action="retry">Refresh</button>
       </div>
     </div>`;
@@ -295,6 +321,7 @@ function render() {
     case 'room':  app.innerHTML = viewRoomDetail(r.ident); break;
     default:      app.innerHTML = viewHome(); break;
   }
+  updateInstallControls();
 }
 
 // ── Events ─────────────────────────────────────────────────────────────────────
@@ -312,6 +339,17 @@ document.body.addEventListener('click', e => {
     loadData(true);
   } else if (action === 'retry') {
     loadData(false);
+  } else if (action === 'install') {
+    if (deferredInstallPrompt) {
+      const prompt = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      prompt.prompt();
+      prompt.userChoice.finally(updateInstallControls);
+    } else {
+      setInstallSheetVisible(true);
+    }
+  } else if (action === 'install-dismiss') {
+    setInstallSheetVisible(false);
   }
 });
 
@@ -329,6 +367,19 @@ document.body.addEventListener('change', e => {
 });
 
 window.addEventListener('hashchange', render);
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  updateInstallControls();
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  setInstallSheetVisible(false);
+  updateInstallControls();
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') setInstallSheetVisible(false);
+});
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {

@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>THD Room Finder</title>
   <meta name="description" content="Find free study rooms at THD Deggendorf in real time. No login required.">
+  <meta name="application-name" content="THD Room Finder">
   <meta name="theme-color" content="#1565C0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Room Finder">
+  <meta name="apple-mobile-web-app-title" content="THD Room Finder">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -182,6 +185,44 @@
       text-decoration: none;
     }
     .btn-tonal:hover { box-shadow: var(--md-shadow-1); }
+
+    .btn-tonal[hidden] { display: none; }
+
+    .install-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 1rem;
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+      background: rgba(0, 0, 0, 0.32);
+    }
+    .install-sheet[hidden] { display: none; }
+    .install-panel {
+      width: min(100%, 420px);
+      background: var(--md-surface);
+      color: var(--md-on-surface);
+      border-radius: var(--md-radius-l);
+      box-shadow: var(--md-shadow-2);
+      padding: 1rem;
+    }
+    .install-panel h2 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .install-panel p {
+      color: var(--md-on-surface-variant);
+      font-size: 0.875rem;
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+    .install-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
 
     /* ── Spinner ──────────────────────────────── */
     .spinner-wrap {
@@ -510,6 +551,15 @@
     </div>
   </header>
   <main id="app"></main>
+  <div class="install-sheet" id="installSheet" hidden role="dialog" aria-modal="true" aria-labelledby="installSheetTitle">
+    <div class="install-panel">
+      <h2 id="installSheetTitle">Install THD Room Finder</h2>
+      <p>On iPhone or iPad, open the Safari share menu and choose Add to Home Screen.</p>
+      <div class="install-actions">
+        <button class="btn-tonal" data-action="install-dismiss">Done</button>
+      </div>
+    </div>
+  </div>
   <script type="module" src="app.js"></script>
 </body>
 </html>
