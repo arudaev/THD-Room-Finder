@@ -16,6 +16,10 @@
   <link rel="icon" href="app/icons/icon.svg" type="image/svg+xml">
   <link rel="icon" href="app/icons/icon-192.png" sizes="192x192" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="app/icons/icon-180.png">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FDFCFF">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111318">
+  <meta name="theme-color" content="#FDFCFF">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -167,9 +171,9 @@
     }
 
     h1 {
-      font-size: clamp(1.9rem, 5vw, 2.75rem);
+      font-size: 2.75rem;
       font-weight: 400;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
       line-height: 1.15;
       margin-bottom: 1rem;
       color: var(--md-on-surface);
@@ -195,7 +199,7 @@
     .stat-num {
       font-size: 1.5rem;
       font-weight: 400;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
       color: var(--md-primary);
       line-height: 1;
     }
@@ -205,7 +209,7 @@
       margin-top: 0.3rem;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0;
     }
 
     /* ── CTAs ─────────────────────────────────── */
@@ -226,7 +230,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       font-family: var(--md-font);
-      letter-spacing: 0.00625rem;
+      letter-spacing: 0;
       padding: 0.625rem 1.5rem;
       border-radius: var(--md-radius-xl);
       text-decoration: none;
@@ -243,7 +247,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       font-family: var(--md-font);
-      letter-spacing: 0.00625rem;
+      letter-spacing: 0;
       padding: 0.625rem 1.5rem;
       border-radius: var(--md-radius-xl);
       text-decoration: none;
@@ -271,9 +275,9 @@
     }
     .sec-head { text-align: center; margin-bottom: 2.5rem; }
     .sec-head h2 {
-      font-size: clamp(1.3rem, 3vw, 1.75rem);
+      font-size: 1.75rem;
       font-weight: 400;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
       margin-bottom: 0.4rem;
       color: var(--md-on-surface);
     }
@@ -349,11 +353,15 @@
       .features { padding: 3rem 1.25rem 4rem; }
       .grid-4 { grid-template-columns: 1fr 1fr; }
       .stat-row { gap: 1.5rem; }
+      h1 { font-size: 2.1rem; }
+      .sec-head h2 { font-size: 1.45rem; }
     }
     @media (max-width: 420px) {
       .grid-4 { grid-template-columns: 1fr; }
     }
   </style>
+  <link rel="stylesheet" href="app/adaptive.css">
+  <script defer src="app/adaptive.js"></script>
 </head>
 <body>
 

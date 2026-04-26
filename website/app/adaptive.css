@@ -1,0 +1,197 @@
+:root {
+  color-scheme: light;
+  accent-color: var(--md-primary);
+  --device-min-tap: 2.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-color: var(--md-outline) var(--md-bg);
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  color-scheme: inherit;
+  font: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--md-primary) 28%, transparent);
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 0.1875rem solid color-mix(in srgb, var(--md-primary) 80%, var(--md-on-surface));
+  outline-offset: 0.1875rem;
+}
+
+@supports not (color: color-mix(in srgb, red, white)) {
+  :where(a, button, input, select, textarea):focus-visible {
+    outline-color: var(--md-primary);
+  }
+}
+
+h1,
+.sec-head h2,
+.stat-num,
+.stat-label,
+.count-num,
+.btn-filled,
+.btn-tonal,
+.filter-label {
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: 2.75rem;
+}
+
+.sec-head h2 {
+  font-size: 1.75rem;
+}
+
+.count-num {
+  font-size: 7rem;
+}
+
+@media (max-width: 37.5rem) {
+  h1 {
+    font-size: 2.1rem;
+  }
+
+  .sec-head h2 {
+    font-size: 1.45rem;
+  }
+
+  .count-num {
+    font-size: 5rem;
+  }
+}
+
+@media (pointer: coarse) {
+  :where(.btn-filled, .btn-tonal, .chip, .nav-gh, .time-input) {
+    min-height: var(--device-min-tap);
+  }
+
+  :where(.nav-sponsor, .header-sponsor, .header-back, .time-reset) {
+    min-width: var(--device-min-tap);
+    min-height: var(--device-min-tap);
+  }
+}
+
+@media (hover: none) {
+  .nav-sponsor:hover,
+  .card-link:hover,
+  .room-card:hover,
+  .header-sponsor:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --md-outline: #2E3138;
+    --md-outline-variant: #61656F;
+    --md-shadow-1: none;
+    --md-shadow-2: none;
+  }
+
+  :where(.card, .summary-card, .room-card, .info-card, .schedule-card, .status-card, .install-panel) {
+    border: 1px solid var(--md-outline);
+  }
+
+  :where(.btn-filled, .btn-tonal, .chip, .badge, .time-input, .time-custom-badge) {
+    border: 1px solid currentColor;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (prefers-contrast: more) {
+  :root {
+    --md-outline: #DEE3EA;
+    --md-outline-variant: #AAB0BA;
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    color-scheme: light dark;
+    --md-primary: Highlight;
+    --md-on-primary: HighlightText;
+    --md-primary-container: Highlight;
+    --md-on-primary-container: HighlightText;
+    --md-secondary: ButtonText;
+    --md-on-secondary: ButtonFace;
+    --md-secondary-container: ButtonFace;
+    --md-on-secondary-container: ButtonText;
+    --md-tertiary: Highlight;
+    --md-on-tertiary: HighlightText;
+    --md-tertiary-container: Highlight;
+    --md-on-tertiary-container: HighlightText;
+    --md-error: Highlight;
+    --md-on-error: HighlightText;
+    --md-error-container: Highlight;
+    --md-on-error-container: HighlightText;
+    --md-surface: Canvas;
+    --md-surface-variant: Canvas;
+    --md-on-surface: CanvasText;
+    --md-on-surface-variant: CanvasText;
+    --md-outline: CanvasText;
+    --md-outline-variant: CanvasText;
+    --md-bg: Canvas;
+    --md-surface-1: Canvas;
+    --sponsor: LinkText;
+    --sponsor-container: Canvas;
+    --md-shadow-1: none;
+    --md-shadow-2: none;
+  }
+
+  :where(.card, .summary-card, .room-card, .info-card, .schedule-card, .status-card, .install-panel) {
+    border: 1px solid CanvasText;
+  }
+
+  :where(.btn-filled, .chip.active, .badge-free, .badge-allday, .status-card.free) {
+    background: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  :where(.btn-tonal, .chip, .time-input, .time-custom-badge) {
+    background: ButtonFace;
+    border-color: ButtonText;
+    color: ButtonText;
+  }
+
+  a {
+    color: LinkText;
+  }
+}
