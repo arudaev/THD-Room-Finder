@@ -13,6 +13,9 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://arudaev.github.io/THD-Room-Finder/og-banner.png">
+  <link rel="icon" href="app/icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="app/icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="app/icons/icon-180.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -32,6 +35,8 @@
       --md-outline-variant:      #C4C6D0;
       --md-bg:                   #F4F6FA;
       --md-surface-1:            #EEF1FA;
+      --sponsor:                 #D81B60;
+      --sponsor-container:       #FCE4EC;
       --md-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       --md-radius-l:  16px;
       --md-radius-xl: 28px;
@@ -56,6 +61,8 @@
         --md-outline-variant:      #44464F;
         --md-bg:                   #111318;
         --md-surface-1:            #21242C;
+        --sponsor:                 #FF8AB7;
+        --sponsor-container:       #5A1631;
         --md-shadow-1: 0 1px 2px rgba(0,0,0,.3),  0 1px 3px 1px rgba(0,0,0,.2);
         --md-shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
       }
@@ -88,6 +95,37 @@
       align-items: center;
       gap: 0.75rem;
     }
+    .nav-actions {
+      --nav-action-height: 2.125rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .nav-sponsor {
+      width: var(--nav-action-height);
+      height: var(--nav-action-height);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sponsor);
+      background: color-mix(in srgb, var(--sponsor-container) 58%, transparent);
+      border-radius: 50%;
+      text-decoration: none;
+      transition: background 0.1s, transform 0.1s;
+    }
+    .nav-sponsor:hover {
+      background: var(--sponsor-container);
+      transform: translateY(-1px);
+    }
+    .nav-sponsor svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
     .nav-gh {
       display: flex;
       align-items: center;
@@ -96,6 +134,7 @@
       text-decoration: none;
       font-size: 0.875rem;
       font-weight: 500;
+      height: var(--nav-action-height);
       padding: 0.5rem 0.75rem;
       border-radius: var(--md-radius-xl);
       transition: background 0.1s, color 0.1s;
@@ -267,6 +306,25 @@
     }
     .card h3 { font-size: 0.9375rem; font-weight: 500; margin-bottom: 0.4rem; }
     .card p  { font-size: 0.8125rem; color: var(--md-on-surface-variant); line-height: 1.65; }
+    .card-link {
+      color: inherit;
+      display: block;
+      text-decoration: none;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .card-link:hover {
+      box-shadow: var(--md-shadow-2);
+      transform: translateY(-1px);
+    }
+    .sponsor-card .card-icon {
+      background: var(--sponsor-container);
+    }
+    .sponsor-card .card-icon svg {
+      stroke: var(--sponsor);
+    }
+    .sponsor-card h3 {
+      color: var(--sponsor);
+    }
 
     /* ── Footer ────────────────────────────────── */
     footer {
@@ -310,12 +368,19 @@
     </svg>
     THD Room Finder
   </a>
-  <a href="https://github.com/HlexNC/THD-Room-Finder" class="nav-gh" target="_blank" rel="noopener">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-    </svg>
-    GitHub
-  </a>
+  <div class="nav-actions">
+    <a href="https://github.com/sponsors/arudaev?frequency=one-time" class="nav-sponsor" target="_blank" rel="noopener" aria-label="Sponsor the iOS release" title="Sponsor the iOS release">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.8 4.6c-1.7-1.7-4.5-1.6-6.1.2L12 7.6 9.3 4.8C7.7 3 4.9 2.9 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"/>
+      </svg>
+    </a>
+    <a href="https://github.com/HlexNC/THD-Room-Finder" class="nav-gh" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+      </svg>
+      GitHub
+    </a>
+  </div>
 </nav>
 
 <section class="hero">
@@ -431,6 +496,13 @@
       <h3>Offline Support</h3>
       <p>Room data is cached locally with a 24-hour TTL. Browse the full list even without a connection — schedules update when back online.</p>
     </div>
+    <a class="card card-link sponsor-card" href="https://github.com/sponsors/arudaev?frequency=one-time" target="_blank" rel="noopener">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M20.8 4.6c-1.7-1.7-4.5-1.6-6.1.2L12 7.6 9.3 4.8C7.7 3 4.9 2.9 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"/></svg>
+      </div>
+      <h3>Help Launch iOS</h3>
+      <p>One-time sponsorships go directly toward the Apple Developer Program so THD Room Finder can ship properly on iPhone.</p>
+    </a>
   </div>
 </section>
 

@@ -1,4 +1,4 @@
-const VERSION = 'thd-v3';
+const VERSION = 'thd-v4';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const SHELL = [

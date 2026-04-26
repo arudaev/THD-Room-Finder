@@ -43,6 +43,8 @@
       --md-outline-variant:      #C4C6D0;
       --md-bg:                   #F4F6FA;
       --md-surface-1:            #EEF1FA;
+      --sponsor:                 #D81B60;
+      --sponsor-container:       #FCE4EC;
       --md-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       --md-radius-s:  8px;
       --md-radius-m:  12px;
@@ -78,6 +80,8 @@
         --md-outline-variant:      #44464F;
         --md-bg:                   #111318;
         --md-surface-1:            #21242C;
+        --sponsor:                 #FF8AB7;
+        --sponsor-container:       #5A1631;
         --md-shadow-1: 0 1px 2px rgba(0,0,0,.3),  0 1px 3px 1px rgba(0,0,0,.2);
         --md-shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
       }
@@ -113,6 +117,39 @@
       font-size: 1.375rem;
       padding: 0 1rem;
       color: var(--md-on-surface);
+      flex: 1;
+      min-width: 0;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      padding-right: 0.5rem;
+      flex-shrink: 0;
+    }
+    .header-sponsor {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sponsor);
+      border-radius: 50%;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.1s, transform 0.1s;
+    }
+    .header-sponsor:hover {
+      background: var(--sponsor-container);
+      transform: translateY(-1px);
+    }
+    .header-sponsor svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     .header-back {
       display: flex;
@@ -548,6 +585,13 @@
         <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
       </svg>
       THD Room Finder
+    </div>
+    <div class="header-actions">
+      <a class="header-sponsor" href="https://github.com/sponsors/arudaev?frequency=one-time" target="_blank" rel="noopener" aria-label="Sponsor the iOS release" title="Sponsor the iOS release">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.8 4.6c-1.7-1.7-4.5-1.6-6.1.2L12 7.6 9.3 4.8C7.7 3 4.9 2.9 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"/>
+        </svg>
+      </a>
     </div>
   </header>
   <main id="app"></main>

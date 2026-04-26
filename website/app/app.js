@@ -1,6 +1,8 @@
 import { fetchRooms, fetchPeriods, toSqlDate } from './api.js';
 import { parseRoom, parseEvents, computeFreeRooms, getRoomSchedule } from './logic.js';
 
+const SPONSOR_URL = 'https://github.com/sponsors/arudaev?frequency=one-time';
+
 // ── State ──────────────────────────────────────────────────────────────────────
 const state = {
   rooms: null,
@@ -268,6 +270,15 @@ function viewRoomDetail(ident) {
 // ── Header ─────────────────────────────────────────────────────────────────────
 function renderHeader(r) {
   const header = document.getElementById('header');
+  const sponsorAction = `
+    <div class="header-actions">
+      <a class="header-sponsor" href="${SPONSOR_URL}" target="_blank" rel="noopener" aria-label="Sponsor the iOS release" title="Sponsor the iOS release">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.8 4.6c-1.7-1.7-4.5-1.6-6.1.2L12 7.6 9.3 4.8C7.7 3 4.9 2.9 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"/>
+        </svg>
+      </a>
+    </div>`;
+
   if (r.view === 'home') {
     header.innerHTML = `
       <div class="header-brand">
@@ -279,7 +290,8 @@ function renderHeader(r) {
           <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
         </svg>
         THD Room Finder
-      </div>`;
+      </div>
+      ${sponsorAction}`;
   } else {
     const backTo = r.view === 'room' ? 'rooms' : '';
     const title = r.view === 'room'
