@@ -1,6 +1,8 @@
 import { fetchRooms, fetchPeriods, toSqlDate } from './api.js';
 import { parseRoom, parseEvents, computeFreeRooms, getRoomSchedule } from './logic.js';
 
+const SPONSOR_URL = 'https://github.com/sponsors/arudaev?frequency=one-time';
+
 // ── State ──────────────────────────────────────────────────────────────────────
 const state = {
   rooms: null,
@@ -15,6 +17,31 @@ const state = {
 };
 
 let refreshTimer = null;
+let deferredInstallPrompt = null;
+
+function isStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function isIosDevice() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(ua) || (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
+}
+
+function shouldShowInstallButton() {
+  return !isStandaloneMode() && (deferredInstallPrompt || isIosDevice());
+}
+
+function updateInstallControls() {
+  document.querySelectorAll('[data-action="install"]').forEach(button => {
+    button.hidden = !shouldShowInstallButton();
+  });
+}
+
+function setInstallSheetVisible(visible) {
+  const sheet = document.getElementById('installSheet');
+  if (sheet) sheet.hidden = !visible;
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function fmt(date, opts = { hour: '2-digit', minute: '2-digit' }) {
@@ -101,6 +128,7 @@ function viewHome() {
       </div>
       <div class="home-actions">
         <a class="btn-filled" href="#rooms">Find a Free Room</a>
+        <button class="btn-tonal" data-action="install" hidden>Install app</button>
         <button class="btn-tonal" data-action="retry">Refresh</button>
       </div>
     </div>`;
@@ -242,6 +270,15 @@ function viewRoomDetail(ident) {
 // ── Header ─────────────────────────────────────────────────────────────────────
 function renderHeader(r) {
   const header = document.getElementById('header');
+  const sponsorAction = `
+    <div class="header-actions">
+      <a class="header-sponsor" href="${SPONSOR_URL}" target="_blank" rel="noopener" aria-label="Sponsor the iOS release" title="Sponsor the iOS release">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.8 4.6c-1.7-1.7-4.5-1.6-6.1.2L12 7.6 9.3 4.8C7.7 3 4.9 2.9 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"/>
+        </svg>
+      </a>
+    </div>`;
+
   if (r.view === 'home') {
     header.innerHTML = `
       <div class="header-brand">
@@ -253,7 +290,8 @@ function renderHeader(r) {
           <line x1="74.4" y1="66.4" x2="82" y2="74" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
         </svg>
         THD Room Finder
-      </div>`;
+      </div>
+      ${sponsorAction}`;
   } else {
     const backTo = r.view === 'room' ? 'rooms' : '';
     const title = r.view === 'room'
@@ -295,6 +333,7 @@ function render() {
     case 'room':  app.innerHTML = viewRoomDetail(r.ident); break;
     default:      app.innerHTML = viewHome(); break;
   }
+  updateInstallControls();
 }
 
 // ── Events ─────────────────────────────────────────────────────────────────────
@@ -312,6 +351,17 @@ document.body.addEventListener('click', e => {
     loadData(true);
   } else if (action === 'retry') {
     loadData(false);
+  } else if (action === 'install') {
+    if (deferredInstallPrompt) {
+      const prompt = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      prompt.prompt();
+      prompt.userChoice.finally(updateInstallControls);
+    } else {
+      setInstallSheetVisible(true);
+    }
+  } else if (action === 'install-dismiss') {
+    setInstallSheetVisible(false);
   }
 });
 
@@ -329,6 +379,19 @@ document.body.addEventListener('change', e => {
 });
 
 window.addEventListener('hashchange', render);
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  updateInstallControls();
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  setInstallSheetVisible(false);
+  updateInstallControls();
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') setInstallSheetVisible(false);
+});
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {

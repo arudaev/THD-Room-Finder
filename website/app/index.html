@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>THD Room Finder</title>
   <meta name="description" content="Find free study rooms at THD Deggendorf in real time. No login required.">
+  <meta name="application-name" content="THD Room Finder">
   <meta name="theme-color" content="#1565C0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Room Finder">
+  <meta name="apple-mobile-web-app-title" content="THD Room Finder">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -40,6 +43,8 @@
       --md-outline-variant:      #C4C6D0;
       --md-bg:                   #F4F6FA;
       --md-surface-1:            #EEF1FA;
+      --sponsor:                 #D81B60;
+      --sponsor-container:       #FCE4EC;
       --md-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       --md-radius-s:  8px;
       --md-radius-m:  12px;
@@ -75,6 +80,8 @@
         --md-outline-variant:      #44464F;
         --md-bg:                   #111318;
         --md-surface-1:            #21242C;
+        --sponsor:                 #FF8AB7;
+        --sponsor-container:       #5A1631;
         --md-shadow-1: 0 1px 2px rgba(0,0,0,.3),  0 1px 3px 1px rgba(0,0,0,.2);
         --md-shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
       }
@@ -110,6 +117,39 @@
       font-size: 1.375rem;
       padding: 0 1rem;
       color: var(--md-on-surface);
+      flex: 1;
+      min-width: 0;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      padding-right: 0.5rem;
+      flex-shrink: 0;
+    }
+    .header-sponsor {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sponsor);
+      border-radius: 50%;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.1s, transform 0.1s;
+    }
+    .header-sponsor:hover {
+      background: var(--sponsor-container);
+      transform: translateY(-1px);
+    }
+    .header-sponsor svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     .header-back {
       display: flex;
@@ -182,6 +222,44 @@
       text-decoration: none;
     }
     .btn-tonal:hover { box-shadow: var(--md-shadow-1); }
+
+    .btn-tonal[hidden] { display: none; }
+
+    .install-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 1rem;
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+      background: rgba(0, 0, 0, 0.32);
+    }
+    .install-sheet[hidden] { display: none; }
+    .install-panel {
+      width: min(100%, 420px);
+      background: var(--md-surface);
+      color: var(--md-on-surface);
+      border-radius: var(--md-radius-l);
+      box-shadow: var(--md-shadow-2);
+      padding: 1rem;
+    }
+    .install-panel h2 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .install-panel p {
+      color: var(--md-on-surface-variant);
+      font-size: 0.875rem;
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+    .install-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
 
     /* ── Spinner ──────────────────────────────── */
     .spinner-wrap {
@@ -508,8 +586,24 @@
       </svg>
       THD Room Finder
     </div>
+    <div class="header-actions">
+      <a class="header-sponsor" href="https://github.com/sponsors/arudaev?frequency=one-time" target="_blank" rel="noopener" aria-label="Sponsor the iOS release" title="Sponsor the iOS release">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.8 4.6c-1.7-1.7-4.5-1.6-6.1.2L12 7.6 9.3 4.8C7.7 3 4.9 2.9 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5z"/>
+        </svg>
+      </a>
+    </div>
   </header>
   <main id="app"></main>
+  <div class="install-sheet" id="installSheet" hidden role="dialog" aria-modal="true" aria-labelledby="installSheetTitle">
+    <div class="install-panel">
+      <h2 id="installSheetTitle">Install THD Room Finder</h2>
+      <p>On iPhone or iPad, open the Safari share menu and choose Add to Home Screen.</p>
+      <div class="install-actions">
+        <button class="btn-tonal" data-action="install-dismiss">Done</button>
+      </div>
+    </div>
+  </div>
   <script type="module" src="app.js"></script>
 </body>
 </html>

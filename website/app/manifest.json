@@ -1,18 +1,48 @@
 {
+  "id": "/",
   "name": "THD Room Finder",
   "short_name": "Room Finder",
   "description": "Find free study rooms at THD Deggendorf in real time. No login required.",
-  "start_url": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
+  "lang": "en",
+  "categories": ["education", "utilities"],
   "theme_color": "#1565C0",
-  "background_color": "#141210",
+  "background_color": "#F4F6FA",
   "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Free Rooms",
+      "short_name": "Rooms",
+      "description": "Open the list of currently available rooms.",
+      "url": "/#rooms"
     }
   ]
 }
