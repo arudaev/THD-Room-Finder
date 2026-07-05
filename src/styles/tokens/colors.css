@@ -1,0 +1,152 @@
+/* ============================================================
+   THD Room Finder — Color System
+   Material 3 tonal palette. Primary is THD blue (#1565C0).
+   Tertiary green signals "free / available"; error red signals
+   "occupied". Sponsor pink is reserved for the iOS-funding CTA only.
+
+   Naming:
+   • --md-*  : Material 3 role tokens (matches the native Android/iOS
+               theme and the original website 1:1 — do not rename).
+   • Semantic aliases below map friendly names onto those roles.
+   ============================================================ */
+
+:root {
+  /* ── Primary — THD blue ───────────────────────────── */
+  --md-primary:               #1565C0;
+  --md-on-primary:            #FFFFFF;
+  --md-primary-container:     #D3E4FF;
+  --md-on-primary-container:  #001C3B;
+
+  /* ── Secondary — slate blue-grey ──────────────────── */
+  --md-secondary:               #546E7A;
+  --md-on-secondary:            #FFFFFF;
+  --md-secondary-container:     #D6E4EF;
+  --md-on-secondary-container:  #0D1D26;
+
+  /* ── Tertiary — teal/green = "free / available" ───── */
+  --md-tertiary:               #00796B;
+  --md-on-tertiary:            #FFFFFF;
+  --md-tertiary-container:     #B2DFDB;
+  --md-on-tertiary-container:  #00251F;
+
+  /* ── Warning — amber = "free, but closing soon" ───── */
+  --md-warning:               #9A6700;
+  --md-on-warning:            #FFFFFF;
+  --md-warning-container:     #FFDF9E;
+  --md-on-warning-container:  #301C00;
+
+  /* ── Error — red = "occupied / unavailable" ───────── */
+  --md-error:                #B3261E;
+  --md-on-error:             #FFFFFF;
+  --md-error-container:      #F9DEDC;
+  --md-on-error-container:   #410E0B;
+
+  /* ── Surfaces & neutrals ──────────────────────────── */
+  --md-bg:                  #F4F6FA;  /* app/page background    */
+  --md-surface:             #FDFCFF;  /* cards, bars, sheets    */
+  --md-surface-1:           #EEF1FA;  /* tinted summary surface */
+  --md-on-surface:          #1C1B1F;  /* primary text           */
+  --md-surface-variant:     #E1E2EC;  /* chips, tags fill       */
+  --md-on-surface-variant:  #44464F;  /* secondary text         */
+  --md-outline:             #74777F;  /* borders, dividers      */
+  --md-outline-variant:     #C4C6D0;  /* hairline dividers      */
+
+  /* ── Sponsor — pink, iOS-funding CTA only ─────────── */
+  --sponsor:            #D81B60;
+  --sponsor-container:  #FCE4EC;
+
+  /* ── Semantic aliases (friendly names → roles) ────── */
+  --color-brand:          var(--md-primary);
+  --color-on-brand:       var(--md-on-primary);
+  --surface-page:         var(--md-bg);
+  --surface-card:         var(--md-surface);
+  --surface-sunken:       var(--md-surface-1);
+  --text-body:            var(--md-on-surface);
+  --text-muted:           var(--md-on-surface-variant);
+  --border-hairline:      var(--md-outline-variant);
+  --border-strong:        var(--md-outline);
+  --status-free:          var(--md-tertiary);
+  --status-free-bg:       var(--md-tertiary-container);
+  --status-soon:          var(--md-warning);
+  --status-soon-bg:       var(--md-warning-container);
+  --status-occupied:      var(--md-error);
+  --status-occupied-bg:   var(--md-error-container);
+}
+
+/* ============================================================
+   Dark theme — applies on system preference OR an explicit
+   [data-theme="dark"] scope (so specimens can force it).
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --md-primary:               #90CAF9;
+    --md-on-primary:            #003063;
+    --md-primary-container:     #00458D;
+    --md-on-primary-container:  #D3E4FF;
+
+    --md-secondary:               #B0BEC5;
+    --md-on-secondary:            #1E333E;
+    --md-secondary-container:     #354A55;
+    --md-on-secondary-container:  #D6E4EF;
+
+    --md-tertiary:               #80CBC4;
+    --md-on-tertiary:            #003733;
+    --md-tertiary-container:     #004F49;
+    --md-on-tertiary-container:  #B2DFDB;
+
+    --md-warning:               #F4C05A;
+    --md-on-warning:            #422C00;
+    --md-warning-container:     #6E4E00;
+    --md-on-warning-container:  #FFDF9E;
+
+    --md-error:                #F2B8B5;
+    --md-on-error:             #601410;
+    --md-error-container:      #8C1D18;
+    --md-on-error-container:   #F9DEDC;
+
+    --md-bg:                  #111318;
+    --md-surface:             #1C1B1F;
+    --md-surface-1:           #21242C;
+    --md-on-surface:          #E6E1E5;
+    --md-surface-variant:     #44464F;
+    --md-on-surface-variant:  #C4C6D0;
+    --md-outline:             #8E9099;
+    --md-outline-variant:     #44464F;
+
+    --sponsor:            #FF8AB7;
+    --sponsor-container:  #5A1631;
+  }
+}
+
+[data-theme="dark"] {
+  --md-primary:               #90CAF9;
+  --md-on-primary:            #003063;
+  --md-primary-container:     #00458D;
+  --md-on-primary-container:  #D3E4FF;
+  --md-secondary:               #B0BEC5;
+  --md-on-secondary:            #1E333E;
+  --md-secondary-container:     #354A55;
+  --md-on-secondary-container:  #D6E4EF;
+  --md-tertiary:               #80CBC4;
+  --md-on-tertiary:            #003733;
+  --md-tertiary-container:     #004F49;
+  --md-on-tertiary-container:  #B2DFDB;
+  --md-warning:               #F4C05A;
+  --md-on-warning:            #422C00;
+  --md-warning-container:     #6E4E00;
+  --md-on-warning-container:  #FFDF9E;
+  --md-error:                #F2B8B5;
+  --md-on-error:             #601410;
+  --md-error-container:      #8C1D18;
+  --md-on-error-container:   #F9DEDC;
+  --md-bg:                  #111318;
+  --md-surface:             #1C1B1F;
+  --md-surface-1:           #21242C;
+  --md-on-surface:          #E6E1E5;
+  --md-surface-variant:     #44464F;
+  --md-on-surface-variant:  #C4C6D0;
+  --md-outline:             #8E9099;
+  --md-outline-variant:     #44464F;
+  --sponsor:            #FF8AB7;
+  --sponsor-container:  #5A1631;
+}

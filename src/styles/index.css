@@ -1,0 +1,78 @@
+/* ============================================================
+   THD Room Finder — global stylesheet entry
+   Imports the design-system tokens, then a small Material-flavored
+   base reset. Consumers of the app only need to import this file.
+   ============================================================ */
+
+@import './tokens/fonts.css';
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/breakpoints.css';
+@import './tokens/elevation.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  color-scheme: light dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-sans);
+  font-size: var(--body-large-size);
+  line-height: var(--body-large-lh);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Honor device notches / home indicators on installed PWAs + native */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-normal);
+  margin: 0;
+}
+
+a {
+  color: var(--md-primary);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Remove the tap flash in favor of explicit Material states */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Everything collapses under reduced-motion (Material a11y) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

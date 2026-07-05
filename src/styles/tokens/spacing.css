@@ -1,0 +1,30 @@
+/* ============================================================
+   THD Room Finder — Spacing & Layout
+   4px base grid (Material standard). The original app pads cards
+   at 16px, gaps room cards by 8px, and insets screens by 16px.
+   ============================================================ */
+
+:root {
+  --space-0:   0;
+  --space-1:   0.25rem;  /*  4px  — hairline gaps             */
+  --space-2:   0.5rem;   /*  8px  — gap between room cards     */
+  --space-3:   0.75rem;  /* 12px  — compact padding           */
+  --space-4:   1rem;     /* 16px  — card padding, screen inset */
+  --space-5:   1.25rem;  /* 20px                              */
+  --space-6:   1.5rem;   /* 24px  — card padding (roomy)       */
+  --space-8:   2rem;     /* 32px                              */
+  --space-10:  2.5rem;   /* 40px  — section rhythm             */
+  --space-12:  3rem;     /* 48px                              */
+  --space-16:  4rem;     /* 64px  — landing section padding    */
+  --space-20:  5rem;     /* 80px                              */
+
+  /* Touch target floor — coarse pointers (Material a11y) */
+  --tap-target: 2.75rem; /* 44px */
+
+  /* App-bar height (matches native + PWA header) */
+  --appbar-height: 64px;
+
+  /* Content max-widths */
+  --content-narrow:  560px;  /* hero column  */
+  --content-wide:    920px;  /* feature grid */
+}

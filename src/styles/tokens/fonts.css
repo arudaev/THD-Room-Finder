@@ -1,0 +1,18 @@
+/* ============================================================
+   THD Room Finder — Fonts
+   The product is Material 3. Its UI font is Roboto (the Android /
+   Material default), with a native system fallback so the app keeps
+   the OS look on iOS/desktop. Roboto Mono is used for tabular,
+   time-of-day and code contexts (schedule times, room codes).
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ── Baseline (Material recreation) ─────────────────
+     Roboto first, then the native system stack the real apps use
+     so installed PWAs match the OS. */
+  --font-sans: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', monospace;
+  --md-font: var(--font-sans);
+}
