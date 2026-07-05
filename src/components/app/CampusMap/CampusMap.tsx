@@ -36,10 +36,6 @@ const signedArea = (poly: Pt[]): number =>
     return sum + a[0] * b[1] - b[0] * a[1];
   }, 0) / 2;
 
-/** Painter's-order anchor at the backmost point of a rotated footprint. */
-const backmostDepth = (poly: Pt[]): number =>
-  Math.min(...poly.map(([x, y]) => x + y));
-
 // These footprints overlap after projection in ways that no single scalar
 // depth can order correctly. Each pair is [paint first, paint on top].
 const BUILDING_DRAW_ORDER: ReadonlyArray<readonly [string, string]> = [
@@ -292,11 +288,13 @@ function renderBody(geo: LocalGeo, st: RenderState) {
       '</g>'
     );
   }
-  function tree(loc: Pt): string {
+  function tree(loc: Pt, index: number): string {
     const b = proj(loc, 0);
     const t = proj(loc, 5);
     return (
-      '<g><ellipse cx="' +
+      '<g class="cm-tree" data-tree-index="' +
+      index +
+      '"><ellipse cx="' +
       b[0].toFixed(1) +
       '" cy="' +
       b[1].toFixed(1) +
@@ -405,13 +403,13 @@ function renderBody(geo: LocalGeo, st: RenderState) {
 
   const items: { d: number; s: string; key?: string }[] = [];
   if (showTrees)
-    geo.trees.forEach((loc) => {
+    geo.trees.forEach((loc, index) => {
       const rl = rot(loc);
-      items.push({ d: rl[0] + rl[1], s: tree(rl) });
+      items.push({ d: rl[0] + rl[1], s: tree(rl, index) });
     });
   geo.B.forEach((b) => {
-    const poly = b.ring.map(rot);
-    items.push({ d: backmostDepth(poly), s: prism(b), key: b.key });
+    const rc = rot(b.c);
+    items.push({ d: rc[0] + rc[1], s: prism(b), key: b.key });
   });
   items.sort((a, b) => a.d - b.d);
   BUILDING_DRAW_ORDER.forEach(([behind, inFront]) => {

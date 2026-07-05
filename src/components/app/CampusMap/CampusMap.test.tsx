@@ -4,6 +4,8 @@ import type { Root } from 'react-dom/client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { CampusMap } from './CampusMap';
 import { CAMPUS_GEOJSON } from './campus-data';
+import { CAMPUS_CONTEXT } from './context-data';
+import type { CampusContext } from './types';
 
 describe('CampusMap geometry', () => {
   let container: HTMLDivElement;
@@ -28,14 +30,26 @@ describe('CampusMap geometry', () => {
     container.remove();
   });
 
-  async function renderMap(interactive = false) {
+  async function renderMap({
+    interactive = false,
+    context,
+    selectedKey,
+    showTrees = false,
+  }: {
+    interactive?: boolean;
+    context?: CampusContext;
+    selectedKey?: string;
+    showTrees?: boolean;
+  } = {}) {
     await act(async () => {
       root.render(
         <CampusMap
           campus={CAMPUS_GEOJSON}
+          context={context}
           availability={{}}
           interactive={interactive}
-          showTrees={false}
+          selectedKey={selectedKey}
+          showTrees={showTrees}
         />,
       );
     });
@@ -60,8 +74,17 @@ describe('CampusMap geometry', () => {
     expect(itc2?.querySelector('[data-wall-edge="3"]')).not.toBeNull();
   });
 
+  it('paints Veilchengasse trees behind the Degg satellite footprint', async () => {
+    await renderMap({ context: CAMPUS_CONTEXT, selectedKey: 'DEGG', showTrees: true });
+
+    const layers = [...container.querySelectorAll('g.cm-tree, g.cm-bld')];
+    const treeBehindDegg = container.querySelector('g[data-tree-index="227"]');
+    const degg = container.querySelector('g[data-id="DEGG"]');
+    expect(layers.indexOf(treeBehindDegg!)).toBeLessThan(layers.indexOf(degg!));
+  });
+
   it('prevents native text selection while dragging the interactive map', async () => {
-    await renderMap(true);
+    await renderMap({ interactive: true });
 
     const svg = container.querySelector('svg');
     expect(svg?.style.userSelect).toBe('none');
