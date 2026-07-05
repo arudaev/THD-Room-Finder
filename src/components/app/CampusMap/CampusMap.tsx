@@ -355,7 +355,7 @@ function renderBody(geo: LocalGeo, st: RenderState) {
           polyPts(r, 0) +
           '" fill="none" stroke="' +
           pal.water +
-          '" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>',
+          '" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>',
       )
       .join('');
   const paths = geo.paths
@@ -550,29 +550,77 @@ export function CampusMap({
     [geo, sel, selectedKey, onSelect],
   );
 
-  // interaction: click (delegated), drag-pan, wheel-zoom — viewBox only, no reproject
+  // interaction: click (delegated), one-finger drag-pan, two-finger pinch-zoom,
+  // wheel-zoom — viewBox only, no reproject. Pointer capture keeps the gesture
+  // alive when a finger drifts off the map; touchAction:none blocks the browser's
+  // native pan/zoom so the map handles it directly (fixes janky mobile zoom).
   React.useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
+    const pointers = new Map<number, { x: number; y: number }>();
     let drag: { x: number; y: number; px: number; py: number } | null = null;
+    let pinch: { dist: number; zoom: number } | null = null;
+
+    const pinchDist = (): number => {
+      const p = [...pointers.values()];
+      return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+    };
+    const startDrag = (x: number, y: number): void => {
+      drag = { x, y, px: camRef.current.panx, py: camRef.current.pany };
+    };
     const down = (e: PointerEvent): void => {
       if (!interactive) return;
-      drag = { x: e.clientX, y: e.clientY, px: camRef.current.panx, py: camRef.current.pany };
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       camRef.current.moved = false;
+      if (pointers.size === 1) {
+        startDrag(e.clientX, e.clientY);
+      } else if (pointers.size === 2) {
+        drag = null;
+        pinch = { dist: pinchDist(), zoom: camRef.current.zoom };
+      }
+      try {
+        svg.setPointerCapture(e.pointerId);
+      } catch {
+        /* capture unsupported */
+      }
       svg.style.cursor = 'grabbing';
     };
     const move = (e: PointerEvent): void => {
-      if (!drag) return;
-      const vb = svg.viewBox.baseVal;
-      const sc = vb.width / svg.clientWidth;
-      if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) > 3) camRef.current.moved = true;
-      camRef.current.panx = drag.px + (e.clientX - drag.x) * sc;
-      camRef.current.pany = drag.py + (e.clientY - drag.y) * sc;
-      applyVB();
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size >= 2 && pinch) {
+        const d = pinchDist();
+        if (pinch.dist > 0) {
+          camRef.current.zoom = Math.min(7, Math.max(0.5, pinch.zoom * (d / pinch.dist)));
+          applyVB();
+        }
+        camRef.current.moved = true;
+        return;
+      }
+      if (drag) {
+        const vb = svg.viewBox.baseVal;
+        const sc = vb.width / svg.clientWidth;
+        if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) > 3) camRef.current.moved = true;
+        camRef.current.panx = drag.px + (e.clientX - drag.x) * sc;
+        camRef.current.pany = drag.py + (e.clientY - drag.y) * sc;
+        applyVB();
+      }
     };
-    const up = (): void => {
-      drag = null;
-      svg.style.cursor = interactive ? 'grab' : 'default';
+    const end = (e: PointerEvent): void => {
+      pointers.delete(e.pointerId);
+      try {
+        svg.releasePointerCapture(e.pointerId);
+      } catch {
+        /* nothing captured */
+      }
+      if (pointers.size < 2) pinch = null;
+      if (pointers.size === 1) {
+        const [p] = [...pointers.values()];
+        startDrag(p.x, p.y); // hand control to the remaining finger without a jump
+      } else if (pointers.size === 0) {
+        drag = null;
+        svg.style.cursor = interactive ? 'grab' : 'default';
+      }
     };
     const click = (e: MouseEvent): void => {
       if (camRef.current.moved) return;
@@ -588,15 +636,17 @@ export function CampusMap({
       applyVB();
     };
     svg.addEventListener('pointerdown', down);
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
+    svg.addEventListener('pointermove', move);
+    svg.addEventListener('pointerup', end);
+    svg.addEventListener('pointercancel', end);
     svg.addEventListener('click', click);
     svg.addEventListener('wheel', wheel, { passive: false });
     svg.style.cursor = interactive ? 'grab' : 'default';
     return () => {
       svg.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
+      svg.removeEventListener('pointermove', move);
+      svg.removeEventListener('pointerup', end);
+      svg.removeEventListener('pointercancel', end);
       svg.removeEventListener('click', click);
       svg.removeEventListener('wheel', wheel);
     };
