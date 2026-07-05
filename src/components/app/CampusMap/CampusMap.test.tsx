@@ -41,13 +41,15 @@ describe('CampusMap geometry', () => {
     });
   }
 
-  it('paints the long C footprint before the foreground HS building', async () => {
+  it('paints overlapping campus footprints in the intended order', async () => {
     await renderMap();
 
     const ids = [...container.querySelectorAll<SVGGElement>('g.cm-bld')].map(
       (building) => building.dataset.id,
     );
     expect(ids.indexOf('C')).toBeLessThan(ids.indexOf('HS'));
+    expect(ids.indexOf('G')).toBeLessThan(ids.indexOf('E'));
+    expect(ids.indexOf('GH')).toBeLessThan(ids.indexOf('ITC2'));
   });
 
   it('renders ITC² rear courtyard wall segments from polygon winding', async () => {

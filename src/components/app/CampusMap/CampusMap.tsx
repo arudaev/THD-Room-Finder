@@ -40,6 +40,14 @@ const signedArea = (poly: Pt[]): number =>
 const backmostDepth = (poly: Pt[]): number =>
   Math.min(...poly.map(([x, y]) => x + y));
 
+// These footprints overlap after projection in ways that no single scalar
+// depth can order correctly. Each pair is [paint first, paint on top].
+const BUILDING_DRAW_ORDER: ReadonlyArray<readonly [string, string]> = [
+  ['C', 'HS'],
+  ['G', 'E'],
+  ['GH', 'ITC2'],
+];
+
 /* ---- default THEME (deep-merge with `theme` prop) ---- */
 const DEFAULT_THEME = {
   // Availability ramp (full → wide-open) on THD's teal "free" family.
@@ -395,7 +403,7 @@ function renderBody(geo: LocalGeo, st: RenderState) {
     )
     .join('');
 
-  const items: { d: number; s: string }[] = [];
+  const items: { d: number; s: string; key?: string }[] = [];
   if (showTrees)
     geo.trees.forEach((loc) => {
       const rl = rot(loc);
@@ -403,9 +411,18 @@ function renderBody(geo: LocalGeo, st: RenderState) {
     });
   geo.B.forEach((b) => {
     const poly = b.ring.map(rot);
-    items.push({ d: backmostDepth(poly), s: prism(b) });
+    items.push({ d: backmostDepth(poly), s: prism(b), key: b.key });
   });
   items.sort((a, b) => a.d - b.d);
+  BUILDING_DRAW_ORDER.forEach(([behind, inFront]) => {
+    const behindIndex = items.findIndex((item) => item.key === behind);
+    const inFrontIndex = items.findIndex((item) => item.key === inFront);
+    if (behindIndex < 0 || inFrontIndex < 0 || behindIndex < inFrontIndex) return;
+
+    const [item] = items.splice(behindIndex, 1);
+    const targetIndex = items.findIndex((candidate) => candidate.key === inFront);
+    items.splice(targetIndex, 0, item);
+  });
 
   let labels = '';
   if (showLabels) {
