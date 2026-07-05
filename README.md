@@ -138,6 +138,8 @@ npm run typecheck  # tsc --noEmit
 ### Android (Capacitor)
 
 ```bash
+# Regenerate launcher/splash assets from assets/logo.svg when branding changes:
+npm run assets:android
 npm run build
 npx cap sync android
 cd android && ./gradlew assembleDebug      # debug APK
