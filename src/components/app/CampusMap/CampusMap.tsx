@@ -29,6 +29,17 @@ const hex = (h: string): number[] => [
 const mix = (a: number[], b: number[], t: number): number[] => a.map((v, i) => v + (b[i] - v) * t);
 const rgb = (c: number[]): string => 'rgb(' + c.map((v) => Math.round(v)).join(',') + ')';
 
+/** Signed polygon area: positive for CCW rings, negative for CW rings. */
+const signedArea = (poly: Pt[]): number =>
+  poly.reduce((sum, a, i) => {
+    const b = poly[(i + 1) % poly.length];
+    return sum + a[0] * b[1] - b[0] * a[1];
+  }, 0) / 2;
+
+/** Painter's-order anchor at the backmost point of a rotated footprint. */
+const backmostDepth = (poly: Pt[]): number =>
+  Math.min(...poly.map(([x, y]) => x + y));
+
 /* ---- default THEME (deep-merge with `theme` prop) ---- */
 const DEFAULT_THEME = {
   // Availability ramp (full → wide-open) on THD's teal "free" family.
@@ -186,6 +197,7 @@ function renderBody(geo: LocalGeo, st: RenderState) {
     const poly = b.ring.map(rot);
     const h = b.height;
     const n = poly.length;
+    const area = signedArea(poly);
     let cx = 0;
     let cy = 0;
     poly.forEach((p) => {
@@ -207,10 +219,10 @@ function renderBody(geo: LocalGeo, st: RenderState) {
       const A = poly[i];
       const Cp = poly[(i + 1) % n];
       const ed = [Cp[0] - A[0], Cp[1] - A[1]];
-      let nm = [ed[1], -ed[0]];
+      // Ring winding gives the true outward normal even for concave footprints.
+      // A centroid direction is ambiguous for ITC²'s inset courtyard walls.
+      const nm = area < 0 ? [-ed[1], ed[0]] : [ed[1], -ed[0]];
       const mid = [(A[0] + Cp[0]) / 2, (A[1] + Cp[1]) / 2];
-      const co = [mid[0] - cx, mid[1] - cy];
-      if (nm[0] * co[0] + nm[1] * co[1] < 0) nm = [-nm[0], -nm[1]];
       if (nm[0] + nm[1] <= 0) continue;
       const L = Math.hypot(nm[0], nm[1]) || 1;
       const t = Math.abs(nm[0] / L) / (Math.abs(nm[0] / L) + Math.abs(nm[1] / L) + 1e-6);
@@ -218,7 +230,9 @@ function renderBody(geo: LocalGeo, st: RenderState) {
       walls.push({
         d: mid[0] + mid[1],
         s:
-          '<polygon points="' +
+          '<polygon data-wall-edge="' +
+          i +
+          '" points="' +
           q.map(P).join(' ') +
           '" fill="' +
           rgb(mix(stoneL, stoneR, t)) +
@@ -388,8 +402,8 @@ function renderBody(geo: LocalGeo, st: RenderState) {
       items.push({ d: rl[0] + rl[1], s: tree(rl) });
     });
   geo.B.forEach((b) => {
-    const rc = rot(b.c);
-    items.push({ d: rc[0] + rc[1], s: prism(b) });
+    const poly = b.ring.map(rot);
+    items.push({ d: backmostDepth(poly), s: prism(b) });
   });
   items.sort((a, b) => a.d - b.d);
 
