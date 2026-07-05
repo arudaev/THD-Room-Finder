@@ -550,7 +550,7 @@ export function CampusMap({
     [geo, sel, selectedKey, onSelect],
   );
 
-  // interaction: click (delegated), one-finger drag-pan, two-finger pinch-zoom,
+  // interaction: building selection, one-finger drag-pan, two-finger pinch-zoom,
   // wheel-zoom — viewBox only, no reproject. Pointer capture keeps the gesture
   // alive when a finger drifts off the map; touchAction:none blocks the browser's
   // native pan/zoom so the map handles it directly (fixes janky mobile zoom).
@@ -560,6 +560,10 @@ export function CampusMap({
     const pointers = new Map<number, { x: number; y: number }>();
     let drag: { x: number; y: number; px: number; py: number } | null = null;
     let pinch: { dist: number; zoom: number } | null = null;
+    // Resolve the tapped building at pointer-down: once we setPointerCapture, a
+    // mouse `click` retargets to the whole SVG, so it can't be used to hit-test
+    // (touch is unaffected — which is why tapping worked but clicking didn't).
+    let tapId: string | null = null;
 
     const pinchDist = (): number => {
       const p = [...pointers.values()];
@@ -570,6 +574,13 @@ export function CampusMap({
     };
     const down = (e: PointerEvent): void => {
       if (!interactive) return;
+      if (pointers.size === 0 && e.button === 0) {
+        const target = e.target as Element;
+        const building = target.closest?.('[data-id]') as HTMLElement | null;
+        tapId = building?.dataset.id ?? null;
+      } else {
+        tapId = null;
+      }
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       camRef.current.moved = false;
       if (pointers.size === 1) {
@@ -607,6 +618,7 @@ export function CampusMap({
       }
     };
     const end = (e: PointerEvent): void => {
+      const tappedBuilding = e.type === 'pointerup' && !camRef.current.moved ? tapId : null;
       pointers.delete(e.pointerId);
       try {
         svg.releasePointerCapture(e.pointerId);
@@ -621,12 +633,8 @@ export function CampusMap({
         drag = null;
         svg.style.cursor = interactive ? 'grab' : 'default';
       }
-    };
-    const click = (e: MouseEvent): void => {
-      if (camRef.current.moved) return;
-      const target = e.target as Element;
-      const g = target.closest && target.closest('[data-id]');
-      if (g) pick((g as HTMLElement).dataset.id as string);
+      tapId = null;
+      if (tappedBuilding) pick(tappedBuilding);
     };
     const wheel = (e: WheelEvent): void => {
       if (!interactive) return;
@@ -639,7 +647,6 @@ export function CampusMap({
     svg.addEventListener('pointermove', move);
     svg.addEventListener('pointerup', end);
     svg.addEventListener('pointercancel', end);
-    svg.addEventListener('click', click);
     svg.addEventListener('wheel', wheel, { passive: false });
     svg.style.cursor = interactive ? 'grab' : 'default';
     return () => {
@@ -647,7 +654,6 @@ export function CampusMap({
       svg.removeEventListener('pointermove', move);
       svg.removeEventListener('pointerup', end);
       svg.removeEventListener('pointercancel', end);
-      svg.removeEventListener('click', click);
       svg.removeEventListener('wheel', wheel);
     };
   }, [interactive, applyVB, pick]);
