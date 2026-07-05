@@ -39,6 +39,7 @@ apps were retired into the `v1-native` git tag.
 | A design-system component | `src/components/<core|app>/…` (mirror the Claude Design source) |
 | Navigation / layout / routing | `src/app/AppShell.tsx`, `src/components/app/AdaptiveNav.tsx` |
 | Theme / locale | `src/lib/theme.tsx`, `src/i18n/` |
+| Change the app logo / launcher / splash | `assets/logo.svg`, then `npm run assets:android` |
 
 ## Commands
 
@@ -59,6 +60,16 @@ A signed release APK needs `android/keystore.properties` (see the `.example`).
 - For UI/behavior, run `npm run dev` and check against **live THabella** data:
   free-room count, duration-ranked order, EN/DE toggle, dark mode, room detail
   schedule. There are no fixtures — the dev middleware hits the real API.
+
+## Agent git workflow
+
+- Use exactly one task branch and one pull request. If review or CI finds a
+  problem, update that same branch and PR; never create follow-up fix PRs for
+  the same task.
+- Agents must never merge pull requests, force-push shared history, move release
+  tags, or publish releases. Stop after opening the PR; the maintainer merges and
+  releases.
+- Keep unrelated working-tree changes out of the branch and PR.
 
 ## Known follow-ups (good first tasks)
 

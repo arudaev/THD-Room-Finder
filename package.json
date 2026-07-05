@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "cap:sync": "cap sync android",
-    "cap:open": "cap open android"
+    "cap:open": "cap open android",
+    "assets:android": "npx --yes @capacitor/assets@3.0.5 generate --android --assetPath assets --iconBackgroundColor \"#F4F6FA\" --iconBackgroundColorDark \"#F4F6FA\" --splashBackgroundColor \"#F4F6FA\" --splashBackgroundColorDark \"#111318\""
   },
   "dependencies": {
     "@capacitor/app": "^6.0.0",
