@@ -3,7 +3,7 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AdaptiveNav } from '../components';
 import type { NavItem } from '../components';
 import { IconList, IconMap, IconStar } from '../components/icons';
-import { useWindowClass } from '../lib/useWindowClass';
+import { useWindowClass, useWideLayout } from '../lib/useWindowClass';
 import { useI18n } from '../i18n';
 import { useFavorites } from '../features/favorites/favorites';
 import { HomeScreen } from '../features/home/HomeScreen';
@@ -13,13 +13,14 @@ import { RoomDetailScreen } from '../features/detail/RoomDetailScreen';
 
 /** Maps the current path to the active nav destination. */
 function activeId(pathname: string): string {
-  if (pathname.startsWith('/campus')) return 'campus';
+  if (pathname.startsWith('/rooms')) return 'rooms';
   if (pathname.startsWith('/saved')) return 'saved';
-  return 'rooms';
+  return 'campus';
 }
 
 export function AppShell() {
   const cls = useWindowClass();
+  const wide = useWideLayout();
   const { t } = useI18n();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
@@ -27,8 +28,8 @@ export function AppShell() {
 
   const items = useMemo<NavItem[]>(
     () => [
-      { id: 'rooms', label: t('Rooms', 'Räume'), icon: <IconList /> },
       { id: 'campus', label: t('Campus', 'Campus'), icon: <IconMap /> },
+      { id: 'rooms', label: t('Rooms', 'Räume'), icon: <IconList /> },
       {
         id: 'saved',
         label: t('Saved', 'Gespeichert'),
@@ -40,7 +41,7 @@ export function AppShell() {
   );
 
   const onSelect = (id: string) => {
-    navigate(id === 'rooms' ? '/' : `/${id}`);
+    navigate(id === 'campus' ? '/' : `/${id}`);
   };
 
   const nav = (
@@ -48,23 +49,23 @@ export function AppShell() {
       items={items}
       active={activeId(location.pathname)}
       onSelect={onSelect}
-      variant={cls === 'compact' ? 'bar' : cls === 'medium' ? 'rail' : 'drawer'}
+      variant={!wide ? 'bar' : cls === 'expanded' ? 'drawer' : 'rail'}
     />
   );
 
   const content = (
     <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflowY: 'auto' }}>
       <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/campus" element={<CampusScreen />} />
+        <Route path="/" element={<CampusScreen />} />
+        <Route path="/rooms" element={<HomeScreen />} />
         <Route path="/saved" element={<FavoritesScreen />} />
         <Route path="/room/:ident" element={<RoomDetailScreen />} />
-        <Route path="*" element={<HomeScreen />} />
+        <Route path="*" element={<CampusScreen />} />
       </Routes>
     </main>
   );
 
-  if (cls === 'compact') {
+  if (!wide) {
     // Content scrolls; bottom navigation bar pinned below.
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>

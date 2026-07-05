@@ -25,3 +25,30 @@ export function useWindowClass(): WindowClass {
   }, []);
   return cls;
 }
+
+/**
+ * Whether to use the wide, side-by-side (map + panel, rail/drawer) layout.
+ * True only when the viewport is both wide enough *and* landscape — a tablet
+ * held upright (portrait) is tall and narrow, so it gets the mobile stacked
+ * layout even though its width alone would qualify as medium/expanded.
+ */
+export function isWideLayout(width: number, height: number): boolean {
+  return width >= 600 && width > height;
+}
+
+export function useWideLayout(): boolean {
+  const [wide, setWide] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? isWideLayout(window.innerWidth, window.innerHeight) : false,
+  );
+  useEffect(() => {
+    const on = () => setWide(isWideLayout(window.innerWidth, window.innerHeight));
+    on();
+    window.addEventListener('resize', on);
+    window.addEventListener('orientationchange', on);
+    return () => {
+      window.removeEventListener('resize', on);
+      window.removeEventListener('orientationchange', on);
+    };
+  }, []);
+  return wide;
+}

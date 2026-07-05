@@ -22,3 +22,15 @@ export { StatusCard } from './app/StatusCard';
 export type { StatusCardProps } from './app/StatusCard';
 export { AdaptiveNav } from './app/AdaptiveNav';
 export type { AdaptiveNavProps, NavItem } from './app/AdaptiveNav';
+
+export { CampusMap } from './app/CampusMap/CampusMap';
+export { CAMPUS_GEOJSON } from './app/CampusMap/campus-data';
+export { CAMPUS_CONTEXT } from './app/CampusMap/context-data';
+export type {
+  CampusData,
+  CampusContext,
+  CampusBuildingFeature,
+  Availability,
+  CampusTheme,
+  CampusMapProps,
+} from './app/CampusMap/types';
