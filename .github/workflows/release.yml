@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing v* tag to build and publish
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -12,8 +18,19 @@ jobs:
   release:
     name: Build web + signed Android APK, publish release
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
     steps:
+      - name: Validate release tag
+        run: |
+          if [[ "$RELEASE_TAG" != v* ]]; then
+            echo "::error::Release tag must start with v"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - uses: actions/setup-node@v4
         with:
@@ -26,7 +43,7 @@ jobs:
 
       - name: Resolve version
         id: version
-        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        run: echo "value=${RELEASE_TAG#v}" >> "$GITHUB_OUTPUT"
 
       - run: npm ci
       - run: npm run typecheck
@@ -76,5 +93,6 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
           files: dist-apk/*.apk
           generate_release_notes: true
