@@ -19,8 +19,8 @@ import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
-import { RoomFilterBar } from '../shared/RoomFilterBar';
-import { SectionLabel, Spinner } from '../shared/ui';
+import { FilterMenu } from '../shared/FilterMenu';
+import { Spinner } from '../shared/ui';
 
 /** On-roof label + full name per campus building key, from the map geometry. */
 const KEY_META: Record<string, { label: string; name: string }> = Object.fromEntries(
@@ -113,9 +113,8 @@ export function CampusScreen() {
   const mapMode = theme === 'system' ? 'auto' : theme;
   const openRoom = (ident: string) => navigate(`/room/${encodeURIComponent(ident)}`);
 
-  const list = (items: FreeRoom[], label: string) => (
+  const list = (items: FreeRoom[]) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-      <SectionLabel>{label}</SectionLabel>
       {items.length === 0 ? (
         <div
           style={{
@@ -186,7 +185,7 @@ export function CampusScreen() {
           </div>
         </div>
       </div>
-      {list(selectedRooms, t('Free rooms', 'Freie Räume'))}
+      {list(selectedRooms)}
     </>
   ) : (
     <>
@@ -209,8 +208,12 @@ export function CampusScreen() {
           {t('Tap a building on the map to see its free rooms.', 'Tippe ein Gebäude auf der Karte für freie Räume.')}
         </div>
       </div>
-      <RoomFilterBar />
-      {list(filteredFree, t('Longest free right now', 'Am längsten frei'))}
+      <div style={{ display: 'flex' }}>
+        <div style={{ marginLeft: 'auto' }}>
+          <FilterMenu />
+        </div>
+      </div>
+      {list(filteredFree)}
     </>
   );
 
