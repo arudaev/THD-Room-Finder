@@ -1,173 +1,126 @@
 # CLAUDE.md — THD Room Finder
 
-> Multi-platform app (Android + iOS) that helps THD students find free study rooms in real-time.
+> Single cross-platform app (web PWA + Android via Capacitor) that helps THD
+> students find a free study room in real time — and know how long it stays free.
 
 ## Project Overview
 
-**THD Room Finder** queries THD's public scheduling system **THabella** (`thabella.th-deg.de`) and cross-references occupied rooms against all known rooms to show which classrooms are currently available.
+**THD Room Finder** queries THD's public scheduling system **THabella**
+(`thabella.th-deg.de`) and cross-references occupied rooms against the rooms that
+actually host teaching, to show which classrooms are free right now, or at any
+time you pick.
 
-**Key principle:** No custom backend. Both apps talk directly to THabella's public `/opn/` endpoints and do all logic on-device.
+**Key principles:**
+- **One codebase.** v2 collapsed the old native Android + native iOS + vanilla-JS
+  PWA into a single **React + TypeScript** app (installable PWA + Capacitor
+  Android). The v1 native apps are preserved under the `v1-native` git tag.
+- **No accounts, no real backend.** The web app uses a thin same-origin proxy
+  (`api/`) only for CORS/caching; Android calls THabella directly. All logic runs
+  on-device.
+- **Answer-first.** Lead with *how long* a room is free, not a binary state.
 
 ## Repository Structure
 
 ```
-app/                    # Android app (Kotlin + Jetpack Compose)
-ios/                    # iOS app (SwiftUI)
-  THDRoomFinder/        # App source (Features/, Domain/, Data/, Intents/)
-  THDRoomFinder.xcodeproj
-shared/
-  thd-room-taxonomy.json   # Canonical room/building metadata (shared by both platforms)
-scripts/
-  ci/                   # CI helpers: upload-appetize.sh, export-ios-*.sh, android-*.sh
-  dev/                  # Dev helpers: thd_room_normalization.py, export-thabella-snapshot.py
-website/                # Static landing page (HTML/CSS)
-docs/                   # GitHub Wiki submodule
-.github/workflows/      # CI: ci.yml, release.yml, appetize.yml, pages.yml
+src/
+  domain/       # framework-free, unit-tested: models, parse, availability, priority, teachingRooms, format
+  data/         # dto, mappers, cache (localStorage), thabellaClient (web proxy / native HTTP)
+  components/   # ported Material 3 design-system components (core/ + app/) + icons
+  features/     # screens + state: home/ detail/ campus/ favorites/ rooms/ (RoomDataContext) shared/
+  i18n/         # EN/DE provider (t(en, de))
+  lib/          # theme provider, window-size-class hook
+  styles/       # design-system token CSS + global entry
+  app/          # AppShell (routing + AdaptiveNav layout)
+api/            # Vercel serverless proxy: rooms.js, periods.js
+android/        # Capacitor Android project (generated)
+public/icons/   # app icons
+shared/         # canonical room/building taxonomy (JSON)
+website/        # static marketing landing page (GitHub Pages)
+scripts/dev/    # Python helpers (taxonomy normalization, THabella snapshot)
+docs/           # GitHub wiki (submodule)
 ```
 
 ## Architecture
 
-### Android
+Layering (dependencies point inward): `features → components → state → domain ← data`.
+The **domain layer has no framework imports** and is the trusted core — a
+faithful TS port of the v1 Android use-cases, extended for v2.
 
-```
-UI (Jetpack Compose + Material 3)
-  └── ViewModel (StateFlow, Kotlin Coroutines)
-        └── Use Cases (domain layer)
-              └── Repository (interface in domain, impl in data)
-                    └── Remote: Retrofit + Kotlin Serialization → THabella
-                    └── Local:  Room DB (cache, 24h TTL rooms / 5min events)
-```
-
-Pattern: MVVM + Clean Architecture. Unidirectional data flow (UDF).
-Package: `de.thd.roomfinder`
-
-### iOS
-
-```
-Features/ (Home, RoomList, RoomDetail) — SwiftUI views + ViewModels
-  └── Domain/ (RoomModels, RoomPresentation, RoomPriorityPolicy, RoomRepository)
-        └── Data/ (ThabellaAPIClient → THabella)
-```
-
-Pattern: MVVM with async/await. No third-party dependencies — Foundation + SwiftUI only.
-
-## Tech Stack
-
-| | Android | iOS |
-|---|---|---|
-| Language | Kotlin | Swift |
-| UI | Jetpack Compose + Material 3 | SwiftUI |
-| Networking | Retrofit 2 + OkHttp | URLSession (async/await) |
-| Serialization | kotlinx.serialization | Codable |
-| Local DB | Room (cache) | — |
-| DI | Hilt | — |
-| Async | Coroutines + Flow | async/await |
-| Min OS | Android 8.0 (SDK 26) | iOS 16+ |
-| Build | Gradle Kotlin DSL | Xcode |
+- **Duration-first ranking** (`domain/availability.ts`): free rooms sorted
+  longest-free first, main-campus `isPriority` as a tiebreak.
+- **Three-state status**: `free | soon | occupied` (`soon` ≤ 40 min).
+- **Teaching-room filter** (`domain/teachingRooms.ts`): a room is eligible only
+  if it hosts ≥1 event in the current Mon–Fri week; plus an excluded-venue
+  blocklist (sports/outdoor/meeting) carried over from the native app.
+- **State** via React context: `RoomDataProvider` (data, time-travel,
+  auto-refresh), `FavoritesProvider`, `I18nProvider`, `ThemeProvider`.
 
 ## THabella API
 
-Base URL: `https://thabella.th-deg.de/thabella/opn/` — **no auth required**.
+Base URL: `https://thabella.th-deg.de/thabella/opn/` — **no auth**.
 
-| Endpoint | Method | Body | Purpose |
-|---|---|---|---|
-| `/room/findRooms` | POST | `{}` | All rooms (289+) as `RoomDto[]` |
-| `/period/findByDate/{dateTime}` | POST | `{"sqlDate":"YYYY-MM-DD HH:mm"}` | Events for a date/time as `PeriodDto[]` |
+| Endpoint | Body | Purpose |
+|---|---|---|
+| `POST /room/findRooms` | `{}` | All rooms `RoomDto[]` |
+| `POST /period/findByDate/{dateTime}` | `{"sqlDate":"YYYY-MM-DD HH:mm"}` | A day's events `PeriodDto[]` |
 
-Key gotchas:
-- `room_ident` in `PeriodDto` is `Map<String, String>`, not an array.
-- Public fields only: `startDateTime`, `duration` (minutes), `eventTypeDescription`. Event titles/organiser are always null.
-- **No official docs.** Endpoints discovered via THabella's RequireJS source.
-- **API may change without notice** — use `ignoreUnknownKeys = true` and nullable fields everywhere.
-- Unknown rate limits — cache aggressively.
-
-## Shared Room Taxonomy (`shared/thd-room-taxonomy.json`)
-
-Canonical metadata used by both platforms. Contains:
-- `buildings` — 28 entries with codes, campus, display names
-- `campuses`, `sites` — campus/site hierarchy
-- `roomCodePatterns` — regex patterns for room code normalization
-
-The normalization script (`scripts/dev/thd_room_normalization.py`) derives `RoomVisibilityClass` for each room:
-- `teaching_room` — regular classrooms shown by default
-- `secondary_venue` — labs, seminar rooms shown in expanded view
-- `exclude_default` — admin/server/storage rooms hidden by default
-- `unknown` — unrecognized pattern
-
-**RoomPriorityPolicy** (iOS: `Domain/RoomPriorityPolicy.swift`, Android: use cases) sorts free rooms: main-campus teaching rooms first, then secondary venues, then remote buildings.
+Gotchas: `room_ident` is a `Map<string,string>` (one period → N rooms). Public
+fields only; titles/organiser are null. **Undocumented, may change** — DTOs are
+fully nullable, unknown keys ignored. Cache aggressively (rooms 24h, events 5min,
+teaching set 24h).
 
 ## Build & Run
 
-### Android
-
 ```bash
-# Debug APK
-./gradlew assembleDebug
+npm install
+npm run dev        # Vite dev server (proxies THabella via a dev middleware)
+npm run build      # tsc --noEmit + vite build → dist/
+npm test           # Vitest
+npm run typecheck
 
-# Release APK
-./gradlew assembleRelease
-
-# Unit tests
-./gradlew test
-
-# Lint
-./gradlew lint
-
-# Full CI check (same as CI pipeline)
-bash scripts/dev/android-build.sh assembleDebug
-bash scripts/dev/android-test.sh
+# Android
+npm run build && npx cap sync android
+cd android && ./gradlew assembleDebug        # or assembleRelease (needs keystore.properties)
 ```
-
-### iOS
-
-Open `ios/THDRoomFinder.xcodeproj` in Xcode. Select a simulator and run.
-
-```bash
-# Package simulator bundle for Appetize
-bash scripts/ci/package-ios-simulator.sh
-
-# Export IPA for TestFlight
-bash scripts/ci/export-ios-testflight.sh
-
-# Upload to Appetize
-bash scripts/ci/upload-appetize.sh
-```
-
-## CI / Delivery
-
-| Workflow | Trigger | What it does |
-|---|---|---|
-| `ci.yml` | push / PR | Build + test both Android and iOS |
-| `release.yml` | tag `v*` | Build release APK + iOS IPA, create GitHub release |
-| `appetize.yml` | push to `main` | Build debug APK + iOS sim bundle, upload to Appetize for live preview |
-| `pages.yml` | push to `main` | Deploy `website/` to GitHub Pages |
-
-Appetize previews require the `APPETIZE_API_TOKEN` secret. If absent, CI still builds and attaches the artifact — it just skips the upload.
-
-## Core Features
-
-- [x] Free Room Finder — rooms not occupied right now per THabella schedule
-- [x] Building filter — filter by building code (FilterChip row)
-- [x] Time-based filtering — check availability at a future date/time
-- [x] Room details — capacity, facilities, contact info, day schedule
-- [x] Room priority sorting — main-campus teaching rooms ranked first
-- [x] Student-friendly visibility filters — exclude admin/server rooms by default
-- [x] Offline support — network-first with Room DB fallback (Android); local-first (iOS)
-- [x] Auto-refresh — silent 5-minute background refresh
-- [x] iOS App Intents — Siri / Shortcuts integration
-- [ ] Favorites — save frequently used rooms
 
 ## Code Conventions
 
-- **Architecture boundaries:** UI → Domain ← Data. Domain layer has no platform imports.
-- **No wildcard imports** (Kotlin); explicit imports (Swift).
-- **Defensive API parsing:** `ignoreUnknownKeys = true`, nullable fields for all DTO properties.
-- **German context:** room names and building codes stay in their original German form; app UI is in English.
-- **Naming:** `<Feature>Screen` / `<Feature>View`, `<Feature>ViewModel`, `<Entity>Repository`, `<Action><Entity>UseCase`, `<Entity>Dto`, `<Entity>Entity`.
-- **Tests:** use fakes over mocks; name tests as `` fun `descriptive behavior`() ``.
+- **Architecture boundaries:** domain imports nothing from data/UI. Keep new
+  business logic in `domain/` with a unit test.
+- **Defensive API parsing:** all DTO fields nullable/optional; unknown keys ignored.
+- **German context:** room/building codes stay in original German; app UI is
+  English with a live DE toggle. One `t(en, de)` per string; never translate codes.
+- **Design system:** style via CSS variables (`--md-*`, tokens), not hard-coded
+  colors. Shadows, not borders. Ported components mirror the Claude Design source.
+- **Naming:** `<Feature>Screen`, `<Entity>Provider` / `use<Entity>`, `<Entity>Dto`.
+- **Tests:** Vitest, behavior-named; fakes over mocks.
 
-## Before Committing
+## Git & Commits
 
-1. `./gradlew assembleDebug test lint` passes (Android)
-2. Xcode builds without warnings (iOS)
-3. One logical change per commit; imperative mood, ≤72 chars.
+**Before committing:** `npm run typecheck && npm test && npm run build` all
+pass. Don't hard-code THabella data; don't add accounts or a stateful backend.
+
+### Branching
+
+- **Never commit directly to `main`.** `main` is the release branch; PRs target it.
+- Branch from the base you're building on (usually `dev`) with a typed prefix:
+  `feat/…`, `fix/…`, `chore/…`, `docs/…`, `ci/…`, `refactor/…`, `test/…`
+  (e.g. `feat/campus-map`). One coherent change per branch.
+- Open a PR to merge back — do not fast-forward straight into `main`.
+
+### Commit message format
+
+Conventional Commits. Subject line: `type(optional-scope): summary`
+
+- **type**: `feat` | `fix` | `docs` | `refactor` | `test` | `chore` | `ci` | `perf`
+- **summary**: imperative mood, lower-case, no trailing period, **≤72 chars**
+  (e.g. `feat(domain): rank free rooms by remaining duration`)
+- **body** (optional): wrap at 72 cols; explain *what* and *why*, not how.
+- **footer** (optional): `BREAKING CHANGE:` or issue refs (`Closes #12`).
+- One logical change per commit; each commit should build.
+
+### No co-authoring / no attribution
+
+Do **not** add any AI or tool attribution to commits or PRs — no
+`Co-Authored-By:` trailers, no "Generated with …" lines, no bot signatures.
+Commits are authored solely by the human maintainer.

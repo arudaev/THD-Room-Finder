@@ -1,0 +1,49 @@
+/* ============================================================
+   THD Room Finder — Shape & Elevation
+   Material 3 shape scale (rounded corners) + the app's two-level
+   elevation shadow system. Shadows are soft, neutral, and low —
+   M3 ElevatedCard sits at level 1; hover lifts to level 2.
+   ============================================================ */
+
+:root {
+  /* ── Shape scale (corner radius) ──────────────────── */
+  --radius-xs:  4px;   /* badges, inline tags            */
+  --radius-s:   8px;   /* chips, inputs, small surfaces  */
+  --radius-m:   12px;  /* icon tiles, menus              */
+  --radius-l:   16px;  /* cards, sheets, panels          */
+  --radius-xl:  28px;  /* buttons (pill), large sheets   */
+  --radius-full: 999px;/* avatars, FAB, circular buttons */
+
+  /* Legacy aliases (match original codebase var names) */
+  --md-radius-s:  var(--radius-s);
+  --md-radius-m:  var(--radius-m);
+  --md-radius-l:  var(--radius-l);
+  --md-radius-xl: var(--radius-xl);
+
+  /* ── Elevation (shadow) ───────────────────────────── */
+  --md-shadow-1: 0 1px 2px rgba(0,0,0,.12), 0 1px 3px 1px rgba(0,0,0,.08);
+  --md-shadow-2: 0 1px 2px rgba(0,0,0,.15), 0 2px 6px 2px rgba(0,0,0,.10);
+
+  /* Semantic aliases */
+  --elevation-resting: var(--md-shadow-1);
+  --elevation-raised:  var(--md-shadow-2);
+
+  /* Motion — Material standard easing & durations.
+     Transitions are short (100–150ms), property-scoped (no
+     all), and respect prefers-reduced-motion globally. */
+  --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast:   0.1s;
+  --duration-medium: 0.15s;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --md-shadow-1: 0 1px 2px rgba(0,0,0,.3),  0 1px 3px 1px rgba(0,0,0,.2);
+    --md-shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
+  }
+}
+[data-theme="dark"] {
+  --md-shadow-1: 0 1px 2px rgba(0,0,0,.3),  0 1px 3px 1px rgba(0,0,0,.2);
+  --md-shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
+}

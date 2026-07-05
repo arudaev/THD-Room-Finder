@@ -1,0 +1,56 @@
+/* ============================================================
+   THD Room Finder — Typography Scale
+   Material 3 type scale, mapped to Roboto. Display weights are
+   light (300) for the big "free room count" hero numbers; titles
+   and labels use medium (500); body uses regular (400).
+   ============================================================ */
+
+:root {
+  /* Family roles */
+  --type-family:       var(--font-sans);
+  --type-family-mono:  var(--font-mono);
+
+  /* Weights */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-bold:     700;
+
+  /* ── M3 type-scale roles (size / line-height / weight) ── */
+
+  /* Display — the big availability count on the home screen */
+  --display-large-size:    7rem;     /* 112px */
+  --display-large-lh:      1;
+  --display-small-size:    2.75rem;  /* 44px  */
+  --display-small-lh:      1.15;
+
+  /* Headline — section headers, page H2 */
+  --headline-size:         1.75rem;  /* 28px */
+  --headline-lh:           1.25;
+
+  /* Title — card titles, app-bar title */
+  --title-large-size:      1.375rem; /* 22px */
+  --title-large-lh:        1.3;
+  --title-medium-size:     1rem;     /* 16px */
+  --title-medium-lh:       1.4;
+  --title-small-size:      0.9375rem;/* 15px */
+  --title-small-lh:        1.4;
+
+  /* Body */
+  --body-large-size:       1rem;     /* 16px */
+  --body-large-lh:         1.7;
+  --body-medium-size:      0.875rem; /* 14px */
+  --body-medium-lh:        1.5;
+  --body-small-size:       0.8125rem;/* 13px */
+  --body-small-lh:         1.5;
+
+  /* Label — buttons, chips, overlines */
+  --label-large-size:      0.875rem; /* 14px */
+  --label-large-lh:        1.2;
+  --label-small-size:      0.75rem;  /* 12px */
+  --label-small-lh:        1.3;
+
+  /* Material 3 uses 0 tracking across the board at these sizes */
+  --tracking-normal:   0;
+  --tracking-overline: 0.06em; /* uppercase eyebrow labels */
+}

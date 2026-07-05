@@ -2,84 +2,46 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
     branches: [main]
 
 permissions:
   contents: read
 
-env:
-  # Java 21 is required by AGP 8.x (minimum supported version for compileSdk 36)
-  JAVA_VERSION: '21'
-  # Pinned simulator name; update when Xcode drops this device from the runtime list
-  IOS_SIMULATOR: 'iPhone 16'
-
 jobs:
-  android:
-    name: Android Build & Test
+  web:
+    name: Web — typecheck, test, build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'temurin'
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build debug APK
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 2
-          command: bash scripts/dev/android-build.sh assembleDebug
-
-      - name: Run unit tests and lint checks
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 2
-          command: bash scripts/dev/android-test.sh test lint
-
-  ios:
-    name: iOS Build & Test
-    runs-on: macos-latest
+  android:
+    name: Android — build debug APK (Capacitor)
+    runs-on: ubuntu-latest
+    needs: web
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build iOS simulator app
-        uses: nick-fields/retry@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          timeout_minutes: 15
-          max_attempts: 2
-          command: |
-            xcodebuild \
-              -project ios/THDRoomFinder.xcodeproj \
-              -scheme THDRoomFinder \
-              -configuration Debug \
-              -destination 'generic/platform=iOS Simulator' \
-              CODE_SIGNING_ALLOWED=NO \
-              build
-
-      - name: Run THDRoomFinderTests
-        uses: nick-fields/retry@v3
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
         with:
-          timeout_minutes: 15
-          max_attempts: 2
-          command: |
-            xcodebuild \
-              -project ios/THDRoomFinder.xcodeproj \
-              -scheme THDRoomFinder \
-              -destination 'platform=iOS Simulator,name=${{ env.IOS_SIMULATOR }},OS=latest' \
-              -only-testing:THDRoomFinderTests \
-              CODE_SIGNING_ALLOWED=NO \
-              test
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - run: chmod +x android/gradlew
+      - name: Assemble debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
