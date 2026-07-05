@@ -7,6 +7,7 @@ import { useI18n } from '../../i18n';
 import { freeRoomDuration, formatTime, roomMeta } from '../../domain/format';
 import { freeStatus } from '../../domain/availability';
 import { BrandHeader } from '../shared/BrandHeader';
+import { ClosedNotice } from '../shared/ClosedNotice';
 import { Page, SectionLabel, Spinner, EmptyState, ErrorState } from '../shared/ui';
 
 function toDateTimeLocal(date: Date): string {
@@ -24,6 +25,7 @@ export function HomeScreen() {
     freeRooms,
     queryTime,
     isCustomTime,
+    campusHours,
     loading,
     error,
     lastUpdated,
@@ -48,25 +50,29 @@ export function HomeScreen() {
     <>
     <BrandHeader />
     <Page>
-      {/* Hero count → flows straight into the list. */}
-      <div>
-        <div
-          style={{
-            fontSize: 'clamp(4rem, 22vw, var(--display-large-size))',
-            lineHeight: 1,
-            fontWeight: 'var(--weight-light)',
-            color: 'var(--md-primary)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {loading && freeRooms.length === 0 ? '—' : shown.length}
+      {/* Hero count → flows straight into the list, or the closed banner. */}
+      {campusHours.open ? (
+        <div>
+          <div
+            style={{
+              fontSize: 'clamp(4rem, 22vw, var(--display-large-size))',
+              lineHeight: 1,
+              fontWeight: 'var(--weight-light)',
+              color: 'var(--md-primary)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {loading && freeRooms.length === 0 ? '—' : shown.length}
+          </div>
+          <div style={{ fontSize: 'var(--title-medium-size)', color: 'var(--md-on-surface-variant)' }}>
+            {building
+              ? t(`rooms free in ${building}`, `Räume frei in ${building}`)
+              : t('rooms free right now', 'Räume jetzt frei')}
+          </div>
         </div>
-        <div style={{ fontSize: 'var(--title-medium-size)', color: 'var(--md-on-surface-variant)' }}>
-          {building
-            ? t(`rooms free in ${building}`, `Räume frei in ${building}`)
-            : t('rooms free right now', 'Räume jetzt frei')}
-        </div>
-      </div>
+      ) : (
+        <ClosedNotice hours={campusHours} compact />
+      )}
 
       {/* Time-travel lookup. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
@@ -150,8 +156,9 @@ export function HomeScreen() {
         </div>
       )}
 
-      {/* The answer: duration-ranked free rooms. */}
-      {error && freeRooms.length === 0 ? (
+      {/* The answer: duration-ranked free rooms (hidden while the campus is closed). */}
+      {campusHours.open &&
+        (error && freeRooms.length === 0 ? (
         <ErrorState message={error} onRetry={refresh} retryLabel={t('Try again', 'Erneut versuchen')} />
       ) : loading && freeRooms.length === 0 ? (
         <Spinner label={t('Checking THabella…', 'THabella wird abgefragt…')} />
@@ -181,7 +188,7 @@ export function HomeScreen() {
             );
           })}
         </div>
-      )}
+      ))}
     </Page>
     </>
   );

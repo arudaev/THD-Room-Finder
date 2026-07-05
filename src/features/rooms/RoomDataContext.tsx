@@ -9,6 +9,8 @@ import {
 import type { ReactNode } from 'react';
 import type { FreeRoom, Room, ScheduledEvent } from '../../domain/models';
 import { computeFreeRooms } from '../../domain/availability';
+import { getCampusHours } from '../../domain/openingHours';
+import type { CampusHours } from '../../domain/openingHours';
 import { getEventsForDate, getRooms, getTeachingRoomIdents } from '../../data/thabellaClient';
 
 const REFRESH_MS = 5 * 60 * 1000;
@@ -21,8 +23,11 @@ export interface RoomData {
   events: ScheduledEvent[];
   /** Teaching-room eligibility set for the current week (offices excluded). */
   teachingIdents: Set<string> | null;
-  /** Free rooms at `queryTime`, duration-ranked and teaching-filtered. */
+  /** Free rooms at `queryTime`, duration-ranked and teaching-filtered. Empty
+   *  when the campus is closed; each room's window is capped at closing time. */
   freeRooms: FreeRoom[];
+  /** Campus opening state at `queryTime` (open/closed, today's window, next open). */
+  campusHours: CampusHours;
   queryTime: Date;
   isCustomTime: boolean;
   lastUpdated: Date | null;
@@ -75,12 +80,17 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(id);
   }, [isCustomTime]);
 
+  const campusHours = useMemo(() => getCampusHours(queryTime), [queryTime]);
+
   const freeRooms = useMemo(
     () =>
-      computeFreeRooms(rooms, events, queryTime, {
-        eligibleIdents: teachingIdents ?? undefined,
-      }),
-    [rooms, events, queryTime, teachingIdents],
+      campusHours.open
+        ? computeFreeRooms(rooms, events, queryTime, {
+            eligibleIdents: teachingIdents ?? undefined,
+            closesAt: campusHours.todayClose,
+          })
+        : [],
+    [rooms, events, queryTime, teachingIdents, campusHours],
   );
 
   const setQueryTime = useCallback((d: Date) => {
@@ -101,6 +111,7 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
       events,
       teachingIdents,
       freeRooms,
+      campusHours,
       queryTime,
       isCustomTime,
       lastUpdated,
@@ -115,6 +126,7 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
       events,
       teachingIdents,
       freeRooms,
+      campusHours,
       queryTime,
       isCustomTime,
       lastUpdated,

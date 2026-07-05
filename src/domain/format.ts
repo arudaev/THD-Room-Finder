@@ -13,6 +13,15 @@ export function formatTime(date: Date): string {
   return `${p(date.getHours())}:${p(date.getMinutes())}`;
 }
 
+/** Short weekday + time, e.g. "Mon 08:30" — used for the next-opening label. */
+export function formatDayTime(date: Date, locale: 'en' | 'de'): string {
+  return new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', {
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
 /**
  * A whole-minute duration as the departure-board hero: "all day" for open-ended,
  * "2h 10m" / "3h" / "25m" otherwise.

@@ -30,6 +30,7 @@ export function freeStatus(freeUntil: Date | null, now: Date): RoomStatus {
 export function computeRoomAvailability(
   events: ScheduledEvent[],
   now: Date,
+  closesAt?: Date | null,
 ): RoomAvailability {
   const current = events.find((e) => e.startDateTime <= now && e.endDateTime > now);
   if (current) {
@@ -38,7 +39,9 @@ export function computeRoomAvailability(
   const future = events
     .filter((e) => e.startDateTime > now)
     .sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
-  const freeUntil = future.length > 0 ? future[0].startDateTime : null;
+  const nextEvent = future.length > 0 ? future[0].startDateTime : null;
+  // A free room is only free until the building closes.
+  const freeUntil = capFreeUntil(nextEvent, closesAt);
   return { status: freeStatus(freeUntil, now), freeUntil, occupiedUntil: null };
 }
 
@@ -48,6 +51,18 @@ export interface ComputeFreeRoomsOptions {
    * When omitted, all non-occupied rooms are considered.
    */
   eligibleIdents?: ReadonlySet<string>;
+  /**
+   * Campus closing time — caps each room's `freeUntil` so "free all day" becomes
+   * "free until close". A room is only useful while the building is open.
+   */
+  closesAt?: Date | null;
+}
+
+/** The earlier of a room's next event and the campus close (either may be null). */
+function capFreeUntil(next: Date | null, closesAt?: Date | null): Date | null {
+  if (!closesAt) return next;
+  if (next === null) return closesAt;
+  return next.getTime() < closesAt.getTime() ? next : closesAt;
 }
 
 /**
@@ -61,7 +76,7 @@ export function computeFreeRooms(
   now: Date,
   options: ComputeFreeRoomsOptions = {},
 ): FreeRoom[] {
-  const { eligibleIdents } = options;
+  const { eligibleIdents, closesAt } = options;
 
   const occupiedIdents = new Set(
     events
@@ -85,7 +100,7 @@ export function computeFreeRooms(
     .map((room) => {
       const future = futureByRoom.get(room.ident);
       const next = future?.reduce((a, b) => (a.startDateTime < b.startDateTime ? a : b)) ?? null;
-      return { room, freeUntil: next?.startDateTime ?? null };
+      return { room, freeUntil: capFreeUntil(next?.startDateTime ?? null, closesAt) };
     });
 
   free.sort((a, b) => {

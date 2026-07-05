@@ -6,7 +6,7 @@ import { useRoomData } from '../rooms/RoomDataContext';
 import { useFavorites } from '../favorites/favorites';
 import { useI18n } from '../../i18n';
 import { computeRoomAvailability, getRoomSchedule } from '../../domain/availability';
-import { formatTime, statusBannerText } from '../../domain/format';
+import { formatDayTime, formatTime, statusBannerText } from '../../domain/format';
 import { Page, Spinner, EmptyState } from '../shared/ui';
 
 const stickyBar = { position: 'sticky' as const, top: 0, zIndex: 10 };
@@ -15,7 +15,7 @@ export function RoomDetailScreen() {
   const params = useParams();
   const navigate = useNavigate();
   const { t, locale } = useI18n();
-  const { rooms, events, queryTime, loading } = useRoomData();
+  const { rooms, events, queryTime, campusHours, loading } = useRoomData();
   const { isFavorite, toggle } = useFavorites();
 
   const ident = decodeURIComponent(params.ident ?? '');
@@ -40,8 +40,10 @@ export function RoomDetailScreen() {
   }
 
   const schedule = getRoomSchedule(events, ident);
-  const availability = computeRoomAvailability(schedule, queryTime);
+  const availability = computeRoomAvailability(schedule, queryTime, campusHours.todayClose);
   const banner = statusBannerText(availability, queryTime);
+  const closed = !campusHours.open;
+  const opensLabel = campusHours.nextOpen ? formatDayTime(campusHours.nextOpen, locale) : null;
   const fav = isFavorite(ident);
 
   const dayLabel = new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', {
@@ -69,18 +71,26 @@ export function RoomDetailScreen() {
         }
       />
       <Page>
-        <StatusCard
-          status={banner.status}
-          title={
-            banner.status === 'occupied'
-              ? t('Occupied now', 'Jetzt belegt')
-              : banner.status === 'soon'
-                ? t('Closing soon', 'Bald belegt')
-                : t('Free now', 'Jetzt frei')
-          }
-          sub={banner.sub}
-          duration={banner.duration}
-        />
+        {closed ? (
+          <StatusCard
+            status="occupied"
+            title={t('Campus closed', 'Campus geschlossen')}
+            sub={opensLabel ? `${t('Opens', 'Öffnet')} ${opensLabel}` : undefined}
+          />
+        ) : (
+          <StatusCard
+            status={banner.status}
+            title={
+              banner.status === 'occupied'
+                ? t('Occupied now', 'Jetzt belegt')
+                : banner.status === 'soon'
+                  ? t('Closing soon', 'Bald belegt')
+                  : t('Free now', 'Jetzt frei')
+            }
+            sub={banner.sub}
+            duration={banner.duration}
+          />
+        )}
 
         {/* Identity + facilities. */}
         <div
