@@ -1,4 +1,6 @@
-module.exports = async function handler(req, res) {
+// ESM: the root package.json declares "type": "module", so Vercel evaluates
+// this function as ESM — `export default`, not `module.exports`.
+export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   const { date } = req.query;
