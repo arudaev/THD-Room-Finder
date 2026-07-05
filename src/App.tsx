@@ -1,6 +1,7 @@
 import { ThemeProvider } from './lib/theme';
 import { I18nProvider } from './i18n';
 import { RoomDataProvider } from './features/rooms/RoomDataContext';
+import { RoomFilterProvider } from './features/rooms/RoomFilterContext';
 import { FavoritesProvider } from './features/favorites/favorites';
 import { AppShell } from './app/AppShell';
 
@@ -16,9 +17,11 @@ export default function App() {
     <ThemeProvider>
       <I18nProvider>
         <RoomDataProvider>
-          <FavoritesProvider>
-            <AppShell />
-          </FavoritesProvider>
+          <RoomFilterProvider>
+            <FavoritesProvider>
+              <AppShell />
+            </FavoritesProvider>
+          </RoomFilterProvider>
         </RoomDataProvider>
       </I18nProvider>
     </ThemeProvider>

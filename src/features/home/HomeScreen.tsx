@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Chip, RoomCard } from '../../components';
 import { IconClock, IconRefresh } from '../../components/icons';
 import { useRoomData } from '../rooms/RoomDataContext';
+import { useRoomFilters } from '../rooms/RoomFilterContext';
+import { useFavorites } from '../favorites/favorites';
 import { useI18n } from '../../i18n';
 import { freeRoomDuration, formatTime, roomMeta } from '../../domain/format';
 import { freeStatus } from '../../domain/availability';
+import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
+import { RoomFilterBar } from '../shared/RoomFilterBar';
 import { Page, SectionLabel, Spinner, EmptyState, ErrorState } from '../shared/ui';
 
 function toDateTimeLocal(date: Date): string {
@@ -34,6 +38,8 @@ export function HomeScreen() {
     refresh,
   } = useRoomData();
 
+  const { filters } = useRoomFilters();
+  const { isFavorite } = useFavorites();
   const [building, setBuilding] = useState<string | null>(null);
 
   const buildings = useMemo(() => {
@@ -41,10 +47,11 @@ export function HomeScreen() {
     return [...set].sort();
   }, [freeRooms]);
 
-  const shown = useMemo(
-    () => (building ? freeRooms.filter((f) => f.room.building === building) : freeRooms),
-    [freeRooms, building],
-  );
+  const shown = useMemo(() => {
+    const inBuilding = building ? freeRooms.filter((f) => f.room.building === building) : freeRooms;
+    const filtered = inBuilding.filter((f) => matchesRoomFilters(f.room, filters));
+    return favoritesFirst(filtered, isFavorite);
+  }, [freeRooms, building, filters, isFavorite]);
 
   return (
     <>
@@ -142,8 +149,11 @@ export function HomeScreen() {
         </button>
       </div>
 
+      {/* Room-type + seats filters — shared with the campus map. */}
+      {campusHours.open && <RoomFilterBar />}
+
       {/* Building filter — the primary narrowing axis. */}
-      {buildings.length > 0 && (
+      {campusHours.open && buildings.length > 0 && (
         <div style={{ display: 'flex', gap: 'var(--space-2)', overflowX: 'auto', paddingBottom: 4 }}>
           <Chip active={building === null} onClick={() => setBuilding(null)}>
             {t('All', 'Alle')}

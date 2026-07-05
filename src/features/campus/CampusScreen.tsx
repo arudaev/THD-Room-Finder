@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { CampusMap, CAMPUS_GEOJSON, CAMPUS_CONTEXT, RoomCard } from '../../components';
 import type { Availability } from '../../components';
 import { useRoomData } from '../rooms/RoomDataContext';
+import { useRoomFilters } from '../rooms/RoomFilterContext';
+import { useFavorites } from '../favorites/favorites';
 import { useI18n } from '../../i18n';
 import { useTheme } from '../../lib/theme';
 import { useWindowClass, useWideLayout } from '../../lib/useWindowClass';
@@ -13,9 +15,11 @@ import {
   CAMPUS_KEY_TO_BUILDINGS,
 } from '../../domain/campusAvailability';
 import type { BuildingCount } from '../../domain/campusAvailability';
+import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
+import { RoomFilterBar } from '../shared/RoomFilterBar';
 import { SectionLabel, Spinner } from '../shared/ui';
 
 /** On-roof label + full name per campus building key, from the map geometry. */
@@ -78,19 +82,33 @@ export function CampusScreen() {
   const cls = useWindowClass();
   const wide = useWideLayout();
   const { rooms, freeRooms, teachingIdents, queryTime, campusHours, loading } = useRoomData();
+  const { filters } = useRoomFilters();
+  const { isFavorite } = useFavorites();
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
+  // Apply the shared room filters (seats / type) to both the lists and the map
+  // tint, then float saved rooms to the top.
+  const filteredFree = useMemo<FreeRoom[]>(
+    () => favoritesFirst(freeRooms.filter((f) => matchesRoomFilters(f.room, filters)), isFavorite),
+    [freeRooms, filters, isFavorite],
+  );
+
   const availability = useMemo<Availability>(
-    () => buildingAvailability(rooms, freeRooms, teachingIdents ?? undefined),
-    [rooms, freeRooms, teachingIdents],
+    () =>
+      buildingAvailability(
+        rooms.filter((r) => matchesRoomFilters(r, filters)),
+        filteredFree,
+        teachingIdents ?? undefined,
+      ),
+    [rooms, filteredFree, teachingIdents, filters],
   );
 
   const selectedRooms = useMemo<FreeRoom[]>(() => {
     if (!selectedKey) return [];
     const codes = new Set(CAMPUS_KEY_TO_BUILDINGS[selectedKey] ?? []);
-    return freeRooms.filter((f) => codes.has(f.room.building));
-  }, [selectedKey, freeRooms]);
+    return filteredFree.filter((f) => codes.has(f.room.building));
+  }, [selectedKey, filteredFree]);
 
   const mapMode = theme === 'system' ? 'auto' : theme;
   const openRoom = (ident: string) => navigate(`/room/${encodeURIComponent(ident)}`);
@@ -182,7 +200,7 @@ export function CampusScreen() {
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {loading && freeRooms.length === 0 ? '—' : freeRooms.length}
+          {loading && filteredFree.length === 0 ? '—' : filteredFree.length}
         </div>
         <div style={{ fontSize: 'var(--title-medium-size)', color: 'var(--md-on-surface)', marginTop: 'var(--space-2)' }}>
           {t('rooms free right now', 'Räume jetzt frei')}
@@ -191,7 +209,8 @@ export function CampusScreen() {
           {t('Tap a building on the map to see its free rooms.', 'Tippe ein Gebäude auf der Karte für freie Räume.')}
         </div>
       </div>
-      {list(freeRooms, t('Longest free right now', 'Am längsten frei'))}
+      <RoomFilterBar />
+      {list(filteredFree, t('Longest free right now', 'Am längsten frei'))}
     </>
   );
 
