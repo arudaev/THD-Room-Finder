@@ -20,8 +20,8 @@ export interface BuildingCount {
  * The map keys (from the OSM footprints) are the Deggendorf riverside core;
  * live `room.building` codes are parsed from THabella room names. Single-letter
  * buildings match directly; ITC² maps onto the parsed "ITC" group; a handful of
- * footprints (F, G, GH, HS, ITC²+, V2) have no distinct live code today and fall
- * back to the map's static sample counts.
+ * footprints (F, G, GH, HS, V2) have no distinct live code today and remain
+ * neutral unless THabella starts returning an eligible room for their code.
  */
 export const CAMPUS_KEY_TO_BUILDINGS: Record<string, string[]> = {
   A: ['A'],
@@ -44,12 +44,24 @@ export const CAMPUS_KEY_TO_BUILDINGS: Record<string, string[]> = {
   V2: ['V2'],
 };
 
+/** Resolve one parsed THabella room onto its campus-map footprint. */
+export function campusKeyForRoom(room: Room): string | null {
+  // The general room mapper intentionally keeps the legacy `ITC` building code,
+  // so split ITC²+ using the raw label before applying the building aliases.
+  if (/^ITC\s*2\+/i.test(room.name)) return 'ITC2P';
+
+  for (const [key, codes] of Object.entries(CAMPUS_KEY_TO_BUILDINGS)) {
+    if (codes.includes(room.building)) return key;
+  }
+  return null;
+}
+
 /**
  * Build a `{ [buildingKey]: { free, total } }` map from the live room set.
  *
  * `total` counts display-eligible rooms (teaching set, minus excluded venues)
- * per building; `free` counts the subset currently free. Keys with no matching
- * live rooms are omitted, so the map can fall back to its static feature props.
+ * per building; `free` counts the subset currently free. Every campus key is
+ * returned so missing live data stays neutral instead of exposing sample data.
  *
  * @param rooms          all rooms known to THabella
  * @param freeRooms      the currently-free, duration-ranked, filtered list
@@ -62,35 +74,18 @@ export function buildingAvailability(
   eligibleIdents?: ReadonlySet<string>,
 ): Record<string, BuildingCount> {
   const freeIdents = new Set(freeRooms.map((f) => f.room.ident));
+  const out = Object.fromEntries(
+    Object.keys(CAMPUS_KEY_TO_BUILDINGS).map((key) => [key, { free: 0, total: 0 }]),
+  ) as Record<string, BuildingCount>;
 
-  // Live counts keyed by the parsed building code.
-  const byBuilding = new Map<string, BuildingCount>();
   for (const room of rooms) {
     if (eligibleIdents && !eligibleIdents.has(room.ident)) continue;
     if (isExcludedVenue(room)) continue;
-    const code = room.building;
-    if (!code) continue;
-    const entry = byBuilding.get(code) ?? { free: 0, total: 0 };
+    const key = campusKeyForRoom(room);
+    if (!key) continue;
+    const entry = out[key];
     entry.total += 1;
     if (freeIdents.has(room.ident)) entry.free += 1;
-    byBuilding.set(code, entry);
-  }
-
-  // Fold live counts onto the campus map's building keys.
-  const out: Record<string, BuildingCount> = {};
-  for (const [key, codes] of Object.entries(CAMPUS_KEY_TO_BUILDINGS)) {
-    let free = 0;
-    let total = 0;
-    let matched = false;
-    for (const code of codes) {
-      const entry = byBuilding.get(code);
-      if (entry) {
-        free += entry.free;
-        total += entry.total;
-        matched = true;
-      }
-    }
-    if (matched) out[key] = { free, total };
   }
   return out;
 }

@@ -12,7 +12,7 @@ import { freeRoomDuration, roomMeta } from '../../domain/format';
 import { freeStatus } from '../../domain/availability';
 import {
   buildingAvailability,
-  CAMPUS_KEY_TO_BUILDINGS,
+  campusKeyForRoom,
 } from '../../domain/campusAvailability';
 import type { BuildingCount } from '../../domain/campusAvailability';
 import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
@@ -106,8 +106,7 @@ export function CampusScreen() {
 
   const selectedRooms = useMemo<FreeRoom[]>(() => {
     if (!selectedKey) return [];
-    const codes = new Set(CAMPUS_KEY_TO_BUILDINGS[selectedKey] ?? []);
-    return filteredFree.filter((f) => codes.has(f.room.building));
+    return filteredFree.filter((f) => campusKeyForRoom(f.room) === selectedKey);
   }, [selectedKey, filteredFree]);
 
   const mapMode = theme === 'system' ? 'auto' : theme;

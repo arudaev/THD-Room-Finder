@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildingAvailability } from './campusAvailability';
+import {
+  buildingAvailability,
+  CAMPUS_KEY_TO_BUILDINGS,
+  campusKeyForRoom,
+} from './campusAvailability';
 import type { FreeRoom, Room } from './models';
 
 function room(partial: Partial<Room> & Pick<Room, 'ident' | 'building'>): Room {
@@ -42,12 +46,36 @@ describe('buildingAvailability', () => {
     expect(avail.ITC2).toEqual({ free: 1, total: 1 });
   });
 
-  it('omits keys with no matching live rooms so the map falls back to static counts', () => {
+  it('separates ITC²+ from ITC² despite their shared parsed building code', () => {
+    const itc2 = room({ ident: 'itc2', building: 'ITC', name: 'ITC 2: sem(1)' });
+    const itc2Plus = room({ ident: 'itc2p', building: 'ITC', name: 'ITC 2+ 0.27' });
+
+    const avail = buildingAvailability([itc2, itc2Plus], [free(itc2Plus)]);
+
+    expect(campusKeyForRoom(itc2)).toBe('ITC2');
+    expect(campusKeyForRoom(itc2Plus)).toBe('ITC2P');
+    expect(avail.ITC2).toEqual({ free: 0, total: 1 });
+    expect(avail.ITC2P).toEqual({ free: 1, total: 1 });
+  });
+
+  it('returns neutral live counts for every footprint without matching rooms', () => {
     const a1 = room({ ident: 'a1', building: 'A' });
     const avail = buildingAvailability([a1], []);
 
-    expect(avail).not.toHaveProperty('G');
-    expect(avail).not.toHaveProperty('HS');
+    expect(Object.keys(avail).sort()).toEqual(Object.keys(CAMPUS_KEY_TO_BUILDINGS).sort());
+    expect(avail.A).toEqual({ free: 0, total: 1 });
+    expect(avail.G).toEqual({ free: 0, total: 0 });
+    expect(avail.HS).toEqual({ free: 0, total: 0 });
+  });
+
+  it('reports every live building as closed when no rooms are free', () => {
+    const j = room({ ident: 'j1', building: 'J', name: 'J103' });
+    const itc2Plus = room({ ident: 'itc2p', building: 'ITC', name: 'ITC 2+ 0.27' });
+
+    const avail = buildingAvailability([j, itc2Plus], []);
+
+    expect(avail.J).toEqual({ free: 0, total: 1 });
+    expect(avail.ITC2P).toEqual({ free: 0, total: 1 });
   });
 
   it('respects the teaching-eligibility set when counting totals', () => {
