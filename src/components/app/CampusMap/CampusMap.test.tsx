@@ -28,13 +28,13 @@ describe('CampusMap geometry', () => {
     container.remove();
   });
 
-  async function renderMap() {
+  async function renderMap(interactive = false) {
     await act(async () => {
       root.render(
         <CampusMap
           campus={CAMPUS_GEOJSON}
           availability={{}}
-          interactive={false}
+          interactive={interactive}
           showTrees={false}
         />,
       );
@@ -58,5 +58,20 @@ describe('CampusMap geometry', () => {
     const itc2 = container.querySelector<SVGGElement>('g[data-id="ITC2"]');
     expect(itc2?.querySelector('[data-wall-edge="1"]')).not.toBeNull();
     expect(itc2?.querySelector('[data-wall-edge="3"]')).not.toBeNull();
+  });
+
+  it('prevents native text selection while dragging the interactive map', async () => {
+    await renderMap(true);
+
+    const svg = container.querySelector('svg');
+    expect(svg?.style.userSelect).toBe('none');
+
+    const pointerDown = new MouseEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+    });
+    svg?.dispatchEvent(pointerDown);
+    expect(pointerDown.defaultPrevented).toBe(true);
   });
 });

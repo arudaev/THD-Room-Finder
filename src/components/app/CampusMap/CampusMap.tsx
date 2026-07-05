@@ -605,6 +605,7 @@ export function CampusMap({
     };
     const down = (e: PointerEvent): void => {
       if (!interactive) return;
+      e.preventDefault();
       if (pointers.size === 0 && e.button === 0) {
         const target = e.target as Element;
         const building = target.closest?.('[data-id]') as HTMLElement | null;
@@ -703,7 +704,14 @@ export function CampusMap({
       <svg
         ref={svgRef}
         preserveAspectRatio="xMidYMid meet"
-        style={{ width: '100%', height: '100%', display: 'block', touchAction: 'none' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          touchAction: 'none',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+        }}
         aria-label="THD campus 2.5D map"
       />
     </div>
