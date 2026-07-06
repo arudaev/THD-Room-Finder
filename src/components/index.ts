@@ -31,6 +31,8 @@ export type {
   CampusContext,
   CampusBuildingFeature,
   Availability,
+  BuildingGlyph,
+  BuildingGlyphs,
   CampusTheme,
   CampusMapProps,
 } from './app/CampusMap/types';

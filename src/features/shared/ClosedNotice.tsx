@@ -4,12 +4,12 @@ import { useI18n } from '../../i18n';
 
 const PERIOD_NOTE: Record<CampusHours['period'], { en: string; de: string }> = {
   regular: {
-    en: 'Term hours: Mon–Thu 08:30–20:00, Fri 08:30–18:00.',
-    de: 'Vorlesungszeit: Mo–Do 08:30–20:00, Fr 08:30–18:00.',
+    en: 'Term hours: Mon–Fri 07:00–20:00. Library: Mon–Thu –20:00, Fri –18:00.',
+    de: 'Vorlesungszeit: Mo–Fr 07:00–20:00. Bibliothek: Mo–Do –20:00, Fr –18:00.',
   },
   exam: {
-    en: 'Exam hours: Mon–Fri 08:30–23:45, Sat/Sun 08:00–23:45.',
-    de: 'Prüfungszeit: Mo–Fr 08:30–23:45, Sa/So 08:00–23:45.',
+    en: 'Exam hours: buildings Mon–Fri 07:00–20:00; Library daily until 23:45.',
+    de: 'Prüfungszeit: Gebäude Mo–Fr 07:00–20:00; Bibliothek täglich bis 23:45.',
   },
   break: {
     en: 'Break hours: Mon–Thu 09:30–16:30, Fri 09:30–13:00.',

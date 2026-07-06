@@ -1,4 +1,5 @@
 import { ThemeProvider } from './lib/theme';
+import { MapPrefsProvider } from './lib/mapPrefs';
 import { I18nProvider } from './i18n';
 import { RoomDataProvider } from './features/rooms/RoomDataContext';
 import { RoomFilterProvider } from './features/rooms/RoomFilterContext';
@@ -15,15 +16,17 @@ import { AppShell } from './app/AppShell';
 export default function App() {
   return (
     <ThemeProvider>
-      <I18nProvider>
-        <RoomDataProvider>
-          <RoomFilterProvider>
-            <FavoritesProvider>
-              <AppShell />
-            </FavoritesProvider>
-          </RoomFilterProvider>
-        </RoomDataProvider>
-      </I18nProvider>
+      <MapPrefsProvider>
+        <I18nProvider>
+          <RoomDataProvider>
+            <RoomFilterProvider>
+              <FavoritesProvider>
+                <AppShell />
+              </FavoritesProvider>
+            </RoomFilterProvider>
+          </RoomDataProvider>
+        </I18nProvider>
+      </MapPrefsProvider>
     </ThemeProvider>
   );
 }

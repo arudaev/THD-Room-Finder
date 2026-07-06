@@ -7,8 +7,9 @@ import { useRoomFilters } from '../rooms/RoomFilterContext';
 import { useFavorites } from '../favorites/favorites';
 import { useI18n } from '../../i18n';
 import { useTheme } from '../../lib/theme';
+import { useMapPrefs } from '../../lib/mapPrefs';
 import { useWindowClass, useWideLayout } from '../../lib/useWindowClass';
-import { freeRoomDuration, roomMeta } from '../../domain/format';
+import { formatTime, freeRoomDuration, roomMeta } from '../../domain/format';
 import { freeStatus } from '../../domain/availability';
 import {
   buildingAvailability,
@@ -17,10 +18,13 @@ import {
 import type { BuildingCount } from '../../domain/campusAvailability';
 import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
+import { getLibraryHours } from '../../domain/openingHours';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
 import { FilterMenu } from '../shared/FilterMenu';
 import { Spinner } from '../shared/ui';
+import { PLACE_GLYPHS, PLACE_META } from './placeMeta';
+import { PlaceCard } from './PlaceCard';
 
 /** On-roof label + full name per campus building key, from the map geometry. */
 const KEY_META: Record<string, { label: string; name: string }> = Object.fromEntries(
@@ -79,9 +83,11 @@ export function CampusScreen() {
   const navigate = useNavigate();
   const { t } = useI18n();
   const { theme } = useTheme();
+  const { showGlyphs } = useMapPrefs();
   const cls = useWindowClass();
   const wide = useWideLayout();
-  const { rooms, freeRooms, teachingIdents, queryTime, campusHours, loading } = useRoomData();
+  const { rooms, freeRooms, teachingIdents, queryTime, planningTime, preview, campusHours, loading } =
+    useRoomData();
   const { filters } = useRoomFilters();
   const { isFavorite } = useFavorites();
 
@@ -104,10 +110,22 @@ export function CampusScreen() {
     [rooms, filteredFree, teachingIdents, filters],
   );
 
+  // The Library hosts no THabella teaching, so tint it by its own hours instead
+  // of a free-room count: teal when open to study, muted when closed.
+  const libraryHours = useMemo(() => getLibraryHours(queryTime), [queryTime]);
+  const mapAvailability = useMemo<Availability>(
+    () => ({ ...availability, G: { free: libraryHours.open ? 1 : 0, total: 1 } }),
+    [availability, libraryHours],
+  );
+
   const selectedRooms = useMemo<FreeRoom[]>(() => {
     if (!selectedKey) return [];
     return filteredFree.filter((f) => campusKeyForRoom(f.room) === selectedKey);
   }, [selectedKey, filteredFree]);
+
+  const selectedMeta = selectedKey ? PLACE_META[selectedKey] : undefined;
+  // A teaching building has real room totals; pure amenity places (F/GH/G) don't.
+  const selectedHasRooms = selectedKey ? (availability[selectedKey]?.total ?? 0) > 0 : false;
 
   const mapMode = theme === 'system' ? 'auto' : theme;
   const openRoom = (ident: string) => navigate(`/room/${encodeURIComponent(ident)}`);
@@ -133,8 +151,8 @@ export function CampusScreen() {
             key={f.room.ident}
             name={f.room.code}
             meta={roomMeta(f.room)}
-            status={freeStatus(f.freeUntil, queryTime)}
-            duration={freeRoomDuration(f, queryTime)}
+            status={freeStatus(f.freeUntil, planningTime)}
+            duration={freeRoomDuration(f, planningTime)}
             href={`/room/${encodeURIComponent(f.room.ident)}`}
             onClick={(e) => {
               e.preventDefault();
@@ -146,10 +164,30 @@ export function CampusScreen() {
     </div>
   );
 
+  // Plan-ahead banner: while closed-but-opening-today, the list previews open.
+  const previewBanner =
+    preview && campusHours.todayOpen ? (
+      <div
+        style={{
+          background: 'var(--md-surface-1)',
+          borderRadius: 'var(--radius-l)',
+          padding: 'var(--space-3) var(--space-4)',
+          fontSize: 'var(--body-medium-size)',
+          color: 'var(--md-on-surface-variant)',
+          textAlign: 'center',
+        }}
+      >
+        {t(
+          `Campus opens at ${formatTime(campusHours.todayOpen)} — planning ahead`,
+          `Campus öffnet um ${formatTime(campusHours.todayOpen)} — Vorschau`,
+        )}
+      </div>
+    ) : null;
+
   // The panel below / beside the map: a "campus closed" banner when the
-  // buildings are shut, else the selected building's rooms, else the free-now
-  // hero + longest-free list.
-  const panel = !campusHours.open ? (
+  // buildings are shut (and not previewing), else the selected building's rooms,
+  // else the free-now hero + longest-free list.
+  const panel = !(campusHours.open || preview) ? (
     <ClosedNotice hours={campusHours} />
   ) : selectedKey ? (
     <>
@@ -173,21 +211,30 @@ export function CampusScreen() {
         >
           <IconArrowLeft />
         </button>
-        <BuildingBadge label={KEY_META[selectedKey]?.label ?? selectedKey} color={availColor(availability[selectedKey])} />
+        <BuildingBadge label={KEY_META[selectedKey]?.label ?? selectedKey} color={availColor(mapAvailability[selectedKey])} />
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ fontSize: 'var(--title-medium-size)', fontWeight: 600, lineHeight: 1.2, color: 'var(--md-on-surface)' }}>
             {KEY_META[selectedKey]?.name ?? selectedKey}
           </div>
-          <div style={{ fontSize: 'var(--body-small-size)', color: 'var(--md-on-surface-variant)', marginTop: 2 }}>
-            <b style={{ color: 'var(--md-on-surface)', fontVariantNumeric: 'tabular-nums' }}>{selectedRooms.length}</b>{' '}
-            {t('rooms free right now', 'Räume jetzt frei')}
-          </div>
+          {selectedHasRooms && (
+            <div style={{ fontSize: 'var(--body-small-size)', color: 'var(--md-on-surface-variant)', marginTop: 2 }}>
+              <b style={{ color: 'var(--md-on-surface)', fontVariantNumeric: 'tabular-nums' }}>{selectedRooms.length}</b>{' '}
+              {t('rooms free right now', 'Räume jetzt frei')}
+            </div>
+          )}
         </div>
       </div>
-      {list(selectedRooms)}
+      {selectedMeta && (
+        <PlaceCard
+          meta={selectedMeta}
+          hours={selectedKey === 'G' ? libraryHours : campusHours}
+        />
+      )}
+      {selectedHasRooms && list(selectedRooms)}
     </>
   ) : (
     <>
+      {previewBanner}
       <div style={{ textAlign: 'center' }}>
         <div
           style={{
@@ -201,7 +248,7 @@ export function CampusScreen() {
           {loading && filteredFree.length === 0 ? '—' : filteredFree.length}
         </div>
         <div style={{ fontSize: 'var(--title-medium-size)', color: 'var(--md-on-surface)', marginTop: 'var(--space-2)' }}>
-          {t('rooms free right now', 'Räume jetzt frei')}
+          {preview ? t('rooms free when it opens', 'Räume frei bei Öffnung') : t('rooms free right now', 'Räume jetzt frei')}
         </div>
         <div style={{ fontSize: 'var(--body-small-size)', color: 'var(--md-on-surface-variant)', marginTop: 'var(--space-3)' }}>
           {t('Tap a building on the map to see its free rooms.', 'Tippe ein Gebäude auf der Karte für freie Räume.')}
@@ -220,7 +267,8 @@ export function CampusScreen() {
     <CampusMap
       campus={CAMPUS_GEOJSON}
       context={CAMPUS_CONTEXT}
-      availability={availability}
+      availability={mapAvailability}
+      glyphs={showGlyphs ? PLACE_GLYPHS : undefined}
       mode={mapMode}
       selectedKey={selectedKey ?? ''}
       onSelect={(k) => setSelectedKey(k)}

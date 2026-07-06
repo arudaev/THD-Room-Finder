@@ -23,12 +23,20 @@ export interface RoomData {
   events: ScheduledEvent[];
   /** Teaching-room eligibility set for the current week (offices excluded). */
   teachingIdents: Set<string> | null;
-  /** Free rooms at `queryTime`, duration-ranked and teaching-filtered. Empty
-   *  when the campus is closed; each room's window is capped at closing time. */
+  /** Free rooms at `planningTime`, duration-ranked and teaching-filtered; each
+   *  room's window is capped at closing time. Populated whenever the campus is
+   *  open OR closed-but-opening-later-today (`preview`); empty otherwise. */
   freeRooms: FreeRoom[];
   /** Campus opening state at `queryTime` (open/closed, today's window, next open). */
   campusHours: CampusHours;
   queryTime: Date;
+  /** The instant `freeRooms` is computed for: `queryTime` when open, else today's
+   *  opening moment while previewing. Use this (not `queryTime`) to render each
+   *  room's status/remaining duration so a preview reads from opening time. */
+  planningTime: Date;
+  /** True when the campus is closed now but opens later today, so `freeRooms`
+   *  is a plan-ahead preview of the opening moment rather than live availability. */
+  preview: boolean;
   isCustomTime: boolean;
   lastUpdated: Date | null;
   setQueryTime: (d: Date) => void;
@@ -82,15 +90,26 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
 
   const campusHours = useMemo(() => getCampusHours(queryTime), [queryTime]);
 
+  // When closed but opening later today, plan ahead from the opening moment so
+  // students can see what will be free (and free all day) once the doors open.
+  const preview = useMemo(
+    () => !campusHours.open && !!campusHours.todayOpen && queryTime < campusHours.todayOpen,
+    [campusHours, queryTime],
+  );
+  const planningTime = useMemo(
+    () => (preview && campusHours.todayOpen ? campusHours.todayOpen : queryTime),
+    [preview, campusHours, queryTime],
+  );
+
   const freeRooms = useMemo(
     () =>
-      campusHours.open
-        ? computeFreeRooms(rooms, events, queryTime, {
+      campusHours.open || preview
+        ? computeFreeRooms(rooms, events, planningTime, {
             eligibleIdents: teachingIdents ?? undefined,
             closesAt: campusHours.todayClose,
           })
         : [],
-    [rooms, events, queryTime, teachingIdents, campusHours],
+    [rooms, events, planningTime, teachingIdents, campusHours, preview],
   );
 
   const setQueryTime = useCallback((d: Date) => {
@@ -113,6 +132,8 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
       freeRooms,
       campusHours,
       queryTime,
+      planningTime,
+      preview,
       isCustomTime,
       lastUpdated,
       setQueryTime,
@@ -128,6 +149,8 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
       freeRooms,
       campusHours,
       queryTime,
+      planningTime,
+      preview,
       isCustomTime,
       lastUpdated,
       setQueryTime,

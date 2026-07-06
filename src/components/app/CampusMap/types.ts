@@ -42,6 +42,11 @@ export interface CampusContext {
 /** Per-building live availability (overrides feature props). */
 export type Availability = Record<string, { free: number; total: number }>;
 
+/** Small amenity glyph drawn above a building's roof label. */
+export type BuildingGlyph = 'coffee' | 'book';
+/** Per-building glyph overlay (e.g. café buildings, the Library). */
+export type BuildingGlyphs = Record<string, BuildingGlyph>;
+
 /** Deep-overridable colour theme. Omitted keys fall back to the default. */
 export interface CampusTheme {
   ramp?: string[];
@@ -75,5 +80,7 @@ export interface CampusMapProps {
   interactive?: boolean;
   showLabels?: boolean;
   showTrees?: boolean;
+  /** Optional amenity glyph per building key, drawn above the roof label. */
+  glyphs?: BuildingGlyphs;
   style?: CSSProperties;
 }
