@@ -7,6 +7,7 @@ import { useRoomFilters } from '../rooms/RoomFilterContext';
 import { useFavorites } from '../favorites/favorites';
 import { useI18n } from '../../i18n';
 import { useTheme } from '../../lib/theme';
+import { useMapPrefs } from '../../lib/mapPrefs';
 import { useWindowClass, useWideLayout } from '../../lib/useWindowClass';
 import { formatTime, freeRoomDuration, roomMeta } from '../../domain/format';
 import { freeStatus } from '../../domain/availability';
@@ -82,6 +83,7 @@ export function CampusScreen() {
   const navigate = useNavigate();
   const { t } = useI18n();
   const { theme } = useTheme();
+  const { showGlyphs } = useMapPrefs();
   const cls = useWindowClass();
   const wide = useWideLayout();
   const { rooms, freeRooms, teachingIdents, queryTime, planningTime, preview, campusHours, loading } =
@@ -266,7 +268,7 @@ export function CampusScreen() {
       campus={CAMPUS_GEOJSON}
       context={CAMPUS_CONTEXT}
       availability={mapAvailability}
-      glyphs={PLACE_GLYPHS}
+      glyphs={showGlyphs ? PLACE_GLYPHS : undefined}
       mode={mapMode}
       selectedKey={selectedKey ?? ''}
       onSelect={(k) => setSelectedKey(k)}

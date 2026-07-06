@@ -1,6 +1,7 @@
 import { LanguageToggle } from '../../components';
 import type { Theme } from '../../lib/theme';
 import { useTheme } from '../../lib/theme';
+import { useMapPrefs } from '../../lib/mapPrefs';
 import { useI18n } from '../../i18n';
 import { Popover, PopoverLabel } from './Popover';
 
@@ -25,12 +26,18 @@ function IconTune({ size = 22 }: { size?: number }) {
  */
 export function OverflowMenu() {
   const { theme, setTheme } = useTheme();
+  const { showGlyphs, setShowGlyphs } = useMapPrefs();
   const { locale, setLocale, t } = useI18n();
 
   const themes: { id: Theme; label: string }[] = [
     { id: 'system', label: t('System', 'System') },
     { id: 'light', label: t('Light', 'Hell') },
     { id: 'dark', label: t('Dark', 'Dunkel') },
+  ];
+
+  const glyphOptions: { on: boolean; label: string }[] = [
+    { on: true, label: t('On', 'An') },
+    { on: false, label: t('Off', 'Aus') },
   ];
 
   return (
@@ -66,6 +73,33 @@ export function OverflowMenu() {
         <div>
           <PopoverLabel>{t('Language', 'Sprache')}</PopoverLabel>
           <LanguageToggle value={locale} onChange={setLocale} />
+        </div>
+        <div>
+          <PopoverLabel>{t('Map amenities', 'Karten-Symbole')}</PopoverLabel>
+          <div style={{ display: 'inline-flex', gap: 2, background: 'var(--md-surface-1)', border: '1px solid var(--md-outline-variant)', borderRadius: 'var(--radius-xl)', padding: 3 }}>
+            {glyphOptions.map((g) => {
+              const on = g.on === showGlyphs;
+              return (
+                <button
+                  key={String(g.on)}
+                  type="button"
+                  onClick={() => setShowGlyphs(g.on)}
+                  style={{
+                    border: 'none',
+                    borderRadius: 'var(--radius-xl)',
+                    cursor: 'pointer',
+                    padding: '0.35rem 0.7rem',
+                    fontSize: 'var(--body-small-size)',
+                    fontWeight: 'var(--weight-medium)',
+                    background: on ? 'var(--md-secondary-container)' : 'transparent',
+                    color: on ? 'var(--md-on-secondary-container)' : 'var(--md-on-surface-variant)',
+                  }}
+                >
+                  {g.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </Popover>
