@@ -167,24 +167,24 @@ interface RenderState {
 }
 
 /**
- * A tiny amenity glyph (coffee cup / book) centred above a building's label, in
- * the label colour with a halo for legibility. Returns an SVG fragment string.
+ * A small POI-style amenity badge (coffee cup / open book) for a building —
+ * a halo-filled disc (so it reads on any roof tint, matching the label's
+ * halo/text pairing) with a filled icon in the label colour. `x,y` is the badge
+ * centre. Returns an SVG fragment string.
  */
 function glyphMark(kind: BuildingGlyph, x: number, y: number, fill: string, halo: string): string {
-  const body =
+  const badge =
+    `<circle cx="${x}" cy="${y}" r="4.8" fill="${halo}" stroke="${fill}" stroke-width="0.6"/>`;
+  const icon =
     kind === 'coffee'
-      ? `<path d="M${x - 2.2} ${y - 1.4} h4 v1.8 a2 2 0 0 1 -4 0 z"/>` +
-        `<path d="M${x + 1.8} ${y - 1} h0.9 a1 1 0 0 1 0 2 h-0.7"/>` +
-        `<line x1="${x - 1.6}" y1="${y - 3}" x2="${x - 1.6}" y2="${y - 2.2}"/>` +
-        `<line x1="${x + 0.2}" y1="${y - 3}" x2="${x + 0.2}" y2="${y - 2.2}"/>`
-      : `<rect x="${x - 2.2}" y="${y - 1.8}" width="4.4" height="3.6" rx="0.4"/>` +
-        `<line x1="${x}" y1="${y - 1.8}" x2="${x}" y2="${y + 1.8}"/>`;
-  return (
-    '<g fill="none" stroke-linecap="round" stroke-linejoin="round">' +
-    `<g stroke="${halo}" stroke-width="1.6">${body}</g>` +
-    `<g stroke="${fill}" stroke-width="0.7">${body}</g>` +
-    '</g>'
-  );
+      ? // filled cup + arc handle + saucer line
+        `<path d="M${x - 2} ${y - 1.5} h3.3 v1.3 a1.65 1.65 0 0 1 -3.3 0 z" fill="${fill}"/>` +
+        `<path d="M${x + 1.5} ${y - 1.1} a1.15 1.15 0 0 1 0 2.1" fill="none" stroke="${fill}" stroke-width="0.55"/>` +
+        `<line x1="${x - 2.4}" y1="${y + 1.7}" x2="${x + 2}" y2="${y + 1.7}" stroke="${fill}" stroke-width="0.6" stroke-linecap="round"/>`
+      : // open book — two filled pages either side of a centre gap
+        `<polygon points="${x - 0.35},${y - 1.6} ${x - 3},${y - 1} ${x - 3},${y + 1.5} ${x - 0.35},${y + 0.9}" fill="${fill}"/>` +
+        `<polygon points="${x + 0.35},${y - 1.6} ${x + 3},${y - 1} ${x + 3},${y + 1.5} ${x + 0.35},${y + 0.9}" fill="${fill}"/>`;
+  return badge + icon;
 }
 
 /* ---- build the SVG body + framing bounds for one camera/state ---- */
@@ -288,7 +288,7 @@ function renderBody(geo: LocalGeo, st: RenderState) {
         b.label +
         '</text>';
       const glyph = glyphs && glyphs[b.key];
-      if (glyph) lbl += glyphMark(glyph, lp[0], lp[1] - 6, pal.text, pal.halo);
+      if (glyph) lbl += glyphMark(glyph, lp[0], lp[1] - 11, pal.text, pal.halo);
     }
     return (
       '<g class="cm-bld" data-id="' +
