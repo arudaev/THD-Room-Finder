@@ -1,6 +1,8 @@
 import React from 'react';
 import type {
   Availability,
+  BuildingGlyph,
+  BuildingGlyphs,
   CampusContext,
   CampusData,
   CampusMapProps,
@@ -161,11 +163,33 @@ interface RenderState {
   showTrees: boolean;
   THEME: ResolvedTheme;
   avail?: Availability;
+  glyphs?: BuildingGlyphs;
+}
+
+/**
+ * A tiny amenity glyph (coffee cup / book) centred above a building's label, in
+ * the label colour with a halo for legibility. Returns an SVG fragment string.
+ */
+function glyphMark(kind: BuildingGlyph, x: number, y: number, fill: string, halo: string): string {
+  const body =
+    kind === 'coffee'
+      ? `<path d="M${x - 2.2} ${y - 1.4} h4 v1.8 a2 2 0 0 1 -4 0 z"/>` +
+        `<path d="M${x + 1.8} ${y - 1} h0.9 a1 1 0 0 1 0 2 h-0.7"/>` +
+        `<line x1="${x - 1.6}" y1="${y - 3}" x2="${x - 1.6}" y2="${y - 2.2}"/>` +
+        `<line x1="${x + 0.2}" y1="${y - 3}" x2="${x + 0.2}" y2="${y - 2.2}"/>`
+      : `<rect x="${x - 2.2}" y="${y - 1.8}" width="4.4" height="3.6" rx="0.4"/>` +
+        `<line x1="${x}" y1="${y - 1.8}" x2="${x}" y2="${y + 1.8}"/>`;
+  return (
+    '<g fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+    `<g stroke="${halo}" stroke-width="1.6">${body}</g>` +
+    `<g stroke="${fill}" stroke-width="0.7">${body}</g>` +
+    '</g>'
+  );
 }
 
 /* ---- build the SVG body + framing bounds for one camera/state ---- */
 function renderBody(geo: LocalGeo, st: RenderState) {
-  const { bear, ang, dark, sel, showLabels, showTrees, THEME, avail } = st;
+  const { bear, ang, dark, sel, showLabels, showTrees, THEME, avail, glyphs } = st;
   const pal = (dark ? THEME.dark : THEME.light) as Pal;
   const COSA = Math.cos(ang);
   const SINA = Math.sin(ang);
@@ -263,6 +287,8 @@ function renderBody(geo: LocalGeo, st: RenderState) {
         '" stroke-width="1.5" paint-order="stroke">' +
         b.label +
         '</text>';
+      const glyph = glyphs && glyphs[b.key];
+      if (glyph) lbl += glyphMark(glyph, lp[0], lp[1] - 6, pal.text, pal.halo);
     }
     return (
       '<g class="cm-bld" data-id="' +
@@ -509,6 +535,7 @@ export function CampusMap({
   interactive = true,
   showLabels = true,
   showTrees = true,
+  glyphs,
   style = {},
 }: CampusMapProps) {
   const svgRef = React.useRef<SVGSVGElement>(null);
@@ -557,12 +584,12 @@ export function CampusMap({
     const svg = svgRef.current;
     if (!svg) return;
     const { html, bb } = renderBody(geo, {
-      bear, ang, dark, sel, showLabels, showTrees, THEME, avail: availability,
+      bear, ang, dark, sel, showLabels, showTrees, THEME, avail: availability, glyphs,
     });
     svg.innerHTML = html;
     camRef.current.bb = bb;
     applyVB();
-  }, [geo, bear, ang, dark, sel, showLabels, showTrees, THEME, availability, applyVB]);
+  }, [geo, bear, ang, dark, sel, showLabels, showTrees, THEME, availability, glyphs, applyVB]);
 
   // selection reframes when a satellite is picked
   const pick = React.useCallback(

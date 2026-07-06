@@ -120,3 +120,19 @@ export const IconSun = ({ size = 24 }: IconProps) =>
 
 export const IconMoon = ({ size = 24 }: IconProps) =>
   svg(size, <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />);
+
+export const IconSearch = ({ size = 24 }: IconProps) =>
+  svg(size, (
+    <>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </>
+  ));
+
+export const IconX = ({ size = 24 }: IconProps) =>
+  svg(size, (
+    <>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </>
+  ));
