@@ -50,13 +50,23 @@ export const PLACE_META: Record<string, PlaceMeta> = {
     showHours: true,
     note: (t) =>
       t(
-        'Building P — central lecture halls, with a shop and a meeting place that is great for studying.',
-        'Gebäude P — zentrale Hörsäle, mit einem Laden und einem Treffpunkt, ideal zum Lernen.',
+        'Pavillon P — a meeting place (Begegnungsstätte) that is great for studying, plus the Campus-Store.',
+        'Pavillon P — eine Begegnungsstätte, ideal zum Lernen, sowie der Campus-Store.',
       ),
     amenities: [
-      (t) => t('Study & meeting place', 'Lern- & Treffpunkt'),
-      (t) => t('Shop', 'Laden'),
+      (t) => t('Meeting & study place', 'Begegnungsstätte & Lernort'),
+      (t) => t('Campus-Store', 'Campus-Store'),
     ],
+  },
+  ITC2: {
+    glyph: 'book',
+    showHours: true,
+    note: (t) =>
+      t(
+        'ITC² — the ITC² library with open study rooms (Lernräume).',
+        'ITC² — die ITC²-Bibliothek mit offenen Lernräumen.',
+      ),
+    amenities: [(t) => t('Library & study rooms', 'Bibliothek & Lernräume')],
   },
   F: {
     glyph: 'coffee',
@@ -69,8 +79,11 @@ export const PLACE_META: Record<string, PlaceMeta> = {
   },
   GH: {
     glyph: 'coffee',
-    note: (t) => t('Glashaus — café.', 'Glashaus — Café.'),
-    amenities: [(t) => t('Café · ground floor', 'Café · Erdgeschoss')],
+    note: (t) => t('Mensa Glashaus — student dining.', 'Mensa Glashaus — studentische Verpflegung.'),
+    amenities: [
+      (t) => t('Mensa · ground floor', 'Mensa · Erdgeschoss'),
+      (t) => t('Conference room · 1st floor', 'Konferenzraum · 1. OG'),
+    ],
     links: [menuLink(STWNO_GLASHAUS)],
   },
   K: {
