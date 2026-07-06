@@ -4,12 +4,14 @@ import { useI18n } from '../../i18n';
 import type { PlaceMeta } from './placeMeta';
 
 /**
- * Side-panel card for a non-teaching / amenity building (Library, Mensa,
- * Glashaus, K café): a short description, amenity lines, external menu links,
- * and — for the Library — a live open/closed line from its own hours.
+ * Side-panel card for a non-teaching / amenity building (Library, study spaces,
+ * Mensa, Glashaus, K café): a short description, amenity lines, external menu
+ * links, and — when `hours` is given — a live open/closed line (the Library
+ * uses its own schedule, study spaces the general campus hours).
  */
-export function PlaceCard({ meta, libraryHours }: { meta: PlaceMeta; libraryHours?: CampusHours }) {
+export function PlaceCard({ meta, hours }: { meta: PlaceMeta; hours?: CampusHours }) {
   const { t, locale } = useI18n();
+  const showHours = meta.showHours && hours;
 
   return (
     <div
@@ -26,22 +28,22 @@ export function PlaceCard({ meta, libraryHours }: { meta: PlaceMeta; libraryHour
         {meta.note(t)}
       </div>
 
-      {meta.isLibrary && libraryHours && (
+      {showHours && (
         <div
           style={{
             fontSize: 'var(--body-medium-size)',
             fontWeight: 'var(--weight-medium)',
-            color: libraryHours.open ? 'var(--md-primary)' : 'var(--md-on-surface-variant)',
+            color: hours.open ? 'var(--md-primary)' : 'var(--md-on-surface-variant)',
           }}
         >
-          {libraryHours.open
-            ? libraryHours.todayClose
-              ? t(`Open until ${formatTime(libraryHours.todayClose)}`, `Geöffnet bis ${formatTime(libraryHours.todayClose)}`)
+          {hours.open
+            ? hours.todayClose
+              ? t(`Open until ${formatTime(hours.todayClose)}`, `Geöffnet bis ${formatTime(hours.todayClose)}`)
               : t('Open', 'Geöffnet')
-            : libraryHours.nextOpen
+            : hours.nextOpen
               ? t(
-                  `Closed · opens ${formatDayTime(libraryHours.nextOpen, locale)}`,
-                  `Geschlossen · öffnet ${formatDayTime(libraryHours.nextOpen, locale)}`,
+                  `Closed · opens ${formatDayTime(hours.nextOpen, locale)}`,
+                  `Geschlossen · öffnet ${formatDayTime(hours.nextOpen, locale)}`,
                 )
               : t('Closed', 'Geschlossen')}
         </div>

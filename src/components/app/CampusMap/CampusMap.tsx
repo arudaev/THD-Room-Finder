@@ -46,6 +46,13 @@ const BUILDING_DRAW_ORDER: ReadonlyArray<readonly [string, string]> = [
   ['GH', 'ITC2'],
 ];
 
+// Per-building label nudges (projected px) for footprints whose centroid label
+// would otherwise sit on a cramped/overlapping neighbour. GH is tucked into
+// ITC²'s courtyard, so lift its label + amenity badge clear toward the plaza.
+const LABEL_OFFSET: Record<string, readonly [number, number]> = {
+  GH: [-6, -13],
+};
+
 /* ---- default THEME (deep-merge with `theme` prop) ---- */
 const DEFAULT_THEME = {
   // Availability ramp (full → wide-open) on THD's teal "free" family.
@@ -212,6 +219,9 @@ function renderBody(geo: LocalGeo, st: RenderState) {
   };
   const stoneR = hex(pal.wallR);
   const stoneL = hex(pal.wallL);
+  // Building labels/badges are collected here and painted in a final overlay
+  // pass, so a taller neighbour (e.g. ITC² over GH) can never occlude them.
+  const bldLabels: string[] = [];
   const avFor = (b: LocalBuilding): { ratio: number } => {
     const o = avail && avail[b.key];
     const free = o ? o.free : b.free;
@@ -270,10 +280,11 @@ function renderBody(geo: LocalGeo, st: RenderState) {
     walls.sort((a, b2) => a.d - b2.d);
     const roof = poly.map((p) => P(proj(p, h))).join(' ');
     const isSel = b.key === sel;
-    let lbl = '';
     if (showLabels) {
-      const lp = proj([cx, cy], h);
-      lbl =
+      const base = proj([cx, cy], h);
+      const off = LABEL_OFFSET[b.key];
+      const lp: Pt = off ? [base[0] + off[0], base[1] + off[1]] : base;
+      let lbl =
         '<text x="' +
         lp[0].toFixed(1) +
         '" y="' +
@@ -289,6 +300,7 @@ function renderBody(geo: LocalGeo, st: RenderState) {
         '</text>';
       const glyph = glyphs && glyphs[b.key];
       if (glyph) lbl += glyphMark(glyph, lp[0], lp[1] - 11, pal.text, pal.halo);
+      bldLabels.push(lbl);
     }
     return (
       '<g class="cm-bld" data-id="' +
@@ -310,7 +322,6 @@ function renderBody(geo: LocalGeo, st: RenderState) {
           (dark ? THEME.selOutline.dark : THEME.selOutline.light) +
           '" stroke-width="1.8" stroke-linejoin="round"/>'
         : '') +
-      lbl +
       '</g>'
     );
   }
@@ -503,7 +514,15 @@ function renderBody(geo: LocalGeo, st: RenderState) {
   const minY = Math.min(...ys) - pad;
   const bb = { minX, minY, w: Math.max(...xs) - minX + pad, h: Math.max(...ys) - minY + pad };
   return {
-    html: ground + green + water + paths + roads + items.map((i) => i.s).join('') + labels,
+    html:
+      ground +
+      green +
+      water +
+      paths +
+      roads +
+      items.map((i) => i.s).join('') +
+      bldLabels.join('') +
+      labels,
     bb,
   };
 }

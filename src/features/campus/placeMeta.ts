@@ -21,8 +21,9 @@ export interface PlaceMeta {
   amenities?: ((t: Translate) => string)[];
   /** External links (e.g. STWNO menu). */
   links?: PlaceLink[];
-  /** The Library shows a live open/closed line from its own hours instead. */
-  isLibrary?: boolean;
+  /** Show a live open/closed line (Library uses its own hours; study spaces the
+   *  general campus hours). The caller supplies the right schedule. */
+  showHours?: boolean;
 }
 
 const STWNO_MENSA = 'https://stwno.de/en/gastro-en/speiseplan-en/menu-deggendorf/menu-th-deg-mensa';
@@ -37,12 +38,25 @@ const menuLink = (url: string): PlaceLink => ({
 export const PLACE_META: Record<string, PlaceMeta> = {
   G: {
     glyph: 'book',
-    isLibrary: true,
+    showHours: true,
     note: (t) =>
       t(
         'Library — always a good place to study, within its opening hours.',
         'Bibliothek — immer ein guter Lernort, innerhalb der Öffnungszeiten.',
       ),
+  },
+  HS: {
+    glyph: 'book',
+    showHours: true,
+    note: (t) =>
+      t(
+        'Building P — central lecture halls, with a shop and a meeting place that is great for studying.',
+        'Gebäude P — zentrale Hörsäle, mit einem Laden und einem Treffpunkt, ideal zum Lernen.',
+      ),
+    amenities: [
+      (t) => t('Study & meeting place', 'Lern- & Treffpunkt'),
+      (t) => t('Shop', 'Laden'),
+    ],
   },
   F: {
     glyph: 'coffee',

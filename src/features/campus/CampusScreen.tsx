@@ -222,7 +222,12 @@ export function CampusScreen() {
           )}
         </div>
       </div>
-      {selectedMeta && <PlaceCard meta={selectedMeta} libraryHours={libraryHours} />}
+      {selectedMeta && (
+        <PlaceCard
+          meta={selectedMeta}
+          hours={selectedKey === 'G' ? libraryHours : campusHours}
+        />
+      )}
       {selectedHasRooms && list(selectedRooms)}
     </>
   ) : (
