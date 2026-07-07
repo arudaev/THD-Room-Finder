@@ -4,19 +4,27 @@ import { useRoomData } from '../rooms/RoomDataContext';
 import { useFavorites } from './favorites';
 import { useI18n } from '../../i18n';
 import { computeRoomAvailability, getRoomSchedule } from '../../domain/availability';
-import { roomMeta, statusBannerText } from '../../domain/format';
+import { formatTime, roomMeta, statusBannerText } from '../../domain/format';
 import { BrandHeader } from '../shared/BrandHeader';
+import { ClosedNotice } from '../shared/ClosedNotice';
 import { Page, EmptyState } from '../shared/ui';
 
 export function FavoritesScreen() {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { rooms, events, queryTime } = useRoomData();
+  const { rooms, events, planningTime, preview, campusHours } = useRoomData();
   const { favorites } = useFavorites();
 
   const saved = favorites
     .map((ident) => rooms.find((r) => r.ident === ident))
     .filter((r): r is NonNullable<typeof r> => Boolean(r));
+
+  // Availability is only meaningful while the campus is reachable. When it's
+  // closed (and not previewing an opening later today), a saved room isn't
+  // "free" — it's shut — so show a closed notice and mute each card rather than
+  // claiming it's open. When open (or previewing), rank status at planningTime
+  // and cap free windows at closing, mirroring the room-detail screen.
+  const showAvailability = campusHours.open || preview;
 
   return (
     <>
@@ -29,9 +37,48 @@ export function FavoritesScreen() {
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {!showAvailability && <ClosedNotice hours={campusHours} compact />}
+            {showAvailability && preview && campusHours.todayOpen && (
+              <div
+                style={{
+                  background: 'var(--md-surface-1)',
+                  borderRadius: 'var(--radius-l)',
+                  padding: 'var(--space-3) var(--space-4)',
+                  fontSize: 'var(--body-medium-size)',
+                  color: 'var(--md-on-surface-variant)',
+                  textAlign: 'center',
+                }}
+              >
+                {t(
+                  `Campus opens at ${formatTime(campusHours.todayOpen)} — planning ahead`,
+                  `Campus öffnet um ${formatTime(campusHours.todayOpen)} — Vorschau`,
+                )}
+              </div>
+            )}
             {saved.map((room) => {
-              const availability = computeRoomAvailability(getRoomSchedule(events, room.ident), queryTime);
-              const banner = statusBannerText(availability, queryTime);
+              if (!showAvailability) {
+                return (
+                  <RoomCard
+                    key={room.ident}
+                    name={room.code}
+                    meta={roomMeta(room)}
+                    status="occupied"
+                    statusLabel={t('closed', 'zu')}
+                    duration="—"
+                    href={`/room/${encodeURIComponent(room.ident)}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(`/room/${encodeURIComponent(room.ident)}`);
+                    }}
+                  />
+                );
+              }
+              const availability = computeRoomAvailability(
+                getRoomSchedule(events, room.ident),
+                planningTime,
+                campusHours.todayClose,
+              );
+              const banner = statusBannerText(availability, planningTime);
               return (
                 <RoomCard
                   key={room.ident}
