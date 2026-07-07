@@ -14,6 +14,7 @@ import { freeStatus } from '../../domain/availability';
 import {
   buildingAvailability,
   campusKeyForRoom,
+  isOnCampusMap,
 } from '../../domain/campusAvailability';
 import type { BuildingCount } from '../../domain/campusAvailability';
 import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
@@ -93,17 +94,23 @@ export function CampusScreen() {
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-  // Apply the shared room filters (seats / type) to both the lists and the map
-  // tint, then float saved rooms to the top.
+  // The map covers only the Deggendorf riverside core, so restrict both lists and
+  // the tint to rooms on that map — remote sites (Cham/Badstraße, Pfarrkirchen)
+  // stay in the full Rooms list but off Campus. Then apply the shared room
+  // filters (seats / type) and float saved rooms to the top.
   const filteredFree = useMemo<FreeRoom[]>(
-    () => favoritesFirst(freeRooms.filter((f) => matchesRoomFilters(f.room, filters)), isFavorite),
+    () =>
+      favoritesFirst(
+        freeRooms.filter((f) => isOnCampusMap(f.room) && matchesRoomFilters(f.room, filters)),
+        isFavorite,
+      ),
     [freeRooms, filters, isFavorite],
   );
 
   const availability = useMemo<Availability>(
     () =>
       buildingAvailability(
-        rooms.filter((r) => matchesRoomFilters(r, filters)),
+        rooms.filter((r) => isOnCampusMap(r) && matchesRoomFilters(r, filters)),
         filteredFree,
         teachingIdents ?? undefined,
       ),

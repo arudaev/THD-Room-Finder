@@ -7,7 +7,7 @@
  * `Availability` shape the `CampusMap` component consumes, without importing it.
  */
 import type { FreeRoom, Room } from './models';
-import { isExcludedVenue } from './priority';
+import { isExcludedVenue, normalizeForMatching } from './priority';
 
 /** One building's headline availability. */
 export interface BuildingCount {
@@ -43,6 +43,29 @@ export const CAMPUS_KEY_TO_BUILDINGS: Record<string, string[]> = {
   DEGG: ['DEGG', 'Deggs'],
   V2: ['V2'],
 };
+
+/**
+ * Room-name markers for THD's non-Deggendorf campuses (Cham/Badstraße and
+ * Pfarrkirchen/ECRI). These remote sites reuse Deggendorf building letters —
+ * Cham has its own "A"/"B" — so they collide with mapped footprints and must be
+ * rejected explicitly. Matched against the umlaut-folded room text, so
+ * "Badstraße" → "badstrasse" matches "badstra".
+ */
+const OFF_CAMPUS_MARKERS = ['badstra', 'cham', 'pfarrkirchen', 'ecri', 'rottal'];
+
+/**
+ * Whether a room belongs on the Deggendorf campus map. The 2.5D map only draws
+ * the Deggendorf riverside core, so a room qualifies when it (a) resolves to a
+ * mapped footprint and (b) carries no remote-campus marker. Rooms at other sites
+ * (Cham, Pfarrkirchen, Land-Au, …) stay in the full Rooms list but off the map.
+ */
+export function isOnCampusMap(room: Room): boolean {
+  if (campusKeyForRoom(room) === null) return false;
+  const text = normalizeForMatching(
+    [room.name, room.displayName, room.untisLongname ?? ''].join(' '),
+  );
+  return !OFF_CAMPUS_MARKERS.some((m) => text.includes(m));
+}
 
 /** Resolve one parsed THabella room onto its campus-map footprint. */
 export function campusKeyForRoom(room: Room): string | null {
