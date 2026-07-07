@@ -8,7 +8,7 @@ import { useI18n } from '../../i18n';
 import { formatDayTime, formatTime, freeRoomDuration, roomMeta, statusBannerText } from '../../domain/format';
 import { freeStatus } from '../../domain/availability';
 import { searchRooms } from '../../domain/roomSearch';
-import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
+import { favoritesFirst, matchesRoomFilters, mayBeLocked } from '../../domain/roomFilters';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
 import { TimeControl } from '../shared/TimeControl';
@@ -27,6 +27,9 @@ export function HomeScreen() {
   const [building, setBuilding] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const searching = query.trim().length > 0;
+
+  const lockHint = (room: Parameters<typeof mayBeLocked>[0]) =>
+    mayBeLocked(room) ? t('may be locked', 'evtl. abgeschlossen') : undefined;
 
   const buildings = useMemo(() => {
     const set = new Set(freeRooms.map((f) => f.room.building));
@@ -132,6 +135,7 @@ export function HomeScreen() {
                         key={room.ident}
                         name={room.code}
                         meta={roomMeta(room)}
+                        hint={lockHint(room)}
                         status={availability.status}
                         duration={b.duration}
                         href={`/room/${encodeURIComponent(room.ident)}`}
@@ -158,6 +162,7 @@ export function HomeScreen() {
                       key={ident}
                       name={f.room.code}
                       meta={roomMeta(f.room)}
+                      hint={lockHint(f.room)}
                       status={freeStatus(f.freeUntil, planningTime)}
                       duration={freeRoomDuration(f, planningTime)}
                       href={`/room/${encodeURIComponent(ident)}`}

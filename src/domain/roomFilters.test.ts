@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { favoritesFirst, matchesRoomFilters, roomKind } from './roomFilters';
+import { favoritesFirst, matchesRoomFilters, mayBeLocked, roomKind } from './roomFilters';
 import type { FreeRoom, Room } from './models';
 
 function room(partial: Partial<Room> & Pick<Room, 'ident' | 'name'>): Room {
@@ -39,6 +39,26 @@ describe('roomKind', () => {
     expect(roomKind(room({ ident: '6', name: 'B004 Kinohörsaal', facilities: ['12 PC-Plätze'] }))).toBe(
       'lecture',
     );
+  });
+
+  it('flags labs and computer/EDV rooms as may-be-locked at any size', () => {
+    expect(mayBeLocked(room({ ident: 'l1', name: 'A008 - Labor', seatsRegular: 60 }))).toBe(true);
+    expect(mayBeLocked(room({ ident: 'l2', name: 'K209 - Rechnerraum', seatsRegular: 24 }))).toBe(true);
+    expect(mayBeLocked(room({ ident: 'l3', name: 'Deggs 0.02 (EDV)', seatsRegular: 62 }))).toBe(true);
+  });
+
+  it('flags small seminar/meeting rooms, even with a "Sendehörsaal" facility', () => {
+    // E203: 16-seat meeting room that merely has broadcast kit fitted.
+    const e203 = room({ ident: 's1', name: 'E203', seatsRegular: 16, facilities: ['Besprechungsraum', 'Sendehörsaal'] });
+    expect(mayBeLocked(e203)).toBe(true);
+    expect(mayBeLocked(room({ ident: 's2', name: 'A210', seatsRegular: 30 }))).toBe(true);
+  });
+
+  it('reads big lecture rooms as open: 40+ seats, named Hörsaal/Kino, or building I', () => {
+    // B004: 220-seat hall whose only "hörsaal" marker is the Sendehörsaal facility.
+    expect(mayBeLocked(room({ ident: 'h0', name: 'B004', seatsRegular: 220, facilities: ['Sendehörsaal'] }))).toBe(false);
+    expect(mayBeLocked(room({ ident: 'h1', name: 'B 0.13 Hörsaal 1', seatsRegular: 20 }))).toBe(false);
+    expect(mayBeLocked(room({ ident: 'h2', name: 'I107', building: 'I', seatsRegular: 100 }))).toBe(false);
   });
 
   it('falls back to seminar for a plain classroom', () => {

@@ -14,11 +14,12 @@ import { freeStatus } from '../../domain/availability';
 import {
   buildingAvailability,
   campusKeyForRoom,
+  isOnCampusMap,
 } from '../../domain/campusAvailability';
 import type { BuildingCount } from '../../domain/campusAvailability';
-import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
+import { favoritesFirst, matchesRoomFilters, mayBeLocked } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
-import { getLibraryHours } from '../../domain/openingHours';
+import { getCafeteriaHours, getLibraryHours, isCafeteria } from '../../domain/openingHours';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
 import { FilterMenu } from '../shared/FilterMenu';
@@ -93,29 +94,50 @@ export function CampusScreen() {
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-  // Apply the shared room filters (seats / type) to both the lists and the map
-  // tint, then float saved rooms to the top.
+  // The map covers only the Deggendorf riverside core, so restrict both lists and
+  // the tint to rooms on that map — remote sites (Cham/Badstraße, Pfarrkirchen)
+  // stay in the full Rooms list but off Campus. Then apply the shared room
+  // filters (seats / type) and float saved rooms to the top.
   const filteredFree = useMemo<FreeRoom[]>(
-    () => favoritesFirst(freeRooms.filter((f) => matchesRoomFilters(f.room, filters)), isFavorite),
+    () =>
+      favoritesFirst(
+        freeRooms.filter((f) => isOnCampusMap(f.room) && matchesRoomFilters(f.room, filters)),
+        isFavorite,
+      ),
     [freeRooms, filters, isFavorite],
   );
 
   const availability = useMemo<Availability>(
     () =>
       buildingAvailability(
-        rooms.filter((r) => matchesRoomFilters(r, filters)),
+        rooms.filter((r) => isOnCampusMap(r) && matchesRoomFilters(r, filters)),
         filteredFree,
         teachingIdents ?? undefined,
       ),
     [rooms, filteredFree, teachingIdents, filters],
   );
 
-  // The Library hosts no THabella teaching, so tint it by its own hours instead
-  // of a free-room count: teal when open to study, muted when closed.
+  // The Library and cafeterias host no THabella teaching, so tint them by their
+  // own opening hours instead of a free-room count: teal when open, muted when
+  // closed. Each keeps its own STWNO/library schedule.
   const libraryHours = useMemo(() => getLibraryHours(queryTime), [queryTime]);
+  const cafeteriaHours = useMemo(
+    () => ({
+      GH: getCafeteriaHours(queryTime, 'GH'),
+      F: getCafeteriaHours(queryTime, 'F'),
+      K: getCafeteriaHours(queryTime, 'K'),
+    }),
+    [queryTime],
+  );
   const mapAvailability = useMemo<Availability>(
-    () => ({ ...availability, G: { free: libraryHours.open ? 1 : 0, total: 1 } }),
-    [availability, libraryHours],
+    () => ({
+      ...availability,
+      G: { free: libraryHours.open ? 1 : 0, total: 1 },
+      ...Object.fromEntries(
+        Object.entries(cafeteriaHours).map(([k, h]) => [k, { free: h?.open ? 1 : 0, total: 1 }]),
+      ),
+    }),
+    [availability, libraryHours, cafeteriaHours],
   );
 
   const selectedRooms = useMemo<FreeRoom[]>(() => {
@@ -151,6 +173,7 @@ export function CampusScreen() {
             key={f.room.ident}
             name={f.room.code}
             meta={roomMeta(f.room)}
+            hint={mayBeLocked(f.room) ? t('may be locked', 'evtl. abgeschlossen') : undefined}
             status={freeStatus(f.freeUntil, planningTime)}
             duration={freeRoomDuration(f, planningTime)}
             href={`/room/${encodeURIComponent(f.room.ident)}`}
@@ -227,7 +250,13 @@ export function CampusScreen() {
       {selectedMeta && (
         <PlaceCard
           meta={selectedMeta}
-          hours={selectedKey === 'G' ? libraryHours : campusHours}
+          hours={
+            selectedKey === 'G'
+              ? libraryHours
+              : isCafeteria(selectedKey)
+                ? cafeteriaHours[selectedKey as keyof typeof cafeteriaHours] ?? campusHours
+                : campusHours
+          }
         />
       )}
       {selectedHasRooms && list(selectedRooms)}

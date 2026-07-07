@@ -3,6 +3,7 @@ import {
   buildingAvailability,
   CAMPUS_KEY_TO_BUILDINGS,
   campusKeyForRoom,
+  isOnCampusMap,
 } from './campusAvailability';
 import type { FreeRoom, Room } from './models';
 
@@ -95,5 +96,25 @@ describe('buildingAvailability', () => {
     const avail = buildingAvailability([gym, lab], [free(lab)]);
 
     expect(avail.A).toEqual({ free: 1, total: 1 });
+  });
+});
+
+describe('isOnCampusMap', () => {
+  it('accepts a mapped Deggendorf room', () => {
+    expect(isOnCampusMap(room({ ident: 'a1', building: 'A', name: 'A 0.13 Hörsaal' }))).toBe(true);
+  });
+
+  it('rejects a remote Cham/Badstraße room that reuses a Deggendorf letter', () => {
+    const cham = room({ ident: 'c1', building: 'A', name: 'A 0.13 Hörsaal Zollner (Badstraße)' });
+    expect(campusKeyForRoom(cham)).toBe('A'); // collides with the core A footprint…
+    expect(isOnCampusMap(cham)).toBe(false); // …but the marker keeps it off the map
+  });
+
+  it('rejects a Pfarrkirchen/ECRI room', () => {
+    expect(isOnCampusMap(room({ ident: 'p1', building: 'B', name: 'B1 (Pfarrkirchen)' }))).toBe(false);
+  });
+
+  it('rejects rooms whose building has no footprint', () => {
+    expect(isOnCampusMap(room({ ident: 'x1', building: 'DMS', name: 'DMS 1.01' }))).toBe(false);
   });
 });

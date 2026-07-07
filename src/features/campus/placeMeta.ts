@@ -70,6 +70,7 @@ export const PLACE_META: Record<string, PlaceMeta> = {
   },
   F: {
     glyph: 'coffee',
+    showHours: true,
     note: (t) => t('Mensa — student dining & café.', 'Mensa — Verpflegung & Café.'),
     amenities: [
       (t) => t('Café · ground floor', 'Café · Erdgeschoss'),
@@ -79,6 +80,7 @@ export const PLACE_META: Record<string, PlaceMeta> = {
   },
   GH: {
     glyph: 'coffee',
+    showHours: true,
     note: (t) => t('Mensa Glashaus — student dining.', 'Mensa Glashaus — studentische Verpflegung.'),
     amenities: [
       (t) => t('Mensa · ground floor', 'Mensa · Erdgeschoss'),
@@ -88,6 +90,7 @@ export const PLACE_META: Record<string, PlaceMeta> = {
   },
   K: {
     glyph: 'coffee',
+    showHours: true,
     note: (t) => t('Kermi Forum — café on the ground floor.', 'Kermi Forum — Café im Erdgeschoss.'),
     amenities: [(t) => t('Café · ground floor', 'Café · Erdgeschoss')],
     links: [menuLink(STWNO_DEGGENDORF)],
