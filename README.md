@@ -56,10 +56,15 @@ long as I need?"*:
 ## Features
 
 - **Free-room finder** — duration-ranked list of rooms free at the query time
+- **Room search** — find any teaching room by code, name or equipment, with live
+  status, even when it's busy; bilingual (searching "projector" finds "Beamer")
 - **Building filter** — the primary way to narrow, once distance is off the table
 - **Time-travel lookup** — check availability at any future date/time
+- **Plan-ahead when closed** — before the doors open, preview the rooms that will
+  be free instead of a dead-end "closed" notice
 - **Room detail** — status banner, capacity, facilities, contact, the day's schedule
-- **Campus locator** — free rooms grouped by building (2.5D campus map planned)
+- **Campus map** — free rooms on a 2.5D campus map, with amenity badges for
+  dining (Mensa, cafés) and study/library spaces
 - **Saved rooms** — star your usual spot; the Saved tab answers "free right now?"
 - **Bilingual** — English UI with German preserved; live EN/DE toggle
 - **Adaptive navigation** — bottom bar (phone) → rail (tablet) → drawer (desktop)
