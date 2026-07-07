@@ -9,6 +9,7 @@ import {
 import type { ReactNode } from 'react';
 import type { FreeRoom, Room, ScheduledEvent } from '../../domain/models';
 import { computeFreeRooms } from '../../domain/availability';
+import { campusNow } from '../../domain/time';
 import { getCampusHours } from '../../domain/openingHours';
 import type { CampusHours } from '../../domain/openingHours';
 import { getEventsForDate, getRooms, getTeachingRoomIdents } from '../../data/thabellaClient';
@@ -47,7 +48,7 @@ export interface RoomData {
 const RoomDataContext = createContext<RoomData | null>(null);
 
 export function RoomDataProvider({ children }: { children: ReactNode }) {
-  const [queryTime, setQueryTimeState] = useState<Date>(() => new Date());
+  const [queryTime, setQueryTimeState] = useState<Date>(() => campusNow());
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [events, setEvents] = useState<ScheduledEvent[]>([]);
@@ -62,7 +63,7 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
     try {
       const [roomList, idents, dayEvents] = await Promise.all([
         getRooms(),
-        getTeachingRoomIdents(),
+        getTeachingRoomIdents(when),
         getEventsForDate(when),
       ]);
       setRooms(roomList);
@@ -83,7 +84,7 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
   // 5-minute silent auto-refresh — only while pinned to "now".
   useEffect(() => {
     const id = setInterval(() => {
-      if (!isCustomTime) setQueryTimeState(new Date());
+      if (!isCustomTime) setQueryTimeState(campusNow());
     }, REFRESH_MS);
     return () => clearInterval(id);
   }, [isCustomTime]);
@@ -118,9 +119,9 @@ export function RoomDataProvider({ children }: { children: ReactNode }) {
   }, []);
   const resetTime = useCallback(() => {
     setIsCustomTime(false);
-    setQueryTimeState(new Date());
+    setQueryTimeState(campusNow());
   }, []);
-  const refresh = useCallback(() => setQueryTimeState(new Date()), []);
+  const refresh = useCallback(() => setQueryTimeState(campusNow()), []);
 
   const value = useMemo<RoomData>(
     () => ({
