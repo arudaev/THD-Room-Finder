@@ -4,6 +4,7 @@ import { useRoomData } from '../rooms/RoomDataContext';
 import { useFavorites } from './favorites';
 import { useI18n } from '../../i18n';
 import { computeRoomAvailability, getRoomSchedule } from '../../domain/availability';
+import { mayBeLocked } from '../../domain/roomFilters';
 import { formatTime, roomMeta, statusBannerText } from '../../domain/format';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
@@ -84,6 +85,7 @@ export function FavoritesScreen() {
                   key={room.ident}
                   name={room.code}
                   meta={roomMeta(room)}
+                  hint={mayBeLocked(room) ? t('may be locked', 'evtl. abgeschlossen') : undefined}
                   status={availability.status}
                   duration={banner.duration ?? ''}
                   href={`/room/${encodeURIComponent(room.ident)}`}

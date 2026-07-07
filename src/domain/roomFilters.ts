@@ -40,6 +40,34 @@ export function roomKind(room: Room): RoomKind {
   return 'seminar';
 }
 
+// Markers matched against the room NAME only — deliberately NOT the facilities
+// list, where "Sendehörsaal" (a broadcast feature fitted to rooms of every size,
+// from the 16-seat E203 to the 220-seat B004) would otherwise misclassify them
+// as lecture halls via the substring "hörsaal".
+const LAB_NAME = /labor|\blab\b|praktikum|rechner|\bedv\b|(^|\W)pcs?(\W|$)/;
+const LECTURE_HALL_NAME = /hoersaal|kino|(^|\W)hs(\W|$)/;
+/** Rooms this size or larger read as general lecture rooms (open); see below. */
+const OPEN_SEAT_THRESHOLD = 40;
+
+/**
+ * Whether a room is likely locked when it has no class. THabella reports a room
+ * as "free" the moment no event occupies it, but many rooms are physically
+ * locked outside their courses, so a student shouldn't cross campus on a maybe.
+ * We never hide these — just add a soft "may be locked" caveat. The heuristic
+ * mirrors how the rooms actually behave:
+ *   • specialised labs (incl. computer/EDV rooms) stay locked at any size;
+ *   • named lecture halls (Hörsaal/Kino) and building "I" read as open;
+ *   • otherwise small rooms (< 40 seats) may be locked, big rooms read as open —
+ *     the "prioritise the 40+ lecture rooms" rule, since seat count is the only
+ *     signal separating a 16-seat seminar room from a 220-seat hall.
+ */
+export function mayBeLocked(room: Room): boolean {
+  const name = normalizeForMatching([room.name, room.displayName].join(' '));
+  if (LAB_NAME.test(name)) return true;
+  if (LECTURE_HALL_NAME.test(name) || room.building === 'I') return false;
+  return room.seatsRegular < OPEN_SEAT_THRESHOLD;
+}
+
 /** User-adjustable filters, shared by the room list and the campus map. */
 export interface RoomFilters {
   /** Only rooms that report a seat count (hides store rooms, foyers, etc.). */

@@ -17,7 +17,7 @@ import {
   isOnCampusMap,
 } from '../../domain/campusAvailability';
 import type { BuildingCount } from '../../domain/campusAvailability';
-import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
+import { favoritesFirst, matchesRoomFilters, mayBeLocked } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
 import { getCafeteriaHours, getLibraryHours, isCafeteria } from '../../domain/openingHours';
 import { BrandHeader } from '../shared/BrandHeader';
@@ -173,6 +173,7 @@ export function CampusScreen() {
             key={f.room.ident}
             name={f.room.code}
             meta={roomMeta(f.room)}
+            hint={mayBeLocked(f.room) ? t('may be locked', 'evtl. abgeschlossen') : undefined}
             status={freeStatus(f.freeUntil, planningTime)}
             duration={freeRoomDuration(f, planningTime)}
             href={`/room/${encodeURIComponent(f.room.ident)}`}

@@ -19,6 +19,9 @@ export interface RoomCardProps {
   statusLabel?: string;
   /** The duration hero, e.g. "2h 10m", "all day", "25m", "until 11:30". */
   duration?: string;
+  /** Optional soft caveat appended to the meta line, e.g. "may be locked". Shown
+   *  in amber after another "·" separator, so it reads as a gentle warning. */
+  hint?: string;
   href?: string;
   onClick?: MouseEventHandler;
   style?: CSSProperties;
@@ -30,6 +33,7 @@ export function RoomCard({
   status = 'free',
   statusLabel,
   duration = '',
+  hint,
   href = '#',
   onClick,
   style = {},
@@ -90,6 +94,7 @@ export function RoomCard({
           }}
         >
           {meta}
+          {hint && <span style={{ color: 'var(--status-soon)' }}> · {hint}</span>}
         </div>
       </div>
       <div

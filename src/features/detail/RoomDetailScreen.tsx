@@ -6,6 +6,7 @@ import { useRoomData } from '../rooms/RoomDataContext';
 import { useFavorites } from '../favorites/favorites';
 import { useI18n } from '../../i18n';
 import { computeRoomAvailability, getRoomSchedule } from '../../domain/availability';
+import { mayBeLocked } from '../../domain/roomFilters';
 import { formatDayTime, formatTime, statusBannerText } from '../../domain/format';
 import { Page, Spinner, EmptyState } from '../shared/ui';
 
@@ -108,6 +109,19 @@ export function RoomDetailScreen() {
             {room.displayName || room.code}
           </div>
           <InfoRow icon={<IconUsers size={18} />} text={`${room.seatsRegular} ${t('seats', 'Plätze')}`} />
+          {mayBeLocked(room) && (
+            <div
+              style={{
+                fontSize: 'var(--body-small-size)',
+                color: 'var(--md-on-surface-variant)',
+              }}
+            >
+              {t(
+                'May be locked when no class is scheduled — check before relying on it.',
+                'Evtl. abgeschlossen, wenn kein Kurs stattfindet — vorher prüfen.',
+              )}
+            </div>
+          )}
           {room.facilities.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {room.facilities.map((f) => (
