@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getCampusHours, getLibraryHours, periodFor } from './openingHours';
+import { getCafeteriaHours, getCampusHours, getLibraryHours, isCafeteria, periodFor } from './openingHours';
 
 // Local Date constructor (year, monthIndex, day, hours, minutes).
 const dt = (y: number, m: number, d: number, hh = 0, mm = 0) => new Date(y, m - 1, d, hh, mm);
@@ -92,5 +92,46 @@ describe('getLibraryHours', () => {
     expect(h.period).toBe('exam');
     expect(h.open).toBe(true);
     expect(h.todayClose).toEqual(dt(2026, 7, 4, 23, 45));
+  });
+});
+
+describe('getCafeteriaHours', () => {
+  it('recognises the cafeteria map keys', () => {
+    expect(isCafeteria('GH')).toBe(true);
+    expect(isCafeteria('F')).toBe(true);
+    expect(isCafeteria('K')).toBe(true);
+    expect(isCafeteria('A')).toBe(false);
+    expect(getCafeteriaHours(dt(2026, 5, 13, 10, 0), 'A')).toBeNull();
+  });
+
+  it('opens the Glashaus Mon–Fri 07:30–14:00 in term/exam', () => {
+    const h = getCafeteriaHours(dt(2026, 5, 13, 10, 0), 'GH')!; // Wed regular
+    expect(h.open).toBe(true);
+    expect(h.todayOpen).toEqual(dt(2026, 5, 13, 7, 30));
+    expect(h.todayClose).toEqual(dt(2026, 5, 13, 14, 0));
+    expect(getCafeteriaHours(dt(2026, 5, 13, 14, 30), 'GH')!.open).toBe(false);
+  });
+
+  it('shortens the Glashaus to 07:30–12:00 during the break', () => {
+    const h = getCafeteriaHours(dt(2026, 8, 12, 11, 0), 'GH')!; // Wed break
+    expect(h.period).toBe('break');
+    expect(h.open).toBe(true);
+    expect(h.todayClose).toEqual(dt(2026, 8, 12, 12, 0));
+  });
+
+  it('closes the Mensa cafeteria earlier on Fridays (15:30)', () => {
+    expect(getCafeteriaHours(dt(2026, 5, 13, 16, 30), 'F')!.open).toBe(true); // Wed 17:00
+    const fri = getCafeteriaHours(dt(2026, 5, 15, 16, 0), 'F')!; // Fri after 15:30
+    expect(fri.open).toBe(false);
+    expect(getCafeteriaHours(dt(2026, 5, 15, 15, 0), 'F')!.todayClose).toEqual(
+      dt(2026, 5, 15, 15, 30),
+    );
+  });
+
+  it('opens the Kaffeebar 09:30–13:30 in term but is closed over the break', () => {
+    const term = getCafeteriaHours(dt(2026, 5, 13, 10, 0), 'K')!; // Wed regular
+    expect(term.open).toBe(true);
+    expect(term.todayClose).toEqual(dt(2026, 5, 13, 13, 30));
+    expect(getCafeteriaHours(dt(2026, 8, 12, 11, 0), 'K')!.open).toBe(false); // Aug break
   });
 });

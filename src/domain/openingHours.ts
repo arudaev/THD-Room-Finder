@@ -168,3 +168,82 @@ export function getCampusHours(now: Date): CampusHours {
 export function getLibraryHours(now: Date): CampusHours {
   return resolveHours(now, LIBRARY);
 }
+
+// ── Cafeterias (STWNO gastronomy) ─────────────────────────────────────────────
+// The café/canteen buildings keep their own STWNO hours, unrelated to teaching.
+// STWNO publishes two sets per venue: one for lecture + exam periods, one for the
+// lecture-free ("break") time. Weekends closed. Source: stwno.de/…/cafeterien-deggendorf.
+
+// Glashaus (map key GH): lecture/exam Mon–Fri 07:30–14:00; break Mon–Fri 07:30–12:00.
+const GLASHAUS_TERM: DayHours[] = [
+  null, // Sun
+  { open: H(7, 30), close: H(14) }, // Mon
+  { open: H(7, 30), close: H(14) }, // Tue
+  { open: H(7, 30), close: H(14) }, // Wed
+  { open: H(7, 30), close: H(14) }, // Thu
+  { open: H(7, 30), close: H(14) }, // Fri
+  null, // Sat
+];
+const GLASHAUS_BREAK: DayHours[] = [
+  null,
+  { open: H(7, 30), close: H(12) },
+  { open: H(7, 30), close: H(12) },
+  { open: H(7, 30), close: H(12) },
+  { open: H(7, 30), close: H(12) },
+  { open: H(7, 30), close: H(12) },
+  null,
+];
+const GLASHAUS: Schedule = { regular: GLASHAUS_TERM, exam: GLASHAUS_TERM, break: GLASHAUS_BREAK };
+
+// Mensa-building cafeteria (map key F): lecture/exam Mon–Thu 07:30–17:00, Fri
+// 07:30–15:30; break Mon–Thu 07:30–16:00, Fri 07:30–15:30.
+const MENSA_TERM: DayHours[] = [
+  null,
+  { open: H(7, 30), close: H(17) }, // Mon
+  { open: H(7, 30), close: H(17) }, // Tue
+  { open: H(7, 30), close: H(17) }, // Wed
+  { open: H(7, 30), close: H(17) }, // Thu
+  { open: H(7, 30), close: H(15, 30) }, // Fri
+  null,
+];
+const MENSA_BREAK: DayHours[] = [
+  null,
+  { open: H(7, 30), close: H(16) }, // Mon
+  { open: H(7, 30), close: H(16) }, // Tue
+  { open: H(7, 30), close: H(16) }, // Wed
+  { open: H(7, 30), close: H(16) }, // Thu
+  { open: H(7, 30), close: H(15, 30) }, // Fri
+  null,
+];
+const MENSA: Schedule = { regular: MENSA_TERM, exam: MENSA_TERM, break: MENSA_BREAK };
+
+// Kaffeebar (K-Gebäude, map key K): lecture/exam Mon–Fri 09:30–13:30. STWNO lists
+// lecture-free hours of 10:00–14:00 for bridge days, but the café is closed for
+// the whole summer break (27 Jul–30 Sep), which is the dominant break-time state,
+// so we model `break` as closed rather than showing hours it won't keep.
+const KAFFEEBAR_TERM: DayHours[] = [
+  null,
+  { open: H(9, 30), close: H(13, 30) }, // Mon
+  { open: H(9, 30), close: H(13, 30) }, // Tue
+  { open: H(9, 30), close: H(13, 30) }, // Wed
+  { open: H(9, 30), close: H(13, 30) }, // Thu
+  { open: H(9, 30), close: H(13, 30) }, // Fri
+  null,
+];
+const KAFFEEBAR_BREAK: DayHours[] = [null, null, null, null, null, null, null];
+const KAFFEEBAR: Schedule = { regular: KAFFEEBAR_TERM, exam: KAFFEEBAR_TERM, break: KAFFEEBAR_BREAK };
+
+/** Cafeteria schedules keyed by campus-map building key. */
+const CAFETERIAS: Record<string, Schedule> = { GH: GLASHAUS, F: MENSA, K: KAFFEEBAR };
+
+/** True when `key` is a cafeteria with published STWNO hours. */
+export function isCafeteria(key: string): boolean {
+  return key in CAFETERIAS;
+}
+
+/** Opening state of a cafeteria (map key GH / F / K) at `now`, or null if `key`
+ *  is not a known cafeteria. */
+export function getCafeteriaHours(now: Date, key: string): CampusHours | null {
+  const schedule = CAFETERIAS[key];
+  return schedule ? resolveHours(now, schedule) : null;
+}

@@ -18,7 +18,7 @@ import {
 import type { BuildingCount } from '../../domain/campusAvailability';
 import { favoritesFirst, matchesRoomFilters } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
-import { getLibraryHours } from '../../domain/openingHours';
+import { getCafeteriaHours, getLibraryHours, isCafeteria } from '../../domain/openingHours';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
 import { FilterMenu } from '../shared/FilterMenu';
@@ -110,12 +110,27 @@ export function CampusScreen() {
     [rooms, filteredFree, teachingIdents, filters],
   );
 
-  // The Library hosts no THabella teaching, so tint it by its own hours instead
-  // of a free-room count: teal when open to study, muted when closed.
+  // The Library and cafeterias host no THabella teaching, so tint them by their
+  // own opening hours instead of a free-room count: teal when open, muted when
+  // closed. Each keeps its own STWNO/library schedule.
   const libraryHours = useMemo(() => getLibraryHours(queryTime), [queryTime]);
+  const cafeteriaHours = useMemo(
+    () => ({
+      GH: getCafeteriaHours(queryTime, 'GH'),
+      F: getCafeteriaHours(queryTime, 'F'),
+      K: getCafeteriaHours(queryTime, 'K'),
+    }),
+    [queryTime],
+  );
   const mapAvailability = useMemo<Availability>(
-    () => ({ ...availability, G: { free: libraryHours.open ? 1 : 0, total: 1 } }),
-    [availability, libraryHours],
+    () => ({
+      ...availability,
+      G: { free: libraryHours.open ? 1 : 0, total: 1 },
+      ...Object.fromEntries(
+        Object.entries(cafeteriaHours).map(([k, h]) => [k, { free: h?.open ? 1 : 0, total: 1 }]),
+      ),
+    }),
+    [availability, libraryHours, cafeteriaHours],
   );
 
   const selectedRooms = useMemo<FreeRoom[]>(() => {
@@ -227,7 +242,13 @@ export function CampusScreen() {
       {selectedMeta && (
         <PlaceCard
           meta={selectedMeta}
-          hours={selectedKey === 'G' ? libraryHours : campusHours}
+          hours={
+            selectedKey === 'G'
+              ? libraryHours
+              : isCafeteria(selectedKey)
+                ? cafeteriaHours[selectedKey as keyof typeof cafeteriaHours] ?? campusHours
+                : campusHours
+          }
         />
       )}
       {selectedHasRooms && list(selectedRooms)}
