@@ -26,6 +26,14 @@
 
 ---
 
+## Get the App
+
+- **Use it now:** [thd-room-finder.vercel.app](https://thd-room-finder.vercel.app/) — no install needed, or "Add to Home Screen" for the PWA
+- **Android APK:** [latest release](https://github.com/arudaev/THD-Room-Finder/releases/latest) — sideload on Android 12+
+- **Landing page:** [arudaev.github.io/THD-Room-Finder](https://arudaev.github.io/THD-Room-Finder/)
+
+---
+
 ## Overview
 
 THD Room Finder queries THD's public scheduling system
