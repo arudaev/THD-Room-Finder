@@ -267,6 +267,109 @@
     }
     .meta-item { display: flex; align-items: center; gap: 0.35rem; }
 
+    /* ── Showcase (campus map) ───────────────────── */
+    .showcase {
+      padding: 1rem 1.5rem 5rem;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+    .map-card {
+      background: var(--md-surface);
+      border-radius: var(--md-radius-l);
+      box-shadow: var(--md-shadow-1);
+      padding: 1rem 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .map-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      background: #E7EAF2;
+    }
+    .map-caption {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+      font-size: 0.8125rem;
+      color: var(--md-on-surface-variant);
+    }
+    .map-caption svg { flex: none; width: 15px; height: 15px; stroke: var(--md-primary); fill: none; stroke-width: 2; }
+
+    .rooms-preview {
+      background: var(--md-surface);
+      border-radius: var(--md-radius-l);
+      box-shadow: var(--md-shadow-1);
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .rooms-preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+    }
+    .rooms-preview-head strong { font-size: 0.9375rem; font-weight: 500; }
+    .rooms-preview-head span { font-size: 0.75rem; color: var(--md-on-surface-variant); }
+    .room-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border-top: 1px solid var(--md-outline-variant);
+    }
+    .room-row:first-of-type { border-top: none; }
+    .room-name { font-size: 0.8125rem; font-weight: 500; }
+    .room-sub { font-size: 0.75rem; color: var(--md-on-surface-variant); margin-top: 0.15rem; }
+    .room-time { text-align: right; flex: none; }
+    .room-status {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #00796B;
+      text-transform: uppercase;
+      display: block;
+    }
+    @media (prefers-color-scheme: dark) { .room-status { color: #4DB6AC; } }
+    .room-dur { font-size: 0.875rem; font-weight: 500; color: var(--md-on-surface); }
+
+    /* ── Trust strip ──────────────────────────────── */
+    .trust {
+      background: var(--md-surface-1);
+      padding: 3.5rem 1.5rem;
+    }
+    .trust-inner {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .trust-item { display: flex; gap: 0.9rem; }
+    .trust-icon {
+      flex: none;
+      width: 36px; height: 36px;
+      background: var(--md-primary-container);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .trust-icon svg { width: 18px; height: 18px; stroke: var(--md-on-primary-container); fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .trust-item h3 { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
+    .trust-item p { font-size: 0.8125rem; color: var(--md-on-surface-variant); line-height: 1.6; }
+
     /* ── Features ─────────────────────────────── */
     .features {
       padding: 4rem 1.5rem 5rem;
@@ -347,10 +450,15 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    @media (max-width: 800px) {
+      .showcase-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 600px) {
       nav { padding: 0 1rem; }
       .hero { padding: 3.5rem 1.25rem 3rem; }
+      .showcase { padding: 0.5rem 1.25rem 4rem; }
       .features { padding: 3rem 1.25rem 4rem; }
+      .trust { padding: 3rem 1.25rem; }
       .grid-4 { grid-template-columns: 1fr 1fr; }
       .stat-row { gap: 1.5rem; }
       h1 { font-size: 2.1rem; }
@@ -460,6 +568,101 @@
         </svg>
         MIT License
       </span>
+    </div>
+  </div>
+</section>
+
+<section class="showcase">
+  <div class="sec-head">
+    <h2>See the whole campus at a glance</h2>
+    <p>Every building, tinted by how many rooms are free right now</p>
+  </div>
+  <div class="showcase-grid">
+    <div class="map-card">
+      <img src="campus-map.svg" alt="2.5D map of THD's Deggendorf campus with buildings tinted by live room availability" width="1200" height="800" loading="lazy">
+      <div class="map-caption">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Darker teal = more free rooms. Tap any building in the app to drill in.
+      </div>
+    </div>
+    <div class="rooms-preview">
+      <div class="rooms-preview-head">
+        <strong>Free right now</strong>
+        <span>sorted by longest-free</span>
+      </div>
+      <div class="room-row">
+        <div>
+          <div class="room-name">D021</div>
+          <div class="room-sub">Building D · 90 seats</div>
+        </div>
+        <div class="room-time"><span class="room-status">Free</span><span class="room-dur">8h 16m</span></div>
+      </div>
+      <div class="room-row">
+        <div>
+          <div class="room-name">C Hörsaal C118 (DMS)</div>
+          <div class="room-sub">Building C · 24 seats</div>
+        </div>
+        <div class="room-time"><span class="room-status">Free</span><span class="room-dur">8h 16m</span></div>
+      </div>
+      <div class="room-row">
+        <div>
+          <div class="room-name">E001</div>
+          <div class="room-sub">Building E · 90 seats</div>
+        </div>
+        <div class="room-time"><span class="room-status">Free</span><span class="room-dur">8h 16m</span></div>
+      </div>
+      <div class="room-row">
+        <div>
+          <div class="room-name">I107</div>
+          <div class="room-sub">Building I · 100 seats</div>
+        </div>
+        <div class="room-time"><span class="room-status">Free</span><span class="room-dur">3h 42m</span></div>
+      </div>
+      <div class="room-row">
+        <div>
+          <div class="room-name">ITC 2: sem(1)</div>
+          <div class="room-sub">Building ITC · 30 seats · may be locked</div>
+        </div>
+        <div class="room-time"><span class="room-status">Free</span><span class="room-dur">1h 05m</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trust">
+  <div class="trust-inner">
+    <div class="sec-head">
+      <h2>Built for THD, from official data</h2>
+      <p>No scraping, no accounts, nothing to sign up for</p>
+    </div>
+    <div class="grid-3">
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        </div>
+        <div>
+          <h3>Straight from THabella</h3>
+          <p>Room and schedule data comes directly from THD's own public scheduling system — the same source lecturers and admin already rely on.</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div>
+          <h3>No accounts, no tracking</h3>
+          <p>Nothing to sign in with and no personal data collected. Room data is cached on-device only, to keep the app fast and work offline.</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24" style="fill: var(--md-on-primary-container); stroke: none;"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        </div>
+        <div>
+          <h3>Open source</h3>
+          <p>Built and maintained by a THD student, in the open on GitHub. Anyone — faculty included — can read the code or suggest a change.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
