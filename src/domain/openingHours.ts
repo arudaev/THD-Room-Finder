@@ -217,6 +217,38 @@ const MENSA_BREAK: DayHours[] = [
 ];
 const MENSA: Schedule = { regular: MENSA_TERM, exam: MENSA_TERM, break: MENSA_BREAK };
 
+// Mensa canteen (1st floor of the same building F, lunch service only — distinct
+// from the ground-floor café above): Mon–Fri 11:00–14:15 in term/exam, Mon–Fri
+// 11:00–14:00 during the break. Source: stwno.de/…/mensen/mensa-th-deggendorf.
+const MENSA_CANTEEN_TERM: DayHours[] = [
+  null,
+  { open: H(11), close: H(14, 15) }, // Mon
+  { open: H(11), close: H(14, 15) }, // Tue
+  { open: H(11), close: H(14, 15) }, // Wed
+  { open: H(11), close: H(14, 15) }, // Thu
+  { open: H(11), close: H(14, 15) }, // Fri
+  null,
+];
+const MENSA_CANTEEN_BREAK: DayHours[] = [
+  null,
+  { open: H(11), close: H(14) }, // Mon
+  { open: H(11), close: H(14) }, // Tue
+  { open: H(11), close: H(14) }, // Wed
+  { open: H(11), close: H(14) }, // Thu
+  { open: H(11), close: H(14) }, // Fri
+  null,
+];
+const MENSA_CANTEEN: Schedule = {
+  regular: MENSA_CANTEEN_TERM,
+  exam: MENSA_CANTEEN_TERM,
+  break: MENSA_CANTEEN_BREAK,
+};
+
+/** Opening state of the Mensa canteen (building F, 1st floor lunch service) at `now`. */
+export function getMensaCanteenHours(now: Date): CampusHours {
+  return resolveHours(now, MENSA_CANTEEN);
+}
+
 // Kaffeebar (K-Gebäude, map key K): lecture/exam Mon–Fri 09:30–13:30. STWNO lists
 // lecture-free hours of 10:00–14:00 for bridge days, but the café is closed for
 // the whole summer break (27 Jul–30 Sep), which is the dominant break-time state,

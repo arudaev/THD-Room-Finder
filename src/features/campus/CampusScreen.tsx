@@ -19,7 +19,7 @@ import {
 import type { BuildingCount } from '../../domain/campusAvailability';
 import { favoritesFirst, matchesRoomFilters, mayBeLocked } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
-import { getCafeteriaHours, getLibraryHours, isCafeteria } from '../../domain/openingHours';
+import { getCafeteriaHours, getLibraryHours, getMensaCanteenHours, isCafeteria } from '../../domain/openingHours';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
 import { FilterMenu } from '../shared/FilterMenu';
@@ -117,10 +117,13 @@ export function CampusScreen() {
     [rooms, filteredFree, teachingIdents, filters],
   );
 
-  // The Library and cafeterias host no THabella teaching, so tint them by their
-  // own opening hours instead of a free-room count: teal when open, muted when
-  // closed. Each keeps its own STWNO/library schedule.
+  // The Library and pure-amenity cafeterias (F, GH) host no THabella teaching,
+  // so tint them by their own opening hours instead of a free-room count: teal
+  // when open, muted when closed. K is a mixed-use building — it hosts real
+  // classrooms alongside its ground-floor café — so it keeps its real room-based
+  // tint and only its café hours are shown in the side panel.
   const libraryHours = useMemo(() => getLibraryHours(queryTime), [queryTime]);
+  const mensaCanteenHours = useMemo(() => getMensaCanteenHours(queryTime), [queryTime]);
   const cafeteriaHours = useMemo(
     () => ({
       GH: getCafeteriaHours(queryTime, 'GH'),
@@ -129,16 +132,18 @@ export function CampusScreen() {
     }),
     [queryTime],
   );
-  const mapAvailability = useMemo<Availability>(
-    () => ({
-      ...availability,
-      G: { free: libraryHours.open ? 1 : 0, total: 1 },
-      ...Object.fromEntries(
-        Object.entries(cafeteriaHours).map(([k, h]) => [k, { free: h?.open ? 1 : 0, total: 1 }]),
-      ),
-    }),
-    [availability, libraryHours, cafeteriaHours],
-  );
+  const mapAvailability = useMemo<Availability>(() => {
+    const hoursTints: Record<string, boolean | undefined> = {
+      G: libraryHours.open,
+      ...Object.fromEntries(Object.entries(cafeteriaHours).map(([k, h]) => [k, h?.open])),
+    };
+    const overrides = Object.fromEntries(
+      Object.entries(hoursTints)
+        .filter(([key]) => (availability[key]?.total ?? 0) === 0)
+        .map(([key, open]) => [key, { free: open ? 1 : 0, total: 1 }]),
+    );
+    return { ...availability, ...overrides };
+  }, [availability, libraryHours, cafeteriaHours]);
 
   const selectedRooms = useMemo<FreeRoom[]>(() => {
     if (!selectedKey) return [];
@@ -257,6 +262,7 @@ export function CampusScreen() {
                 ? cafeteriaHours[selectedKey as keyof typeof cafeteriaHours] ?? campusHours
                 : campusHours
           }
+          secondaryHours={selectedKey === 'F' ? mensaCanteenHours : undefined}
         />
       )}
       {selectedHasRooms && list(selectedRooms)}

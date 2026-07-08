@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { getCafeteriaHours, getCampusHours, getLibraryHours, isCafeteria, periodFor } from './openingHours';
+import {
+  getCafeteriaHours,
+  getCampusHours,
+  getLibraryHours,
+  getMensaCanteenHours,
+  isCafeteria,
+  periodFor,
+} from './openingHours';
 
 // Local Date constructor (year, monthIndex, day, hours, minutes).
 const dt = (y: number, m: number, d: number, hh = 0, mm = 0) => new Date(y, m - 1, d, hh, mm);
@@ -133,5 +140,30 @@ describe('getCafeteriaHours', () => {
     expect(term.open).toBe(true);
     expect(term.todayClose).toEqual(dt(2026, 5, 13, 13, 30));
     expect(getCafeteriaHours(dt(2026, 8, 12, 11, 0), 'K')!.open).toBe(false); // Aug break
+  });
+});
+
+describe('getMensaCanteenHours', () => {
+  it('serves lunch 11:00–14:15 in term/exam, distinct from the ground-floor café', () => {
+    const h = getMensaCanteenHours(dt(2026, 5, 13, 12, 0)); // Wed regular, mid-lunch
+    expect(h.open).toBe(true);
+    expect(h.todayOpen).toEqual(dt(2026, 5, 13, 11, 0));
+    expect(h.todayClose).toEqual(dt(2026, 5, 13, 14, 15));
+  });
+
+  it('is closed before 11:00 and after 14:15, even though the café is still open', () => {
+    const before = getMensaCanteenHours(dt(2026, 5, 13, 8, 0)); // café is open 07:30–17:00
+    expect(before.open).toBe(false);
+    expect(before.nextOpen).toEqual(dt(2026, 5, 13, 11, 0));
+
+    const after = getMensaCanteenHours(dt(2026, 5, 13, 15, 0)); // café still open until 17:00
+    expect(after.open).toBe(false);
+  });
+
+  it('shortens to 11:00–14:00 during the break', () => {
+    const h = getMensaCanteenHours(dt(2026, 8, 12, 13, 30)); // Wed break
+    expect(h.period).toBe('break');
+    expect(h.open).toBe(true);
+    expect(h.todayClose).toEqual(dt(2026, 8, 12, 14, 0));
   });
 });

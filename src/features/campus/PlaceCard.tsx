@@ -5,13 +5,50 @@ import type { PlaceMeta } from './placeMeta';
 
 /**
  * Side-panel card for a non-teaching / amenity building (Library, study spaces,
- * Mensa, Glashaus, K café): a short description, amenity lines, external menu
- * links, and — when `hours` is given — a live open/closed line (the Library
- * uses its own schedule, study spaces the general campus hours).
+ * Mensa, Glashaus, K café): a short description, amenity lines (what's here and
+ * on which floor), a live open/closed line, then external links. Buildings with
+ * a `secondaryVenue` (building F's upstairs Mensa) get a second, labeled hours
+ * line driven by `secondaryHours`. STWNO venues (`fullHoursFormat`) show today's
+ * whole opening window, not just the closing time — the closing time alone
+ * doesn't tell you when a Mensa's lunch service actually starts.
  */
-export function PlaceCard({ meta, hours }: { meta: PlaceMeta; hours?: CampusHours }) {
+export function PlaceCard({
+  meta,
+  hours,
+  secondaryHours,
+}: {
+  meta: PlaceMeta;
+  hours?: CampusHours;
+  secondaryHours?: CampusHours;
+}) {
   const { t, locale } = useI18n();
   const showHours = meta.showHours && hours;
+  const showSecondaryHours = meta.secondaryVenue && secondaryHours;
+
+  const status = (h: CampusHours) => (h.open ? t('Open', 'Geöffnet') : t('Closed', 'Geschlossen'));
+
+  const abbreviatedText = (h: CampusHours) =>
+    h.open
+      ? h.todayClose
+        ? t(`Open until ${formatTime(h.todayClose)}`, `Geöffnet bis ${formatTime(h.todayClose)}`)
+        : t('Open', 'Geöffnet')
+      : h.nextOpen
+        ? t(
+            `Closed · opens ${formatDayTime(h.nextOpen, locale)}`,
+            `Geschlossen · öffnet ${formatDayTime(h.nextOpen, locale)}`,
+          )
+        : t('Closed', 'Geschlossen');
+
+  const fullRangeText = (h: CampusHours) => {
+    if (h.todayOpen && h.todayClose) {
+      return `${status(h)} · ${formatTime(h.todayOpen)}–${formatTime(h.todayClose)}`;
+    }
+    return h.nextOpen
+      ? `${status(h)} · ${t('opens', 'öffnet')} ${formatDayTime(h.nextOpen, locale)}`
+      : status(h);
+  };
+
+  const hoursText = (h: CampusHours) => (meta.fullHoursFormat ? fullRangeText(h) : abbreviatedText(h));
 
   return (
     <div
@@ -28,6 +65,16 @@ export function PlaceCard({ meta, hours }: { meta: PlaceMeta; hours?: CampusHour
         {meta.note(t)}
       </div>
 
+      {meta.amenities && meta.amenities.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          {meta.amenities.map((line, i) => (
+            <div key={i} style={{ fontSize: 'var(--body-small-size)', color: 'var(--md-on-surface-variant)' }}>
+              {line(t)}
+            </div>
+          ))}
+        </div>
+      )}
+
       {showHours && (
         <div
           style={{
@@ -36,26 +83,20 @@ export function PlaceCard({ meta, hours }: { meta: PlaceMeta; hours?: CampusHour
             color: hours.open ? 'var(--md-primary)' : 'var(--md-on-surface-variant)',
           }}
         >
-          {hours.open
-            ? hours.todayClose
-              ? t(`Open until ${formatTime(hours.todayClose)}`, `Geöffnet bis ${formatTime(hours.todayClose)}`)
-              : t('Open', 'Geöffnet')
-            : hours.nextOpen
-              ? t(
-                  `Closed · opens ${formatDayTime(hours.nextOpen, locale)}`,
-                  `Geschlossen · öffnet ${formatDayTime(hours.nextOpen, locale)}`,
-                )
-              : t('Closed', 'Geschlossen')}
+          {meta.primaryVenueLabel && <>{meta.primaryVenueLabel(t)}: </>}
+          {hoursText(hours)}
         </div>
       )}
 
-      {meta.amenities && meta.amenities.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-          {meta.amenities.map((line, i) => (
-            <div key={i} style={{ fontSize: 'var(--body-small-size)', color: 'var(--md-on-surface-variant)' }}>
-              {line(t)}
-            </div>
-          ))}
+      {showSecondaryHours && (
+        <div
+          style={{
+            fontSize: 'var(--body-medium-size)',
+            fontWeight: 'var(--weight-medium)',
+            color: secondaryHours.open ? 'var(--md-primary)' : 'var(--md-on-surface-variant)',
+          }}
+        >
+          {meta.secondaryVenue!.label(t)}: {hoursText(secondaryHours)}
         </div>
       )}
 
