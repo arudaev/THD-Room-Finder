@@ -279,3 +279,25 @@ export function getCafeteriaHours(now: Date, key: string): CampusHours | null {
   const schedule = CAFETERIAS[key];
   return schedule ? resolveHours(now, schedule) : null;
 }
+
+// ── Copy shop (building C, room C 012) ───────────────────────────────────────
+// Mon–Thu 09:00–14:00, closed Fri/weekends. THD's own page only says a "special
+// arrangement" (Sonderregelung) applies during the semester break without
+// giving times, so we model the break as closed rather than guess a schedule
+// it may not keep. Source: th-deg.de/de/studierende/campusleben.
+const COPYSHOP_TERM: DayHours[] = [
+  null,
+  { open: H(9), close: H(14) }, // Mon
+  { open: H(9), close: H(14) }, // Tue
+  { open: H(9), close: H(14) }, // Wed
+  { open: H(9), close: H(14) }, // Thu
+  null, // Fri
+  null,
+];
+const COPYSHOP_BREAK: DayHours[] = [null, null, null, null, null, null, null];
+const COPYSHOP: Schedule = { regular: COPYSHOP_TERM, exam: COPYSHOP_TERM, break: COPYSHOP_BREAK };
+
+/** Opening state of the copy shop (building C, room C 012) at `now`. */
+export function getCopyShopHours(now: Date): CampusHours {
+  return resolveHours(now, COPYSHOP);
+}

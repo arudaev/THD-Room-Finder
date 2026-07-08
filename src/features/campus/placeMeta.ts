@@ -1,8 +1,9 @@
 /**
- * Static metadata for the non-teaching / amenity buildings on the campus map —
- * the Library (a study space) and the café/canteen buildings. These host no
- * THabella teaching, so they'd otherwise render as neutral, empty footprints.
- * Keyed by campus-map building key (see CampusMap `key`).
+ * Static metadata for the amenity buildings/venues on the campus map — the
+ * Library, the café/canteen buildings, and mixed-use buildings (K, C) that
+ * host both real classrooms and a walk-in amenity. Pure-amenity buildings host
+ * no THabella teaching, so they'd otherwise render as neutral, empty
+ * footprints. Keyed by campus-map building key (see CampusMap `key`).
  */
 import type { BuildingGlyph } from '../../components';
 import type { Translate } from '../../i18n';
@@ -112,6 +113,14 @@ export const PLACE_META: Record<string, PlaceMeta> = {
     fullHoursFormat: true,
     note: (t) => t('Kermi Forum — café on the ground floor.', 'Kermi Forum — Café im Erdgeschoss.'),
     amenities: [(t) => t('Café · ground floor', 'Café · Erdgeschoss')],
+  },
+  C: {
+    glyph: 'printer',
+    showHours: true,
+    fullHoursFormat: true,
+    note: (t) =>
+      t('Copy shop — room C 012, on the ground floor.', 'Copyshop — Raum C 012, im Erdgeschoss.'),
+    amenities: [(t) => t('Printing, copying & binding', 'Drucken, Kopieren & Binden')],
   },
 };
 

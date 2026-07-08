@@ -19,7 +19,13 @@ import {
 import type { BuildingCount } from '../../domain/campusAvailability';
 import { favoritesFirst, matchesRoomFilters, mayBeLocked } from '../../domain/roomFilters';
 import type { FreeRoom } from '../../domain/models';
-import { getCafeteriaHours, getLibraryHours, getMensaCanteenHours, isCafeteria } from '../../domain/openingHours';
+import {
+  getCafeteriaHours,
+  getCopyShopHours,
+  getLibraryHours,
+  getMensaCanteenHours,
+  isCafeteria,
+} from '../../domain/openingHours';
 import { BrandHeader } from '../shared/BrandHeader';
 import { ClosedNotice } from '../shared/ClosedNotice';
 import { FilterMenu } from '../shared/FilterMenu';
@@ -119,11 +125,13 @@ export function CampusScreen() {
 
   // The Library and pure-amenity cafeterias (F, GH) host no THabella teaching,
   // so tint them by their own opening hours instead of a free-room count: teal
-  // when open, muted when closed. K is a mixed-use building — it hosts real
-  // classrooms alongside its ground-floor café — so it keeps its real room-based
-  // tint and only its café hours are shown in the side panel.
+  // when open, muted when closed. K and C are mixed-use buildings — they host
+  // real classrooms alongside a walk-in amenity (café / copy shop) — so they
+  // keep their real room-based tint and only the amenity's hours are shown in
+  // the side panel.
   const libraryHours = useMemo(() => getLibraryHours(queryTime), [queryTime]);
   const mensaCanteenHours = useMemo(() => getMensaCanteenHours(queryTime), [queryTime]);
+  const copyShopHours = useMemo(() => getCopyShopHours(queryTime), [queryTime]);
   const cafeteriaHours = useMemo(
     () => ({
       GH: getCafeteriaHours(queryTime, 'GH'),
@@ -258,9 +266,11 @@ export function CampusScreen() {
           hours={
             selectedKey === 'G'
               ? libraryHours
-              : isCafeteria(selectedKey)
-                ? cafeteriaHours[selectedKey as keyof typeof cafeteriaHours] ?? campusHours
-                : campusHours
+              : selectedKey === 'C'
+                ? copyShopHours
+                : isCafeteria(selectedKey)
+                  ? cafeteriaHours[selectedKey as keyof typeof cafeteriaHours] ?? campusHours
+                  : campusHours
           }
           secondaryHours={selectedKey === 'F' ? mensaCanteenHours : undefined}
         />

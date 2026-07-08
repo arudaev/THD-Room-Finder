@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getCafeteriaHours,
   getCampusHours,
+  getCopyShopHours,
   getLibraryHours,
   getMensaCanteenHours,
   isCafeteria,
@@ -165,5 +166,29 @@ describe('getMensaCanteenHours', () => {
     expect(h.period).toBe('break');
     expect(h.open).toBe(true);
     expect(h.todayClose).toEqual(dt(2026, 8, 12, 14, 0));
+  });
+});
+
+describe('getCopyShopHours', () => {
+  it('opens Mon–Thu 09:00–14:00 in term/exam', () => {
+    const h = getCopyShopHours(dt(2026, 5, 13, 10, 0)); // Wed regular
+    expect(h.open).toBe(true);
+    expect(h.todayOpen).toEqual(dt(2026, 5, 13, 9, 0));
+    expect(h.todayClose).toEqual(dt(2026, 5, 13, 14, 0));
+  });
+
+  it('is closed on Fridays and weekends', () => {
+    const fri = getCopyShopHours(dt(2026, 5, 15, 10, 0)); // Fri
+    expect(fri.open).toBe(false);
+    expect(fri.nextOpen).toEqual(dt(2026, 5, 18, 9, 0)); // next Mon
+
+    const sat = getCopyShopHours(dt(2026, 5, 16, 10, 0)); // Sat
+    expect(sat.open).toBe(false);
+  });
+
+  it('is closed during the semester break (no published break hours)', () => {
+    const h = getCopyShopHours(dt(2026, 8, 12, 11, 0)); // Wed break
+    expect(h.period).toBe('break');
+    expect(h.open).toBe(false);
   });
 });
