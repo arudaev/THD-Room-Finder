@@ -11,6 +11,12 @@ function roomCode(name: string): string {
 }
 
 function parseBuilding(name: string): string {
+  // Veilchengasse 2's two rooms are named descriptively ("Smart Lab
+  // (Veilchengasse)", "Vorlesungssaal Veilchengasse 2") instead of the usual
+  // "<Letter><Number> - <name>" convention, so the generic leading-letters
+  // parse below would resolve to "Smart"/"Vorlesungssaal" and never match the
+  // V2 campus-map footprint. Special-case them onto its live code.
+  if (/veilchengasse/i.test(name)) return 'V2';
   const firstPart = roomCode(name).split(' ')[0];
   const letters = firstPart.match(/^[A-Za-z]+/)?.[0];
   return letters && letters.length > 0 ? letters : firstPart;

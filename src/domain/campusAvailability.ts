@@ -19,9 +19,10 @@ export interface BuildingCount {
  * Campus map building key → the live THabella building code(s) it represents.
  * The map keys (from the OSM footprints) are the Deggendorf riverside core;
  * live `room.building` codes are parsed from THabella room names. Single-letter
- * buildings match directly; ITC² maps onto the parsed "ITC" group; a handful of
- * footprints (F, G, GH, HS, V2) have no distinct live code today and remain
- * neutral unless THabella starts returning an eligible room for their code.
+ * buildings match directly; ITC² maps onto the parsed "ITC" group; Veilchengasse
+ * 2's descriptively-named rooms are special-cased onto "V2" in `parseBuilding`.
+ * A handful of footprints (F, G, GH, HS) have no distinct live code today and
+ * remain neutral unless THabella starts returning an eligible room for them.
  */
 export const CAMPUS_KEY_TO_BUILDINGS: Record<string, string[]> = {
   A: ['A'],
