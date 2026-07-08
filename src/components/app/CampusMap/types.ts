@@ -43,7 +43,7 @@ export interface CampusContext {
 export type Availability = Record<string, { free: number; total: number }>;
 
 /** Small amenity glyph drawn above a building's roof label. */
-export type BuildingGlyph = 'coffee' | 'book';
+export type BuildingGlyph = 'coffee' | 'book' | 'printer';
 /** Per-building glyph overlay (e.g. café buildings, the Library). */
 export type BuildingGlyphs = Record<string, BuildingGlyph>;
 

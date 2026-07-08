@@ -1,6 +1,6 @@
 {
   "name": "thd-room-finder",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "Find free study rooms at Technische Hochschule Deggendorf in real time. One React + TypeScript codebase: installable PWA on web, native Android via Capacitor.",
   "type": "module",

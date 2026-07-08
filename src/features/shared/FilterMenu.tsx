@@ -49,6 +49,11 @@ export function FilterMenu({
   const showBuildings = buildings && buildings.length > 0 && onBuilding;
   const active = isFiltered || (building != null);
 
+  const seatOptions: { on: boolean; label: string }[] = [
+    { on: false, label: t('All', 'Alle') },
+    { on: true, label: t('Only known', 'Nur bekannte') },
+  ];
+
   return (
     <Popover
       ariaLabel={t('Filters', 'Filter')}
@@ -83,6 +88,34 @@ export function FilterMenu({
           </div>
         </div>
 
+        <div>
+          <PopoverLabel>{t('Seat info', 'Platzangabe')}</PopoverLabel>
+          <div style={{ display: 'inline-flex', gap: 2, background: 'var(--md-surface-1)', border: '1px solid var(--md-outline-variant)', borderRadius: 'var(--radius-xl)', padding: 3 }}>
+            {seatOptions.map((o) => {
+              const on = o.on === filters.withSeatsOnly;
+              return (
+                <button
+                  key={String(o.on)}
+                  type="button"
+                  onClick={() => setWithSeatsOnly(o.on)}
+                  style={{
+                    border: 'none',
+                    borderRadius: 'var(--radius-xl)',
+                    cursor: 'pointer',
+                    padding: '0.35rem 0.7rem',
+                    fontSize: 'var(--body-small-size)',
+                    fontWeight: 'var(--weight-medium)',
+                    background: on ? 'var(--md-secondary-container)' : 'transparent',
+                    color: on ? 'var(--md-on-secondary-container)' : 'var(--md-on-surface-variant)',
+                  }}
+                >
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {showBuildings && (
           <div>
             <PopoverLabel>{t('Building', 'Gebäude')}</PopoverLabel>
@@ -98,25 +131,6 @@ export function FilterMenu({
             </div>
           </div>
         )}
-
-        <label
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            cursor: 'pointer',
-            fontSize: 'var(--body-small-size)',
-            color: 'var(--md-on-surface-variant)',
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={filters.withSeatsOnly}
-            onChange={(e) => setWithSeatsOnly(e.target.checked)}
-            style={{ accentColor: 'var(--md-primary)', width: 16, height: 16 }}
-          />
-          {t('Only rooms with seat info', 'Nur Räume mit Platzangabe')}
-        </label>
       </div>
     </Popover>
   );

@@ -1,8 +1,9 @@
 /**
- * Static metadata for the non-teaching / amenity buildings on the campus map —
- * the Library (a study space) and the café/canteen buildings. These host no
- * THabella teaching, so they'd otherwise render as neutral, empty footprints.
- * Keyed by campus-map building key (see CampusMap `key`).
+ * Static metadata for the amenity buildings/venues on the campus map — the
+ * Library, the café/canteen buildings, and mixed-use buildings (K, C) that
+ * host both real classrooms and a walk-in amenity. Pure-amenity buildings host
+ * no THabella teaching, so they'd otherwise render as neutral, empty
+ * footprints. Keyed by campus-map building key (see CampusMap `key`).
  */
 import type { BuildingGlyph } from '../../components';
 import type { Translate } from '../../i18n';
@@ -24,11 +25,24 @@ export interface PlaceMeta {
   /** Show a live open/closed line (Library uses its own hours; study spaces the
    *  general campus hours). The caller supplies the right schedule. */
   showHours?: boolean;
+  /** Show the full today's opening window (e.g. "Open · 07:30–17:00") instead of
+   *  the abbreviated "Open until 17:00" — used for the STWNO cafeteria/Mensa
+   *  venues, where the whole window matters more than just the closing time. */
+  fullHoursFormat?: boolean;
+  /** Label for the primary hours line, only needed when `secondaryVenue` also
+   *  shows its own hours (otherwise the line is unlabeled). */
+  primaryVenueLabel?: (t: Translate) => string;
+  /** A second venue in the same building with its own opening hours (e.g. the
+   *  Mensa lunch service upstairs from building F's ground-floor café). The
+   *  caller supplies the matching CampusHours. */
+  secondaryVenue?: {
+    label: (t: Translate) => string;
+  };
 }
 
+// Only the Mensa (building F) publishes a daily Speiseplan — Glashaus and the
+// Kaffeebar serve snacks/coffee off a fixed counter, not a changing menu.
 const STWNO_MENSA = 'https://stwno.de/en/gastro-en/speiseplan-en/menu-deggendorf/menu-th-deg-mensa';
-const STWNO_GLASHAUS = 'https://stwno.de/en/gastro-en/speiseplan-en/menu-deggendorf/menu-th-deg-glashaus';
-const STWNO_DEGGENDORF = 'https://stwno.de/en/gastro-en/speiseplan-en/menu-deggendorf';
 
 const menuLink = (url: string): PlaceLink => ({
   label: (t) => t('Menu (STWNO)', 'Speiseplan (STWNO)'),
@@ -71,29 +85,42 @@ export const PLACE_META: Record<string, PlaceMeta> = {
   F: {
     glyph: 'coffee',
     showHours: true,
+    fullHoursFormat: true,
     note: (t) => t('Mensa — student dining & café.', 'Mensa — Verpflegung & Café.'),
     amenities: [
       (t) => t('Café · ground floor', 'Café · Erdgeschoss'),
-      (t) => t('Canteen · 1st floor', 'Mensa · 1. OG'),
+      (t) => t('Mensa · 1st floor', 'Mensa · 1. OG'),
     ],
     links: [menuLink(STWNO_MENSA)],
+    primaryVenueLabel: (t) => t('Café', 'Café'),
+    secondaryVenue: {
+      label: (t) => t('Mensa (lunch)', 'Mensa (Mittagstisch)'),
+    },
   },
   GH: {
     glyph: 'coffee',
     showHours: true,
+    fullHoursFormat: true,
     note: (t) => t('Mensa Glashaus — student dining.', 'Mensa Glashaus — studentische Verpflegung.'),
     amenities: [
       (t) => t('Mensa · ground floor', 'Mensa · Erdgeschoss'),
       (t) => t('Conference room · 1st floor', 'Konferenzraum · 1. OG'),
     ],
-    links: [menuLink(STWNO_GLASHAUS)],
   },
   K: {
     glyph: 'coffee',
     showHours: true,
+    fullHoursFormat: true,
     note: (t) => t('Kermi Forum — café on the ground floor.', 'Kermi Forum — Café im Erdgeschoss.'),
     amenities: [(t) => t('Café · ground floor', 'Café · Erdgeschoss')],
-    links: [menuLink(STWNO_DEGGENDORF)],
+  },
+  C: {
+    glyph: 'printer',
+    showHours: true,
+    fullHoursFormat: true,
+    note: (t) =>
+      t('Copy shop — room C 012, on the ground floor.', 'Copyshop — Raum C 012, im Erdgeschoss.'),
+    amenities: [(t) => t('Printing, copying & binding', 'Drucken, Kopieren & Binden')],
   },
 };
 

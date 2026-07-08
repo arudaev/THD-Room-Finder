@@ -30,6 +30,14 @@ describe('toRoom', () => {
     expect(room.seatsRegular).toBe(0);
     expect(room.inChargeName).toBeNull();
   });
+
+  it('maps Veilchengasse\'s descriptively-named rooms onto building "V2"', () => {
+    const smartLab = toRoom({ id: 3, ident: 'r1', name: 'Smart Lab (Veilchengasse)' });
+    expect(smartLab.building).toBe('V2');
+
+    const lectureHall = toRoom({ id: 4, ident: 'r2', name: 'Vorlesungssaal Veilchengasse 2' });
+    expect(lectureHall.building).toBe('V2');
+  });
 });
 
 describe('toEvents', () => {

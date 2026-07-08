@@ -217,6 +217,38 @@ const MENSA_BREAK: DayHours[] = [
 ];
 const MENSA: Schedule = { regular: MENSA_TERM, exam: MENSA_TERM, break: MENSA_BREAK };
 
+// Mensa canteen (1st floor of the same building F, lunch service only — distinct
+// from the ground-floor café above): Mon–Fri 11:00–14:15 in term/exam, Mon–Fri
+// 11:00–14:00 during the break. Source: stwno.de/…/mensen/mensa-th-deggendorf.
+const MENSA_CANTEEN_TERM: DayHours[] = [
+  null,
+  { open: H(11), close: H(14, 15) }, // Mon
+  { open: H(11), close: H(14, 15) }, // Tue
+  { open: H(11), close: H(14, 15) }, // Wed
+  { open: H(11), close: H(14, 15) }, // Thu
+  { open: H(11), close: H(14, 15) }, // Fri
+  null,
+];
+const MENSA_CANTEEN_BREAK: DayHours[] = [
+  null,
+  { open: H(11), close: H(14) }, // Mon
+  { open: H(11), close: H(14) }, // Tue
+  { open: H(11), close: H(14) }, // Wed
+  { open: H(11), close: H(14) }, // Thu
+  { open: H(11), close: H(14) }, // Fri
+  null,
+];
+const MENSA_CANTEEN: Schedule = {
+  regular: MENSA_CANTEEN_TERM,
+  exam: MENSA_CANTEEN_TERM,
+  break: MENSA_CANTEEN_BREAK,
+};
+
+/** Opening state of the Mensa canteen (building F, 1st floor lunch service) at `now`. */
+export function getMensaCanteenHours(now: Date): CampusHours {
+  return resolveHours(now, MENSA_CANTEEN);
+}
+
 // Kaffeebar (K-Gebäude, map key K): lecture/exam Mon–Fri 09:30–13:30. STWNO lists
 // lecture-free hours of 10:00–14:00 for bridge days, but the café is closed for
 // the whole summer break (27 Jul–30 Sep), which is the dominant break-time state,
@@ -246,4 +278,26 @@ export function isCafeteria(key: string): boolean {
 export function getCafeteriaHours(now: Date, key: string): CampusHours | null {
   const schedule = CAFETERIAS[key];
   return schedule ? resolveHours(now, schedule) : null;
+}
+
+// ── Copy shop (building C, room C 012) ───────────────────────────────────────
+// Mon–Thu 09:00–14:00, closed Fri/weekends. THD's own page only says a "special
+// arrangement" (Sonderregelung) applies during the semester break without
+// giving times, so we model the break as closed rather than guess a schedule
+// it may not keep. Source: th-deg.de/de/studierende/campusleben.
+const COPYSHOP_TERM: DayHours[] = [
+  null,
+  { open: H(9), close: H(14) }, // Mon
+  { open: H(9), close: H(14) }, // Tue
+  { open: H(9), close: H(14) }, // Wed
+  { open: H(9), close: H(14) }, // Thu
+  null, // Fri
+  null,
+];
+const COPYSHOP_BREAK: DayHours[] = [null, null, null, null, null, null, null];
+const COPYSHOP: Schedule = { regular: COPYSHOP_TERM, exam: COPYSHOP_TERM, break: COPYSHOP_BREAK };
+
+/** Opening state of the copy shop (building C, room C 012) at `now`. */
+export function getCopyShopHours(now: Date): CampusHours {
+  return resolveHours(now, COPYSHOP);
 }

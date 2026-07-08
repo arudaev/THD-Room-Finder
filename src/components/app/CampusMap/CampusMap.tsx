@@ -174,23 +174,33 @@ interface RenderState {
 }
 
 /**
- * A small POI-style amenity badge (coffee cup / open book) for a building —
- * a halo-filled disc (so it reads on any roof tint, matching the label's
- * halo/text pairing) with a filled icon in the label colour. `x,y` is the badge
- * centre. Returns an SVG fragment string.
+ * A small POI-style amenity badge (coffee cup / open book / printer) for a
+ * building — a halo-filled disc (so it reads on any roof tint, matching the
+ * label's halo/text pairing) with a filled icon in the label colour. `x,y` is
+ * the badge centre. Returns an SVG fragment string.
  */
 function glyphMark(kind: BuildingGlyph, x: number, y: number, fill: string, halo: string): string {
   const badge =
     `<circle cx="${x}" cy="${y}" r="4.8" fill="${halo}" stroke="${fill}" stroke-width="0.6"/>`;
-  const icon =
-    kind === 'coffee'
-      ? // filled cup + arc handle + saucer line
-        `<path d="M${x - 2} ${y - 1.5} h3.3 v1.3 a1.65 1.65 0 0 1 -3.3 0 z" fill="${fill}"/>` +
-        `<path d="M${x + 1.5} ${y - 1.1} a1.15 1.15 0 0 1 0 2.1" fill="none" stroke="${fill}" stroke-width="0.55"/>` +
-        `<line x1="${x - 2.4}" y1="${y + 1.7}" x2="${x + 2}" y2="${y + 1.7}" stroke="${fill}" stroke-width="0.6" stroke-linecap="round"/>`
-      : // open book — two filled pages either side of a centre gap
-        `<polygon points="${x - 0.35},${y - 1.6} ${x - 3},${y - 1} ${x - 3},${y + 1.5} ${x - 0.35},${y + 0.9}" fill="${fill}"/>` +
-        `<polygon points="${x + 0.35},${y - 1.6} ${x + 3},${y - 1} ${x + 3},${y + 1.5} ${x + 0.35},${y + 0.9}" fill="${fill}"/>`;
+  let icon: string;
+  if (kind === 'coffee') {
+    // filled cup + arc handle + saucer line
+    icon =
+      `<path d="M${x - 2} ${y - 1.5} h3.3 v1.3 a1.65 1.65 0 0 1 -3.3 0 z" fill="${fill}"/>` +
+      `<path d="M${x + 1.5} ${y - 1.1} a1.15 1.15 0 0 1 0 2.1" fill="none" stroke="${fill}" stroke-width="0.55"/>` +
+      `<line x1="${x - 2.4}" y1="${y + 1.7}" x2="${x + 2}" y2="${y + 1.7}" stroke="${fill}" stroke-width="0.6" stroke-linecap="round"/>`;
+  } else if (kind === 'book') {
+    // open book — two filled pages either side of a centre gap
+    icon =
+      `<polygon points="${x - 0.35},${y - 1.6} ${x - 3},${y - 1} ${x - 3},${y + 1.5} ${x - 0.35},${y + 0.9}" fill="${fill}"/>` +
+      `<polygon points="${x + 0.35},${y - 1.6} ${x + 3},${y - 1} ${x + 3},${y + 1.5} ${x + 0.35},${y + 0.9}" fill="${fill}"/>`;
+  } else {
+    // printer — paper feeding in at top, body, sheet coming out the bottom
+    icon =
+      `<rect x="${x - 1.3}" y="${y - 3.2}" width="2.6" height="1.5" fill="${fill}"/>` +
+      `<rect x="${x - 2.6}" y="${y - 1.8}" width="5.2" height="2.7" rx="0.4" fill="${fill}"/>` +
+      `<rect x="${x - 1.5}" y="${y + 0.9}" width="3" height="1.8" fill="${halo}" stroke="${fill}" stroke-width="0.5"/>`;
+  }
   return badge + icon;
 }
 
