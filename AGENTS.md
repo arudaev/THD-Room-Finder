@@ -25,7 +25,12 @@ apps were retired into the `v1-native` git tag.
    (`src/styles/tokens`). Shadows, not borders. Keep the Material 3 look.
 5. **Bilingual by construction.** UI strings use `t(en, de)` from `useI18n()`.
    Never translate room/building codes (`A.011`, `ITC1.07`).
-6. **Don't add a backend or accounts.** The `api/` proxy is CORS/caching only.
+6. **Keep backend scope explicit.** Current shipped app is accountless and the
+   THabella proxy remains CORS/caching only. The selected M1 plan in
+   [PROJECT-CHARTER.md](PROJECT-CHARTER.md) permits designing a separate, minimal
+   identity/presence service. Implement it only in the tracked delivery tasks
+   with isolated environments, audience authorization and cost limits; do not
+   turn the timetable proxy into a general social backend.
 
 ## Where things live
 
@@ -70,12 +75,40 @@ A signed release APK needs `android/keystore.properties` (see the `.example`).
   tags, or publish releases. Stop after opening the PR; the maintainer merges and
   releases.
 - Keep unrelated working-tree changes out of the branch and PR.
+- A dependent epic may use native GitHub stacked PRs: one branch/PR per coherent
+  child issue, each based on the layer below. This is compatible with the
+  one-PR-per-task rule; it is not one PR for every tiny edit. Use the official
+  `github/gh-stack` extension and [CONTRIBUTING.md](CONTRIBUTING.md).
+- Use `main` as production trunk; PR-specific previews provide integration
+  testing. Do not require a permanent `dev` branch or alter existing dev work.
+- Use sensible, consolidated commits for meaningful completed units. Do not
+  commit every small edit or leave a long chain of WIP/fixup checkpoints.
+- Standardize subjects as `feat(scope): imperative summary` (or fix/docs/chore/
+  refactor/test/ci/perf), at most 72 characters. Substantive commits need an
+  organized body, normally bullets covering behavior, purpose and verification.
+- Author all commits as `arudaev <hlexhelftd@gmail.com>`. No co-author trailers,
+  generated-by text, bot signatures, tool attribution or session IDs in commits
+  or PRs. These rules apply regardless of which development tool is used.
+- Never run `gh stack merge`, enable auto-merge or force-push shared stack
+  history. Inspect sync/rebase/push behavior before touching published layers;
+  maintainer handles shared-history restacking and all merges/releases.
 
 ## Known follow-ups (good first tasks)
 
-- **Room/building code normalization** via `shared/thd-room-taxonomy.json`:
-  descriptively-named rooms currently yield noisy building-filter chips
-  (`Vorlesungssaal`, `DEGG`, `--`). Map them to canonical codes.
-- **2.5D CampusMap**: `CampusScreen` is a building-grouped locator; the
-  design-system `CampusMap` (SVG) is meant to replace it.
+- **Room/building identity audit** via `shared/thd-room-taxonomy.json`:
+  normalization already exists; verify remaining aliases and distinguish
+  campuses before extending shared building codes.
+- **2.5D CampusMap extensions**: the SVG map is implemented in `CampusScreen`.
+  Future event overlays and other-campus datasets are proposals.
 - **iOS**: `npx cap add ios` once Apple developer funding lands.
+
+## Product research
+
+See `docs/Product-Direction.md` for the selected product plan, roadmap, user
+stories and design-session brief. See `docs/Map-Expansion.md` for map reuse limits
+and `docs/Focus-and-Presence.md` for proposed focus-session semantics.
+The selected first milestone is individual room-linked focus with remembered
+degree/cohort identity and cohort-aware room signals/ranking; see
+`PROJECT-CHARTER.md`. Solo/group mode is separate from visibility. Multi-person
+focus, organizations, voting and push are later scope. GitHub planning is now
+authorized; feature/database implementation is a separate tracked phase.

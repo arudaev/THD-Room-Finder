@@ -1,0 +1,91 @@
+{
+  "owner": "arudaev",
+  "repository": "arudaev/THD-Room-Finder",
+  "projectNumber": 8,
+  "projectId": "PVT_kwHOA_b70c4BmgV8",
+  "statusFieldId": "PVTSSF_lAHOA_b70c4BmgV8zhlJGxM",
+  "statusOptions": {
+    "Backlog": "f75ad846",
+    "Done": "98236657",
+    "Blocked": "319feb40",
+    "Ready": "6a713d8c",
+    "In review": "4e31c297",
+    "In progress": "47fc9ee4"
+  },
+  "startDateFieldId": "PVTF_lAHOA_b70c4BmgV8zhlJHq8",
+  "completedDateFieldId": "PVTF_lAHOA_b70c4BmgV8zhlJHs4",
+  "issues": [
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6IwE",
+      "key": "M0",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/15",
+      "number": 15
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6IxM",
+      "key": "M1",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/16",
+      "number": 16
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6Iyo",
+      "key": "M1-S1",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/17",
+      "number": 17
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I0E",
+      "key": "M1-S2",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/18",
+      "number": 18
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I08",
+      "key": "M1-S3",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/19",
+      "number": 19
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I1w",
+      "key": "M1-S4",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/20",
+      "number": 20
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I24",
+      "key": "M1-S5",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/21",
+      "number": 21
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I30",
+      "key": "M1-S6",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/22",
+      "number": 22
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I4g",
+      "key": "M2",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/23",
+      "number": 23
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I5E",
+      "key": "M3",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/24",
+      "number": 24
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6I6A",
+      "key": "M4",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/25",
+      "number": 25
+    },
+    {
+      "projectItemId": "PVTI_lAHOA_b70c4BmgV8zg_6NPE",
+      "key": "M0-A1",
+      "url": "https://github.com/arudaev/THD-Room-Finder/issues/26",
+      "number": 26
+    }
+  ]
+}

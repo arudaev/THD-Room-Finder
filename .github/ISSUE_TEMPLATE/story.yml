@@ -1,0 +1,34 @@
+name: Story or delivery task
+description: One independently reviewable behavior or technical outcome
+title: "[M1-S] "
+labels: [story]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User story or technical problem
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Observable behavior, failure cases and non-goals. Avoid one issue per tiny edit.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Parent and dependencies
+      description: Name parent/blocked-by issues; maintain native GitHub relationships too.
+  - type: textarea
+    id: design
+    attributes:
+      label: Design, data and environment implications
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: Meaningful tests, preview/device review and applicable request/privacy budgets.
+    validations:
+      required: true

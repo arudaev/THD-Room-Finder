@@ -98,14 +98,16 @@ cd android && ./gradlew assembleDebug        # or assembleRelease (needs keystor
 ## Git & Commits
 
 **Before committing:** `npm run typecheck && npm test && npm run build` all
-pass. Don't hard-code THabella data; don't add accounts or a stateful backend.
+  pass. Don't hard-code THabella data. Preserve the narrow timetable proxy;
+  any M1 identity/presence service follows PROJECT-CHARTER.md and its tracked
+  architecture/environment tasks rather than expanding backend scope freely.
 
 ### Branching
 
 - **Never commit directly to `main`.** `main` is the release branch; PRs target it.
-- Branch from the base you're building on (usually `dev`) with a typed prefix:
-  `feat/…`, `fix/…`, `chore/…`, `docs/…`, `ci/…`, `refactor/…`, `test/…`
-  (e.g. `feat/campus-map`). One coherent change per branch.
+- Branch from `main`, or the preceding layer of a native GitHub stack.
+  Use `feature/<issue>-<description>`, `fix/…`, `docs/…` or `chore/…` for new
+  work. PR-specific Vercel previews replace a mandatory dev integration branch.
 - Open a PR to merge back — do not fast-forward straight into `main`.
 
 ### Commit message format
@@ -115,12 +117,21 @@ Conventional Commits. Subject line: `type(optional-scope): summary`
 - **type**: `feat` | `fix` | `docs` | `refactor` | `test` | `chore` | `ci` | `perf`
 - **summary**: imperative mood, lower-case, no trailing period, **≤72 chars**
   (e.g. `feat(domain): rank free rooms by remaining duration`)
-- **body** (optional): wrap at 72 cols; explain *what* and *why*, not how.
+- **body**: required for substantive changes; use organized bullets explaining
+  behavior, purpose and verification, wrapping near 72 columns.
 - **footer** (optional): `BREAKING CHANGE:` or issue refs (`Closes #12`).
-- One logical change per commit; each commit should build.
+- Consolidate meaningful completed units; do not commit every edit or produce
+  a long WIP/fixup history. Prefer one commit for a small coherent PR; each
+  commit should build. Do not rewrite already shared history to reduce counts.
 
 ### No co-authoring / no attribution
 
 Do **not** add any AI or tool attribution to commits or PRs — no
 `Co-Authored-By:` trailers, no "Generated with …" lines, no bot signatures.
 Commits are authored solely by the human maintainer.
+
+Author: `arudaev <hlexhelftd@gmail.com>`. Native stack, issue/sub-issue, project
+status and environment conventions are in [CONTRIBUTING.md](CONTRIBUTING.md).
+Read [PROJECT-CHARTER.md](PROJECT-CHARTER.md) for selected scope. One branch/PR
+per coherent task; dependent tasks may form a stack. Agents never merge stacks,
+enable auto-merge, force-push shared history or publish releases.

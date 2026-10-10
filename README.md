@@ -203,4 +203,29 @@ docs/           GitHub wiki (submodule)
 
 ## License
 
-GPL-3.0 – see [LICENSE](LICENSE).
+GPL-3.0 — see [LICENSE](LICENSE).
+
+## Product research and future direction
+
+The selected plan develops individual study presence alongside the
+room finder, while keeping myTHD as the source for academic services. Start with
+[Product direction](docs/Product-Direction.md), then the
+[market research](docs/Market-Research.md), [user stories](docs/User-Stories.md),
+[conditional roadmap](docs/Product-Roadmap.md),
+[architecture options](docs/Future-Architecture.md), and
+[design-session brief](docs/Design-Session-Brief.md).
+
+The expanded exploration covers [focus and shared study](docs/Focus-and-Presence.md),
+[focus/event interaction patterns](docs/Interaction-Research.md), and
+[reusing the map for other campuses](docs/Map-Expansion.md).
+The selected first milestone is individual room focus and cohort-aware room
+discovery; see [PROJECT-CHARTER.md](PROJECT-CHARTER.md). Contributor commits,
+branches, native PR stacks and project conventions are in
+[CONTRIBUTING.md](CONTRIBUTING.md). See
+[operating budgets and safeguards](docs/Operating-Envelope.md) for PWA, scaling
+and abuse-cost planning.
+
+Focus/presence is selected future scope, not a shipped feature. GitHub planning
+is authorized; implementation follows the tracked tasks and narrow service
+boundary in the charter. `docs/` is a separate wiki submodule; its changes
+require separate publication.

@@ -1,0 +1,30 @@
+name: Epic
+description: A coherent milestone outcome with native sub-issues
+title: "[M1] "
+labels: [epic]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and users
+      description: Describe the concrete problem and resulting behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and non-goals
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Completion criteria
+      description: Include end-to-end behavior and verification; add children through native sub-issues.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and references
+      description: Link charter/design/architecture and record native blocking relationships separately.
