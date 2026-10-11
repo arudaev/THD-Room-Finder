@@ -135,3 +135,10 @@ status and environment conventions are in [CONTRIBUTING.md](CONTRIBUTING.md).
 Read [PROJECT-CHARTER.md](PROJECT-CHARTER.md) for selected scope. One branch/PR
 per coherent task; dependent tasks may form a stack. Agents never merge stacks,
 enable auto-merge, force-push shared history or publish releases.
+
+## Current work authorization
+
+The current scope is documentation, research, issue/project workflows and
+environment or staging setup. Do not build interactive prototypes, application
+features or feature database changes without a separate explicit request.
+Tracked issues and requests to continue planning do not authorize implementation.

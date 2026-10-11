@@ -101,7 +101,7 @@ Read summaries once for the visible room/detail set, then at most every 60 secon
 
 Existing room eligibility, query-time availability, duration and access constraints run first. For otherwise suitable rooms, default activity bucket 0 = no reported activity or authorized same-degree/same-cohort activity; bucket 1 = unrelated activity. Preserve existing duration/tiebreak ordering within each bucket. Quiet preference moves all activity to bucket 1. Expired/unknown summaries restore schedule-only order; unknown must not be labeled empty. Live presence appears only for “now”, never attached to a historical/future time-travel result.
 
-The activity row sits below the existing availability window. Building badges summarize study activity without changing timetable fill colors. Detail owns Start/End; a compact active control persists across navigation. A shared session is not a booking and does not hide the room from other students. [Clickable specimen and component contract](../design/README.md).
+The activity row sits below the existing availability window. Building badges summarize study activity without changing timetable fill colors. Detail owns Start/End; a compact active control persists across navigation. A shared session is not a booking and does not hide the room from other students. Proposed component and state requirements are documented in the [design-session brief](../docs/Design-Session-Brief.md).
 
 ## Retention and failure boundary
 

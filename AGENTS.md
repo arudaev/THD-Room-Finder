@@ -111,4 +111,7 @@ The selected first milestone is individual room-linked focus with remembered
 degree/cohort identity and cohort-aware room signals/ranking; see
 `PROJECT-CHARTER.md`. Solo/group mode is separate from visibility. Multi-person
 focus, organizations, voting and push are later scope. GitHub planning is now
-authorized; feature/database implementation is a separate tracked phase.
+authorized, along with documentation, research and environment/staging setup.
+Do not build interactive prototypes, application features or feature database
+changes without a separate explicit request. Issues describe future work;
+continuing planning does not authorize implementation.
