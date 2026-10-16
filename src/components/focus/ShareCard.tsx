@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { addDays, dayKey, focusLevel, mondayOf, parseDay } from './FocusGraph';
+import { addDays, dayKey, focusLevel, sundayOf, parseDay } from './FocusGraph';
 import type { FocusDay } from './FocusGraph';
+import { isCampusClosedDay } from '../../domain/openingHours';
 
 /**
  * The focus graph as an image (D4): drawn with Canvas 2D, so the same picture
@@ -58,6 +59,7 @@ interface Palette {
   on: string;
   onVar: string;
   ramp: string[];
+  closed: string;
   sans: string;
 }
 
@@ -78,6 +80,7 @@ function readPalette(theme: 'light' | 'dark', accent: string): Palette {
     on: col('--md-on-surface'),
     onVar: col('--md-on-surface-variant'),
     ramp: [0, 1, 2, 3, 4].map((i) => col(`--md-graph-${i}`)),
+    closed: col('--md-graph-closed'),
     sans: getComputedStyle(probe).getPropertyValue('--font-sans').trim() || 'Roboto, sans-serif',
   };
   probe.remove();
@@ -109,10 +112,10 @@ function roundRect(x: CanvasRenderingContext2D, X: number, Y: number, W: number,
   else x.rect(X, Y, W, H);
 }
 
-/** Number of week columns from the semester's first Monday through its end. */
+/** Number of week columns from the semester's first Sunday through its end. */
 export function semesterWeeks(semesterStart: string, semesterEnd: string): number {
-  const first = mondayOf(parseDay(semesterStart));
-  const last = mondayOf(parseDay(semesterEnd));
+  const first = sundayOf(parseDay(semesterStart));
+  const last = sundayOf(parseDay(semesterEnd));
   return Math.round((last.getTime() - first.getTime()) / (7 * 86400000)) + 1;
 }
 
@@ -125,7 +128,7 @@ export async function renderShareCard(o: ShareCardOptions): Promise<Blob> {
 
   const minutes = new Map<string, number>();
   for (const d of o.days) minutes.set(d.date, (minutes.get(d.date) ?? 0) + d.minutes);
-  const first = mondayOf(parseDay(o.semesterStart));
+  const first = sundayOf(parseDay(o.semesterStart));
   const weeks = semesterWeeks(o.semesterStart, o.semesterEnd);
   const today = parseDay(o.today);
 
@@ -202,7 +205,7 @@ export async function renderShareCard(o: ShareCardOptions): Promise<Blob> {
         x.stroke();
         continue;
       }
-      x.fillStyle = C.ramp[focusLevel(minutes.get(dayKey(date)) ?? 0)];
+      x.fillStyle = isCampusClosedDay(date) ? C.closed : C.ramp[focusLevel(minutes.get(dayKey(date)) ?? 0)];
       roundRect(x, X, Y, cell, cell, r);
       x.fill();
       if (dayKey(date) === o.today) {

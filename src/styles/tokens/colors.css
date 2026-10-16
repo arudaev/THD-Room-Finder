@@ -88,6 +88,7 @@
      3:1 on purpose (contribution-graph look); the value is
      also in the tooltip, legend and screen-reader table.
      Other graph colours: [data-accent] at the end of file. */
+  --md-graph-closed:           var(--md-outline-variant); /* campus closed */
   --md-graph-0:                #EFEEF5;
   --md-graph-1:                #D8CCF6;
   --md-graph-2:                #AE95E8;
@@ -181,6 +182,7 @@
     --md-on-event:               #373100;
     --md-event-container:        #504600;
     --md-on-event-container:     #F7E886;
+    --md-graph-closed:           var(--md-outline-variant); /* campus closed */
     --md-graph-0:                #2B2930;
     --md-graph-1:                #3D2D6E;
     --md-graph-2:                #5B3FAD;
@@ -235,6 +237,7 @@
   --md-on-event:               #373100;
   --md-event-container:        #504600;
   --md-on-event-container:     #F7E886;
+  --md-graph-closed:           var(--md-outline-variant); /* campus closed */
   --md-graph-0:                #2B2930;
   --md-graph-1:                #3D2D6E;
   --md-graph-2:                #5B3FAD;

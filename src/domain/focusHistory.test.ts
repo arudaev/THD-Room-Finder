@@ -39,8 +39,8 @@ describe('dailyMinutes', () => {
 
 describe('streak', () => {
   const days = [
-    { date: '2026-10-10', minutes: 20 },
-    { date: '2026-10-11', minutes: 40 },
+    { date: '2026-10-08', minutes: 20 },
+    { date: '2026-10-09', minutes: 40 },
     { date: '2026-10-12', minutes: 10 },
   ];
 
@@ -55,6 +55,39 @@ describe('streak', () => {
   it('is zero after a missed day', () => {
     expect(streak(days, at(2026, 10, 14))).toBe(0);
   });
+
+  const week = [5, 6, 7, 8, 9].map((d) => ({ date: `2026-10-${String(d).padStart(2, '0')}`, minutes: 25 }));
+
+  it.each([10, 11, 12])('preserves five weekdays through the weekend and Monday morning (%s)', (d) => {
+    expect(streak(week, at(2026, 10, d))).toBe(5);
+  });
+
+  it('continues at six on Monday and ignores saved weekend sessions', () => {
+    const history = [...week, { date: '2026-10-10', minutes: 90 }, { date: '2026-10-12', minutes: 25 }];
+    expect(streak(history, at(2026, 10, 12))).toBe(6);
+    expect(minutesBetween(history, '2026-10-05', '2026-10-12')).toBe(240);
+  });
+
+  it('breaks on a missed Friday as soon as the weekend starts', () => {
+    expect(streak(week.slice(0, 4), at(2026, 10, 9))).toBe(4);
+    expect(streak(week.slice(0, 4), at(2026, 10, 10))).toBe(0);
+    expect(streak(week.slice(0, 4), at(2026, 10, 12))).toBe(0);
+  });
+
+  it('never creates streak days from empty or weekend-only history', () => {
+    expect(streak([], at(2026, 10, 11))).toBe(0);
+    expect(streak([{ date: '2026-10-10', minutes: 25 }], at(2026, 10, 12))).toBe(0);
+  });
+
+  it.each([
+    ['2026-03-27', '2026-03-30'], // Berlin DST begins
+    ['2026-10-23', '2026-10-26'], // Berlin DST ends
+    ['2027-12-31', '2028-01-03'], // year boundary
+  ])('crosses the weekend from %s to %s using calendar days', (friday, monday) => {
+    const [y, m, d] = monday.split('-').map(Number);
+    expect(streak([{ date: friday, minutes: 25 }, { date: monday, minutes: 25 }], at(y, m, d))).toBe(2);
+  });
+
 });
 
 describe('semesterOf', () => {

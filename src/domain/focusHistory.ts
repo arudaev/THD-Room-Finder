@@ -5,6 +5,8 @@
  * validate an exported file before it is imported.
  */
 
+import { isCampusClosedDay } from './openingHours';
+
 export interface FocusEntry {
   /** Stable id, so importing the same file twice adds nothing. */
   id: string;
@@ -58,17 +60,24 @@ export function dailyMinutes(entries: FocusEntry[]): DayMinutes[] {
 }
 
 /**
- * Consecutive days with focus, ending today. A day without focus yet today
- * doesn't break the streak until it is over, so it counts back from yesterday.
+ * Consecutive open campus days with focus. Closed days pause the streak and
+ * never add to it, even if they contain saved focus. An unfinished open day
+ * doesn't break the streak until it is over. Calendar arithmetic preserves DST.
  */
 export function streak(days: DayMinutes[], today: Date): number {
   const active = new Set(days.filter((d) => d.minutes > 0).map((d) => d.date));
   const cursor = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  if (!active.has(localDay(cursor))) cursor.setDate(cursor.getDate() - 1);
+  const previousOpenDay = () => {
+    do cursor.setDate(cursor.getDate() - 1);
+    while (isCampusClosedDay(cursor));
+  };
+  while (isCampusClosedDay(cursor)) cursor.setDate(cursor.getDate() - 1);
+  // Only today's open day gets grace, not the last open day before a closure.
+  if (localDay(cursor) === localDay(today) && !active.has(localDay(cursor))) previousOpenDay();
   let n = 0;
   while (active.has(localDay(cursor))) {
     n += 1;
-    cursor.setDate(cursor.getDate() - 1);
+    previousOpenDay();
   }
   return n;
 }

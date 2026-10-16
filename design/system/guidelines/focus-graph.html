@@ -8,13 +8,14 @@
   * { box-sizing: border-box; margin: 0; }
   body { font-family: var(--font-sans); background: var(--md-bg); color: var(--md-on-surface); padding: 18px; display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
   .card { background: var(--md-surface); border-radius: var(--radius-l); box-shadow: var(--md-shadow-1); padding: 16px; }
-  .stats { font-size: 13px; color: var(--md-on-surface-variant); margin-bottom: 10px; }
+  .stats { font-size: 22px; font-weight: 500; margin-bottom: 18px; } .stats small { display: block; font-size: 14px; font-weight: 400; color: var(--md-on-surface-variant); margin-top: 4px; } .graph-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; font-size: 12px; color: var(--md-on-surface-variant); } .graph-footer .ramp { margin: 0; }
   .g { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); gap: 3px; }
   .g i { width: 11px; height: 11px; border-radius: 2px; display: block; }
   .g i.today { outline: 1.5px solid var(--md-on-surface); outline-offset: 1px; }
   .g i.slot { background: none; }
   .ramp { display: flex; gap: 3px; align-items: center; justify-content: flex-end; font-size: 11px; color: var(--md-on-surface-variant); margin-top: 10px; }
   .ramp i { width: 11px; height: 11px; border-radius: 2px; display: block; }
+  .closed { background: var(--md-graph-closed); }
   .l0 { background: var(--md-graph-0); } .l1 { background: var(--md-graph-1); } .l2 { background: var(--md-graph-2); }
   .l3 { background: var(--md-graph-3); } .l4 { background: var(--md-graph-4); }
   .accents { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--md-on-surface-variant); }
@@ -33,9 +34,10 @@
 </head>
 <body>
   <div class="card">
-    <div class="stats">21 h this semester · 12-day streak</div>
+    <div class="stats">21 h this semester<small>12-day study streak</small></div>
+
     <div class="g" id="g" aria-hidden="true"></div>
-    <div class="ramp">Less <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> More · 0 · 1 · 2–3 · 4–6 · 7+ Pomodoro blocks</div>
+    <div class="graph-footer"><span>Ⅱ &nbsp; Weekends pause your streak</span><div class="ramp" role="img" aria-label="Less to more focus"><i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i></div></div>
   </div>
   <div class="card accents">
     <strong style="color: var(--md-on-surface); font-weight: 500;">Graph colour</strong>
@@ -60,14 +62,15 @@
   const g = document.getElementById('g');
   for (let w = 0; w < 20; w++) for (let d = 0; d < 7; d++) {
     const i = document.createElement('i');
-    if (w === 19 && d > 1) i.className = 'slot';
-    else i.className = 'l' + level() + (w === 19 && d === 1 ? ' today' : '');
+    if (w === 19 && d > 2) i.className = 'slot';
+    else if ((d === 0 || d === 6)) i.className = 'closed';
+    else i.className = 'l' + level() + (w === 19 && d === 2 ? ' today' : '');
     g.appendChild(i);
   }
   const sg = document.getElementById('sg');
   for (let w = 0; w < 24; w++) for (let d = 0; d < 7; d++) {
     const i = document.createElement('i');
-    i.className = w > 2 || (w === 2 && d > 1) ? 'slot' : 'l' + Math.max(1, level());
+    i.className = w > 2 || (w === 2 && d > 2) ? 'slot' : (d === 0 || d === 6) ? 'closed' : 'l' + Math.max(1, level());
     sg.appendChild(i);
   }
 </script>

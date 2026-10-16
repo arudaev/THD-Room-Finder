@@ -12,3 +12,10 @@ tokens for the given theme and graph colour; about 100 KB.
 
 `renderShareCard(options)` returns the PNG blob for Save Image. Name and batch
 (`who`) are opt-in; rooms, times and programme never appear.
+
+Closed campus dates use the neutral `--md-graph-closed` token in every graph
+colour and theme. Future days retain their empty/outlined slots. The classroom
+calendar currently contains weekends only, not a dated holiday calendar;
+reduced semester-break weekdays stay open. Closed-day minutes remain in totals
+but do not add streak days. Five focused weekdays followed by Monday = six
+focus days; an intervening missed open day breaks the streak.

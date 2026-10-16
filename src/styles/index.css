@@ -76,3 +76,18 @@ button {
     scroll-behavior: auto !important;
   }
 }
+
+/* Native swipe, trackpad and keyboard scrolling without a bright scrollbar. */
+.thd-focus-graph-scroll::-webkit-scrollbar { display: none; }
+.thd-focus-graph-scroll:focus-visible {
+  outline: 2px solid var(--md-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+/* Focus cards use their own width, including split-screen and zoomed layouts. */
+.thd-focus-period { font-size: 0.6em; font-weight: 400; color: var(--md-on-surface-variant); display: inline-block; }
+.thd-focus-navigation { display: flex; justify-content: flex-end; gap: 0; margin-left: -8px; }
+@media (hover: none) and (pointer: coarse) { .thd-focus-navigation { display: none; } }
+
+@container (max-width: 480px) { .thd-focus-navigation { display: none; } }

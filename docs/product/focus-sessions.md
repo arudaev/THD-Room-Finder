@@ -96,7 +96,7 @@ if they pass the same test.
 | Profile | Contents |
 |---|---|
 | Header | Avatar initial, display name, batch chip ("AIN 7"), gear → Settings. Signed out: "Set Up Study Profile" |
-| Focus graph | GitHub-style contribution calendar: square cells, rows Mon–Sun, one column per week, current week rightmost, five levels from near-white to the darkest violet, counted in Pomodoro blocks per day (1 · 2–3 · 4–6 · 7+); streak and total; **Share** |
+| Focus graph | GitHub-style contribution calendar: square cells, rows Sun–Sat, one column per week, current week rightmost, five levels from near-white to the darkest violet, counted in Pomodoro blocks per day (1 · 2–3 · 4–6 · 7+); streak and total; **Share** |
 | Saved rooms | Today's Saved list with live status (unchanged behaviour, new home) |
 
 | Settings | Contents |
@@ -226,3 +226,34 @@ Phase 2 ([later phases](later-phases.md)).
 
 Group objects and invitations, chat, friends, organization accounts, events, city layer, push
 from a server, leaderboards. See [later phases](later-phases.md).
+
+### Campus closures and focus streaks
+
+Focus streaks count consecutive **open classroom-campus days**, not calendar
+days. Saturday and Sunday pause the streak: focusing Monday through Friday
+produces five days, it remains five over the weekend and on Monday before a
+session, and becomes six after focusing Monday. Missing an open weekday breaks
+the streak once that day ends. Closed days never add streak days, even if an
+older/imported session falls on one; all saved minutes remain in history and
+semester totals. An empty history always has a zero streak.
+
+The profile graph, compact mobile graph, saved PNG and link-preview card show
+elapsed closed dates in neutral gray (`--md-graph-closed`), independent of graph
+colour, in light and dark themes. Today retains its outline, including on a
+closed day. Future dates retain the graph's blank slots / share card's outlined
+slots. Tooltips and the accessible table include "Campus closed" / "Campus
+geschlossen" alongside any recorded minutes; the compact graph footer explains the
+paused streak. The semester total leads the card, with the study-day streak on a secondary line. The footer pairs a pause icon and a short weekend note with the five-swatch intensity ramp; its less-to-more label remains accessible. At every screen width, native swipe, trackpad and keyboard scrolling reveal the full year without a visible scrollbar. Cells scale with the card width (14�26 px); the profile column is capped at 840 px. Wider pointer layouts also offer older/newer navigation buttons. The viewed week is preserved when resizing or rotating. Weekend cells blend the closed-day token into the surface for softer contrast. A subtle left-edge fade signals more history and disappears at the oldest week.
+
+The source is the general classroom schedule in `src/domain/openingHours.ts`,
+not the library schedule or the absence of THabella lectures. The repository
+currently has **no dated holiday or exceptional campus-closure calendar**, so
+no extra closure dates are guessed. Semester breaks have reduced weekday hours
+and therefore do not pause weekday streaks. If verified dated closures are
+added later, update the classroom calendar and the server share-card renderer
+together and extend their consistency tests.
+
+Weeks start on Sunday in the graph and new share cards/links, matching the
+GitHub contribution calendar reference. Visible row labels remain Monday,
+Wednesday and Friday (rows 2, 4 and 6). Existing share payloads retain their
+encoded start date, so older links still map minutes to the correct dates.

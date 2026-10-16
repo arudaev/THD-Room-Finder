@@ -99,7 +99,7 @@ export function FocusGallery() {
   const months = locale === 'de'
     ? ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const dayNames = locale === 'de' ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayNames = locale === 'de' ? ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const surfaceText: FocusSurfaceText = {
     title: t('Focus', 'Fokus'),
@@ -129,7 +129,7 @@ export function FocusGallery() {
     days: dayNames,
     months,
     cellLabel: (d, m) => {
-      const day = `${dayNames[(d.getDay() + 6) % 7]} ${d.getDate()}${locale === 'de' ? '.' : ''} ${months[d.getMonth()]}`;
+      const day = `${dayNames[d.getDay()]} ${d.getDate()}${locale === 'de' ? '.' : ''} ${months[d.getMonth()]}`;
       if (!m) return `${day} · ${t('No focus', 'Kein Fokus')}`;
       const h = Math.floor(m / 60);
       const min = m % 60;
@@ -138,6 +138,10 @@ export function FocusGallery() {
     },
     less: t('Less', 'Weniger'),
     more: t('More', 'Mehr'),
+    closed: t('Campus closed', 'Campus geschlossen'),
+    closureNote: t('Weekends pause your streak', 'Serie pausiert am Wochenende'),
+    older: t('Older weeks', '�ltere Wochen'),
+    newer: t('Newer weeks', 'Neuere Wochen'),
     share: t('Share focus graph', 'Fokus-Verlauf teilen'),
     tableCaption: t('Focus minutes per day, newest week first', 'Fokus-Minuten pro Tag, neueste Woche zuerst'),
     weekOf: t('Week of', 'Woche ab'),
@@ -249,9 +253,9 @@ export function FocusGallery() {
             { id: 'graphite', label: t('Graphite', 'Graphit') },
           ]}
         />
-        <FocusGraph days={DAYS} today={TODAY} weeks={53} stats={stats} label={stats} text={graphText} onShare={() => setSnack(t('Link copied', 'Link kopiert'))} />
+        <FocusGraph days={DAYS} today={TODAY} weeks={53} stats={t('21 h this semester', '21 Std. dieses Semester')} secondaryStats={t('12-day study streak', '12 Lerntage in Folge')} label={stats} text={graphText} onShare={() => setSnack(t('Link copied', 'Link kopiert'))} />
         <div style={{ maxWidth: 380 }}>
-          <FocusGraph days={DAYS} today={TODAY} weeks={53} compact stats={stats} label={stats} text={graphText} onShare={() => undefined} />
+          <FocusGraph days={DAYS} today={TODAY} weeks={53} compact stats={t('21 h this semester', '21 Std. dieses Semester')} secondaryStats={t('12-day study streak', '12 Lerntage in Folge')} label={stats} text={graphText} onShare={() => undefined} />
         </div>
         <FocusGraph days={[]} today={TODAY} weeks={20} stats={t('No focus yet. Start a session in any free room.', 'Noch kein Fokus. Starte eine Session in einem freien Raum.')} label="Focus graph" text={graphText} />
         <div style={{ background: 'var(--md-surface)', borderRadius: 'var(--radius-l)', boxShadow: 'var(--md-shadow-1)', padding: '4px 16px' }}>

@@ -40,8 +40,9 @@
   }
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const graphText = {
-    days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], months,
+    days: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], months,
     cellLabel: (d, m) => `${d.getDate()} ${months[d.getMonth()]} · ${m ? m + ' min' : 'No focus'}`,
+    closed: 'Campus closed', closureNote: 'Weekends pause your streak',
     less: 'Less', more: 'More', share: 'Share focus graph',
     tableCaption: 'Focus minutes per day, newest week first', weekOf: 'Week of',
     weekLabel: (d) => `${d.getDate()} ${months[d.getMonth()]}`,
@@ -82,7 +83,7 @@
           </div>
           <MapLegend free="Free rooms" batch="AIN 7 studying" claim="Focus session" />
           <span className="lbl" style={{ marginTop: 8 }}>Profile · D2 and share card · D4</span>
-          <FocusGraph days={days} today="2026-10-13" weeks={20} stats="21 h this semester · 12-day streak" label="Focus graph" text={graphText} onShare={() => {}} />
+          <FocusGraph days={days} today="2026-10-13" weeks={20} stats="21 h this semester" secondaryStats="12-day study streak" label="Focus graph" text={graphText} onShare={() => {}} />
           <div style={{ maxWidth: 260 }}>
             <ShareCard days={days} today="2026-10-13" semesterStart="2026-10-01" semesterEnd="2027-03-14" months={months}
               theme="light" iconSrc="../../assets/logo/icon.svg" url="thd-room-finder.vercel.app"

@@ -37,11 +37,13 @@ async function render(node: ReactNode) {
 }
 
 const graphText: FocusGraphText = {
-  days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   cellLabel: (d, m) => `${d.getDate()} · ${m ? `${m} min` : 'No focus'}`,
   less: 'Less',
   more: 'More',
+  closed: 'Campus closed',
+  closureNote: 'Closed campus days pause your streak. Only open days count.',
   share: 'Share focus graph',
   tableCaption: 'Focus minutes per day, newest week first',
   weekOf: 'Week of',
@@ -78,7 +80,7 @@ describe('focus graph levels', () => {
 
 describe('FocusGraph', () => {
   it('ends on the week of today, outlines today and leaves later days empty', async () => {
-    // Tue 13 Oct 2026: Mon 12 Oct starts the last column.
+    // Tue 13 Oct 2026: Sun 11 Oct starts the last column.
     await render(
       <FocusGraph
         days={[
@@ -95,14 +97,29 @@ describe('FocusGraph', () => {
     );
     const rows = container.querySelectorAll('tbody tr');
     expect(rows).toHaveLength(3);
-    // Newest week first: Mon 200, Tue 45 + 40, the rest of the week is still to come.
+    // Newest week first: Sun closed, Mon 200, Tue 45 + 40, the rest of the week is still to come.
     const newest = Array.from(rows[0].querySelectorAll('td')).map((td) => td.textContent);
-    expect(newest).toEqual(['200', '85', '—', '—', '—', '—', '—']);
+    expect(newest).toEqual(['0 · Campus closed', '200', '85', '—', '—', '—', '—']);
     const outlined = Array.from(container.querySelectorAll<HTMLElement>('[aria-hidden="true"] div')).filter((el) =>
       el.style.outline.includes('solid'),
     );
     expect(outlined).toHaveLength(1);
     expect(outlined[0].style.background).toBe('var(--md-graph-2)');
+  });
+
+  it.each([false, true])('grays weekends with minutes and labels them accessibly (compact=%s)', async (compact) => {
+    await render(<FocusGraph days={[{ date: '2026-10-10', minutes: 175 }]} today="2026-10-11" weeks={2}
+      compact={compact} stats="0-day streak" label="Focus graph" text={graphText} />);
+    const saturday = container.querySelector<HTMLElement>('[data-date="2026-10-10"]')!;
+    const sunday = container.querySelector<HTMLElement>('[data-date="2026-10-11"]')!;
+    expect(saturday.style.background).toBe('color-mix(in srgb, var(--md-graph-closed) 72%, var(--md-surface))');
+    expect(sunday.style.background).toBe('color-mix(in srgb, var(--md-graph-closed) 72%, var(--md-surface))');
+    expect(sunday.style.outline).toContain('solid');
+    expect(saturday.title).toBe('10 · 175 min · Campus closed');
+    expect(container.querySelector('tbody')?.textContent).toContain('175 · Campus closed');
+    await act(async () => saturday.click());
+    expect(container.textContent).toContain('10 · 175 min · Campus closed');
+    expect(container.textContent).toContain(graphText.closureNote);
   });
 
   it('hides Share until there is something to share', async () => {
@@ -206,9 +223,9 @@ describe('Sheet', () => {
 
 describe('share card grid', () => {
   it('counts the semester in whole weeks from the week of its first day', () => {
-    // Winter: Thu 1 Oct 2026 – Sun 14 Mar 2027 → Mon 28 Sep … Mon 8 Mar.
-    expect(semesterWeeks('2026-10-01', '2027-03-14')).toBe(24);
-    // Summer: Sun 15 Mar – Wed 30 Sep 2026 → Mon 9 Mar … Mon 28 Sep.
-    expect(semesterWeeks('2026-03-15', '2026-09-30')).toBe(30);
+    // Winter: Thu 1 Oct 2026 – Sun 14 Mar 2027 → Sun 27 Sep … Sun 14 Mar.
+    expect(semesterWeeks('2026-10-01', '2027-03-14')).toBe(25);
+    // Summer: Sun 15 Mar – Wed 30 Sep 2026 → Sun 15 Mar … Sun 27 Sep.
+    expect(semesterWeeks('2026-03-15', '2026-09-30')).toBe(29);
   });
 });

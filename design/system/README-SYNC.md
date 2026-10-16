@@ -34,7 +34,8 @@ node design/mirror-components.mjs
 
 It writes `<Name>.jsx` (types stripped, comments kept) and `<Name>.d.ts` (from
 the TypeScript compiler, with the `@startingPoint` tag) for every component in
-its list. `.prompt.md` usage notes and the `.card.html` specimens are written
+its list. It also mirrors the classroom calendar into `domain/` so focus
+graph and share-card previews use the app's closure rules. `.prompt.md` usage notes and the `.card.html` specimens are written
 by hand. Never edit a mirrored `.jsx` here; change the source and run the
 script in the same PR.
 

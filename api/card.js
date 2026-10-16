@@ -7,8 +7,8 @@ import { decodeShare, hoursText } from '../shared/shareLink.js';
 // and the CDN may keep it forever. Colours mirror src/styles/tokens/colors.css.
 
 const SURFACE = {
-  light: { bg: '#FDFCFF', on: '#1C1B1F', onVar: '#44464F', empty: '#EFEEF5', slot: '#E3E1EC', brand: '#1565C0' },
-  dark: { bg: '#1C1B1F', on: '#E6E1E5', onVar: '#C4C6D0', empty: '#2B2930', slot: '#36343B', brand: '#A8C8FF' },
+  light: { bg: '#FDFCFF', on: '#1C1B1F', onVar: '#44464F', empty: '#EFEEF5', slot: '#E3E1EC', closed: '#C4C6D0', brand: '#1565C0' },
+  dark: { bg: '#1C1B1F', on: '#E6E1E5', onVar: '#C4C6D0', empty: '#2B2930', slot: '#36343B', closed: '#44464F', brand: '#A8C8FF' },
 };
 const RAMP = {
   light: {
@@ -44,32 +44,36 @@ export function cardTree(s, origin) {
   const hours = hoursText(s.minutes, s.lang);
   const [num, unit] = hours.split(' ');
 
-  // Grid: one column per week, Monday at the top; days after today are slots.
+  // Grid: one column per week, Sunday at the top for new links; days after today are slots.
   const gridW = 680;
   const pitch = Math.min(Math.floor(gridW / s.weeks), 34);
   const cell = pitch - Math.max(3, Math.round(pitch * 0.16));
   const start = new Date(`${s.start}T00:00:00Z`);
   const columns = [];
   for (let w = 0; w < s.weeks; w++) {
-    const monday = new Date(start.getTime() + w * 7 * 86400000);
-    const prev = new Date(monday.getTime() - 7 * 86400000);
+    const weekStart = new Date(start.getTime() + w * 7 * 86400000);
+    const prev = new Date(weekStart.getTime() - 7 * 86400000);
     // As the in-app graph: a new month gets a label; the first column only
     // when its month lasts two more weeks, so the labels never collide.
-    const ahead = (n) => new Date(monday.getTime() + n * 7 * 86400000).getUTCMonth() === monday.getUTCMonth();
-    const shows = w === 0 ? ahead(1) && ahead(2) : monday.getUTCMonth() !== prev.getUTCMonth();
-    const label = shows ? MONTHS[s.lang][monday.getUTCMonth()] : '';
+    const ahead = (n) => new Date(weekStart.getTime() + n * 7 * 86400000).getUTCMonth() === weekStart.getUTCMonth();
+    const shows = w === 0 ? ahead(1) && ahead(2) : weekStart.getUTCMonth() !== prev.getUTCMonth();
+    const label = shows ? MONTHS[s.lang][weekStart.getUTCMonth()] : '';
     const cells = [];
     for (let d = 0; d < 7; d++) {
       const i = w * 7 + d;
       const future = i > s.today;
       const level = future ? 0 : s.levels[i] ?? 0;
+      // Calendar dates use UTC here; browser/domain dates use local calendar days.
+      // Repository classroom schedules currently close only on weekends.
+      const weekday = new Date(start.getTime() + i * 86400000).getUTCDay();
+      const closed = weekday === 0 || weekday === 6;
       cells.push(
         h('div', {
           width: cell,
           height: cell,
           marginBottom: pitch - cell,
           borderRadius: Math.max(3, Math.round(cell * 0.18)),
-          background: future ? 'transparent' : level ? ramp[level - 1] : C.empty,
+          background: future ? 'transparent' : closed ? C.closed : level ? ramp[level - 1] : C.empty,
           border: future ? `2px solid ${C.slot}` : i === s.today ? `3px solid ${C.on}` : 'none',
         }),
       );
@@ -131,6 +135,8 @@ export function cardTree(s, origin) {
       h(
         'div',
         { alignItems: 'center' },
+        h('div', { width: 20, height: 20, borderRadius: 4, background: C.closed, marginRight: 8 }),
+        h('div', { marginRight: 18 }, de ? 'Campus geschlossen' : 'Campus closed'),
         h('div', { marginRight: 10 }, de ? 'Weniger' : 'Less'),
         ...[C.empty, ...ramp].map((c) => h('div', { width: 20, height: 20, borderRadius: 4, background: c, marginRight: 5 })),
         h('div', { marginLeft: 5 }, de ? 'Mehr' : 'More'),

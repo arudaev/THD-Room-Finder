@@ -42,7 +42,7 @@ export interface ShareCardOptions {
     /** Footer text on the right. */
     url?: string;
 }
-/** Number of week columns from the semester's first Monday through its end. */
+/** Number of week columns from the semester's first Sunday through its end. */
 export declare function semesterWeeks(semesterStart: string, semesterEnd: string): number;
 /** Draws the card and resolves to a PNG blob. */
 export declare function renderShareCard(o: ShareCardOptions): Promise<Blob>;

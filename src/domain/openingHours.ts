@@ -164,6 +164,14 @@ export function getCampusHours(now: Date): CampusHours {
   return resolveHours(now, CAMPUS);
 }
 
+/** Whole-day classroom closure, not whether the doors are open at this hour.
+ * No dated holiday/closure calendar is currently available in the repository.
+ * Reduced semester-break weekdays remain study days; library hours do not apply.
+ */
+export function isCampusClosedDay(date: Date): boolean {
+  return dayHoursFor(CAMPUS, date) === null;
+}
+
 /** Opening state of the Library (building G) at `now` — its own schedule. */
 export function getLibraryHours(now: Date): CampusHours {
   return resolveHours(now, LIBRARY);

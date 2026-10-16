@@ -1,4 +1,4 @@
-import { addDays, dayKey, focusLevel, mondayOf, parseDay } from '../../components/focus/FocusGraph';
+import { addDays, dayKey, focusLevel, sundayOf, parseDay } from '../../components/focus/FocusGraph';
 import type { FocusDay } from '../../components/focus/FocusGraph';
 import { semesterWeeks } from '../../components/focus/ShareCard';
 import { encodeShare } from '../../../shared/shareLink.js';
@@ -30,11 +30,11 @@ export function inviteLink(dark: boolean, lang: 'en' | 'de', origin: string): st
 
 /**
  * The /f/ link for the semester graph (ADR 0003): one level per day from the
- * semester's first Monday through today, plus the figures. No rooms, no
+ * semester's first Sunday through today, plus the figures. No rooms, no
  * times; name and batch only when passed.
  */
 export function shareLink(input: ShareLinkInput, origin: string): string {
-  const first = mondayOf(parseDay(input.semesterStart));
+  const first = sundayOf(parseDay(input.semesterStart));
   const weeks = semesterWeeks(input.semesterStart, input.semesterEnd);
   const todayDate = parseDay(input.today);
   const elapsed = Math.round((todayDate.getTime() - first.getTime()) / 86400000);

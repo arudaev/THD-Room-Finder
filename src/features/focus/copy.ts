@@ -14,11 +14,11 @@ export function monthNames(locale: Locale): string[] {
     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 }
 
-/** Mon … Sun. */
+/** Sun … Sat. */
 export function dayNames(locale: Locale): string[] {
   return locale === 'de'
-    ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    ? ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 }
 
 /** 85 → "1 h 25 min" / "1 Std. 25 Min."; whole hours drop the minutes. */
@@ -35,7 +35,7 @@ export function formatMinutes(minutes: number, locale: Locale): string {
 
 /** "Tue 13 Oct" / "Di 13. Okt". */
 export function shortDate(d: Date, locale: Locale): string {
-  const day = dayNames(locale)[(d.getDay() + 6) % 7];
+  const day = dayNames(locale)[d.getDay()];
   return `${day} ${d.getDate()}${locale === 'de' ? '.' : ''} ${monthNames(locale)[d.getMonth()]}`;
 }
 
@@ -48,6 +48,10 @@ export function graphText(t: Translate, locale: Locale): FocusGraphText {
       `${shortDate(d, locale)} · ${m ? formatMinutes(m, locale) : t('No focus', 'Kein Fokus')}`,
     less: t('Less', 'Weniger'),
     more: t('More', 'Mehr'),
+    closed: t('Campus closed', 'Campus geschlossen'),
+    closureNote: t('Weekends pause your streak', 'Serie pausiert am Wochenende'),
+    older: t('Older weeks', '�ltere Wochen'),
+    newer: t('Newer weeks', 'Neuere Wochen'),
     share: t('Share focus graph', 'Fokus-Verlauf teilen'),
     tableCaption: t('Focus minutes per day, newest week first', 'Fokus-Minuten pro Tag, neueste Woche zuerst'),
     weekOf: t('Week of', 'Woche ab'),

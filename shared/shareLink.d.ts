@@ -5,7 +5,7 @@ export interface ShareSnapshot {
   dark: boolean;
   accent: ShareAccent;
   lang: 'en' | 'de';
-  /** Monday of the semester's first week, YYYY-MM-DD. */
+  /** First week start, YYYY-MM-DD. Sunday in new links; Monday in older links. */
   start: string;
   /** Week columns in the grid. */
   weeks: number;

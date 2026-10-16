@@ -1,3 +1,4 @@
+import { isCampusClosedDay } from './openingHours';
 import { describe, expect, it } from 'vitest';
 import {
   getCafeteriaHours,
@@ -190,5 +191,25 @@ describe('getCopyShopHours', () => {
     const h = getCopyShopHours(dt(2026, 8, 12, 11, 0)); // Wed break
     expect(h.period).toBe('break');
     expect(h.open).toBe(false);
+  });
+});
+
+
+describe('whole-day campus closures for focus', () => {
+  it('uses the classroom schedule in regular, exam and break periods at every hour', () => {
+    for (const month of [1, 3, 7, 9, 10]) {
+      for (let day = 1; day <= 31; day++) {
+        for (const hour of [0, 10, 23]) {
+          const date = new Date(2026, month - 1, day, hour);
+          expect(isCampusClosedDay(date)).toBe(getCampusHours(date).todayOpen === null);
+          expect(isCampusClosedDay(date)).toBe([0, 6].includes(date.getDay()));
+        }
+      }
+    }
+  });
+
+  it('does not mistake reduced hours or an unlisted holiday for a full closure', () => {
+    expect(isCampusClosedDay(new Date(2026, 8, 1))).toBe(false);
+    expect(isCampusClosedDay(new Date(2026, 11, 25))).toBe(false);
   });
 });

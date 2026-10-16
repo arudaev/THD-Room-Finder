@@ -54,7 +54,7 @@ export function AppShell() {
   };
 
   const nav = (
-    <AdaptiveNav
+    <AdaptiveNav key="navigation"
       items={items}
       active={activeId(location.pathname)}
       onSelect={onSelect}
@@ -63,7 +63,7 @@ export function AppShell() {
   );
 
   const content = (
-    <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflowY: 'auto' }}>
+    <main key="page-content" style={{ flex: 1, minWidth: 0, minHeight: 0, overflowY: 'auto' }}>
       <Routes>
         <Route path="/" element={<CampusScreen />} />
         <Route path="/rooms" element={<HomeScreen />} />

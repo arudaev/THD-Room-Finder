@@ -29,11 +29,11 @@ describe('focus graph share link', () => {
     expect(url.length).toBeLessThan(140);
 
     const s = decodeShare(payloadOf(url))!;
-    expect(s.start).toBe('2026-09-28'); // the semester's first Monday
-    expect(s.weeks).toBe(24);
-    expect(s.today).toBe(17); // Thu 15 Oct
+    expect(s.start).toBe('2026-09-27'); // the semester's first Sunday
+    expect(s.weeks).toBe(25);
+    expect(s.today).toBe(18); // Thu 15 Oct
     // Mon 12 Oct 200 min → 8 blocks, Tue 50 → 2, Thu 25 → 1.
-    expect(s.levels.slice(14, 18)).toEqual([4, 2, 0, 1]);
+    expect(s.levels.slice(15, 19)).toEqual([4, 2, 0, 1]);
     expect(s).toMatchObject({ minutes: 275, streak: 2, dark: false, accent: 'violet', lang: 'en' });
     expect(s.name).toBeUndefined();
     expect(s.batch).toBeUndefined();

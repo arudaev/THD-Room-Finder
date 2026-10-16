@@ -6,7 +6,7 @@
 //   0      version (1)
 //   1      flags: bit 0 dark, bits 1-2 accent, bit 3 German,
 //          bit 4 has name, bit 5 has batch
-//   2-3    grid start (a Monday) as days since 2020-01-01
+//   2-3    grid start (Sunday; older links may start Monday) as days since 2020-01-01
 //   4      weeks in the grid (1-40)
 //   5      today, as a day index into the grid (0 … weeks*7-1)
 //   6-8    focus minutes this semester (capped)
