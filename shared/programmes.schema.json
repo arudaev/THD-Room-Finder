@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "programmes.schema.json",
+  "title": "THD Programme and Batch Taxonomy",
+  "description": "Validation schema for shared/programmes.json. Provisional codes and unknown durations are explicit rather than silently guessed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "version",
+    "asOf",
+    "description",
+    "codePolicy",
+    "batchRules",
+    "sourceIndex",
+    "edgeCases",
+    "programmes"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "asOf": {
+      "type": "string",
+      "format": "date"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "codePolicy": {
+      "type": "object",
+      "required": [
+        "verified",
+        "provisional"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "verified": {
+          "type": "string"
+        },
+        "provisional": {
+          "type": "string"
+        }
+      }
+    },
+    "batchRules": {
+      "type": "object",
+      "required": [
+        "batchIdentity",
+        "recommendedDisambiguators",
+        "displayExamples",
+        "currentSemesterLabels",
+        "extensionSemesters",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "batchIdentity": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2
+        },
+        "recommendedDisambiguators": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "displayExamples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "programmeCode",
+              "intakeTerm",
+              "intakeYear",
+              "displayInWinter2026"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "programmeCode": {
+                "type": "string"
+              },
+              "intakeTerm": {
+                "enum": [
+                  "winter",
+                  "summer"
+                ]
+              },
+              "intakeYear": {
+                "type": "integer"
+              },
+              "displayInWinter2026": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "currentSemesterLabels": {
+          "type": "object",
+          "required": [
+            "winter",
+            "summer"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "winter": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "summer": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "extensionSemesters": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 0
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sourceIndex": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      },
+      "minItems": 1
+    },
+    "edgeCases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edgeCase"
+      }
+    },
+    "programmes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/programme"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "url",
+        "supports",
+        "accessedOn"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "supports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accessedOn": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "edgeCase": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "details",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "programme": {
+      "type": "object",
+      "required": [
+        "id",
+        "code",
+        "codeStatus",
+        "level",
+        "award",
+        "nameEn",
+        "nameDe",
+        "language",
+        "faculty",
+        "campus",
+        "intakeTerms",
+        "standardDurationSemesters",
+        "studyMode",
+        "status",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "codeStatus": {
+          "enum": [
+            "verified",
+            "provisional"
+          ]
+        },
+        "level": {
+          "enum": [
+            "bachelor",
+            "master"
+          ]
+        },
+        "award": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameEn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nameDe": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "en",
+              "de"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "faculty": {
+          "type": "string",
+          "minLength": 1
+        },
+        "campus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "intakeTerms": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "winter",
+              "summer"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "standardDurationSemesters": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 20
+        },
+        "studyMode": {
+          "enum": [
+            "full-time",
+            "part-time"
+          ]
+        },
+        "status": {
+          "enum": [
+            "active",
+            "not_offered",
+            "discontinued",
+            "catalogue_conflict",
+            "intake_unverified"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

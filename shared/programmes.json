@@ -1,0 +1,4198 @@
+{
+  "$schema": "./programmes.schema.json",
+  "version": 1,
+  "asOf": "2026-10-14",
+  "description": "THD degree programme and cohort-start taxonomy containing records with substantiated programme codes. This is a discovery aid, not proof of enrolment.",
+  "codePolicy": {
+    "verified": "The code is the programme-page slug from THD's bachelor or master catalogue (th-deg.de/<code>-b or -m), upper-cased without the level suffix, and that page is in the record's sources.",
+    "provisional": "No programme page carries this code yet; do not use it as a cohort identifier. No record is provisional in this version."
+  },
+  "batchRules": {
+    "batchIdentity": [
+      "programme code",
+      "intake term",
+      "intake year"
+    ],
+    "recommendedDisambiguators": [
+      "campus",
+      "language",
+      "study mode",
+      "degree level"
+    ],
+    "displayExamples": [
+      {
+        "programmeCode": "AIN",
+        "intakeTerm": "winter",
+        "intakeYear": 2023,
+        "displayInWinter2026": "AIN 7"
+      },
+      {
+        "programmeCode": "KI",
+        "intakeTerm": "winter",
+        "intakeYear": 2023,
+        "displayInWinter2026": "KI 7"
+      }
+    ],
+    "currentSemesterLabels": {
+      "winter": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "summer": [
+        2,
+        4,
+        6
+      ]
+    },
+    "extensionSemesters": [
+      8,
+      9
+    ],
+    "notes": [
+      "The displayed semester is the cohort's current curriculum semester for the current academic term; it is not a promise that a student has passed every previous semester.",
+      "Keep AIN (English) and KI (German) as separate programmes.",
+      "Some programmes have different start terms by language variant or campus, so use each record's intakeTerms rather than assuming every programme starts in both terms.",
+      "Extension semesters 8 and 9 are allowed cohort labels, not separate programmes or intake terms.",
+      "Where the same short code has multiple campuses or study modes, include campus and study mode in the stable cohort key to avoid collisions.",
+      "Codes repeat across levels (KI, ET, MT, MB, ASW, WI, EM) and campuses (MCS in Deggendorf and Cham). Match batches on the record id, which is the page slug and unique, and show the code to people."
+    ]
+  },
+  "sourceIndex": [
+    {
+      "id": "bachelorCatalogue",
+      "title": "Bachelor degree programmes",
+      "url": "https://www.th-deg.de/bachelorstudiengaenge",
+      "supports": [
+        "programme list",
+        "programme-page links that carry the code"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "masterCatalogue",
+      "title": "Master degree programmes",
+      "url": "https://www.th-deg.de/masterstudiengaenge",
+      "supports": [
+        "programme list",
+        "programme-page links that carry the code"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "focusSessionsSpec",
+      "title": "Focus sessions specification: batches",
+      "url": "https://github.com/arudaev/THD-Room-Finder/blob/main/docs/product/focus-sessions.md#batches",
+      "supports": [
+        "batch identity",
+        "semester labels"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "moduleHandbooks",
+      "title": "Official module handbook index",
+      "url": "https://www.th-deg.de/en/students/documents",
+      "supports": [
+        "current official module-handbook index",
+        "corroborating programme-code conventions where a programme handbook is listed"
+      ],
+      "accessedOn": "2026-10-18"
+    },
+    {
+      "id": "page-ae-m",
+      "title": "Car IT und Elektronik, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/ae-m",
+      "supports": [
+        "excluded: taught at OTH Regensburg"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-hrm-m",
+      "title": "Human Resource Management, M.A. (programme page)",
+      "url": "https://www.th-deg.de/hrm-m",
+      "supports": [
+        "excluded: run with OTH Regensburg"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ai-m",
+      "title": "Angewandte Informatik - Infotronik, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/ai-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ai-m-en",
+      "title": "Applied Computer Science, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/ai-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-aid-m",
+      "title": "Artificial Intelligence and Data Science, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/aid-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-aid-m-en",
+      "title": "Artificial Intelligence and Data Science, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/aid-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-aif-b",
+      "title": "Angewandte Informatik, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/aif-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-aif-b-en",
+      "title": "Applied Computer Science, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/aif-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ain-b",
+      "title": "Artificial Intelligence, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/ain-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ain-b-en",
+      "title": "Artificial Intelligence, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/ain-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-anv-b",
+      "title": "Außerklinische Akut- und Notfallversorgung, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/anv-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-anv-b-en",
+      "title": "Emergency Paramedic, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/anv-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ar-m",
+      "title": "Applied Research in Engineering Sciences, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/ar-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ar-m-en",
+      "title": "Applied Research in Engineering Sciences, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/ar-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ase-m",
+      "title": "Automotive Software Engineering, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/ase-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ase-m-en",
+      "title": "Automotive Software Engineering, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/ase-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-asw-b",
+      "title": "Angewandte Sportwissenschaften mit Schwerpunkt Training und Gesundheit, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/asw-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-asw-b-en",
+      "title": "Applied Sports Science, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/asw-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-asw-m",
+      "title": "Angewandte Sportwissenschaften, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/asw-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-asw-m-en",
+      "title": "Applied Sports Science with Focus on Interprofessional Care in Sports, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/asw-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-avw-b",
+      "title": "Verkehrswissenschaften, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/avw-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-avw-b-en",
+      "title": "Traffic Sciences, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/avw-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-biw-b",
+      "title": "Bauingenieurwesen, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/biw-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-biw-b-en",
+      "title": "Civil and Construction Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/biw-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bpp-b",
+      "title": "Building Products and Processes, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/bpp-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bpp-b-en",
+      "title": "Building Products and Processes, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/bpp-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bs-b",
+      "title": "Business Administration and Service Management, B.A. (programme page)",
+      "url": "https://www.th-deg.de/bs-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bs-b-en",
+      "title": "Business Administration and Service Management, B.A. (English programme page)",
+      "url": "https://www.th-deg.de/bs-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bu-m",
+      "title": "Bau- und Umweltingenieurwesen, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/bu-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bu-m-en",
+      "title": "Civil and Environmental Engineering, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/bu-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-bwl-b",
+      "title": "Betriebswirtschaft, B.A. (programme page)",
+      "url": "https://www.th-deg.de/bwl-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ce-b",
+      "title": "Ressourceneffiziente Produktentwicklung - Circular Engineering, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/ce-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ce-b-en",
+      "title": "Circular Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/ce-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-cy-b",
+      "title": "Cyber Security, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/cy-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-cy-b-en",
+      "title": "Cyber Security, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/cy-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-db-m",
+      "title": "Digital Business, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/db-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-db-m-en",
+      "title": "Digital Business, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/db-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dbm-b",
+      "title": "Digitale Biomedizin, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/dbm-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dbm-b-en",
+      "title": "Digital Biomedicine, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/dbm-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dbp-m",
+      "title": "Digital Business Psychology, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/dbp-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dbp-m-en",
+      "title": "Digital Business Psychology, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/dbp-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dh-m",
+      "title": "Digital Health, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/dh-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dh-m-en",
+      "title": "Digital Health, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/dh-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dm-m",
+      "title": "Applied Artificial Intelligence for Digital Production Management, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/dm-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-dm-m-en",
+      "title": "Applied AI for Digital Production Management, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/dm-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-eai-b",
+      "title": "Electronics Engineering for Artificial Intelligence - International, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/eai-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-eai-b-en",
+      "title": "Electronics Engineering for Artificial Intelligence - International, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/eai-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-eki-b",
+      "title": "Elektronik für Künstliche Intelligenz - International, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/eki-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-eki-b-en",
+      "title": "Electronics for Artificial Intelligence, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/eki-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-em-b",
+      "title": "Elektromobilität, autonomes Fahren und mobile Robotik, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/em-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-em-b-en",
+      "title": "Electromobility, Autonomous Driving and Mobile Robotics, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/em-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-em-m",
+      "title": "Elektromobilität, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/em-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-em-m-en",
+      "title": "Electromobility, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/em-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-emi-b",
+      "title": "Elektromobilität, autonomes Fahren und mobile Robotik - International, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/emi-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-emi-b-en",
+      "title": "Electromobility, Autonomous Driving and Mobile Robotics - International, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/emi-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-en-b",
+      "title": "Engineering Nachhaltiger Systeme, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/en-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-en-b-en",
+      "title": "Sustainable Systems Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/en-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-erg-b",
+      "title": "Ergotherapie, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/erg-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-erg-b-en",
+      "title": "Ergotherapy, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/erg-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ese-b",
+      "title": "Energy Systems Engineering, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/ese-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ese-b-en",
+      "title": "Energy Systems Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/ese-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-et-b",
+      "title": "Elektro- und Informationstechnik, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/et-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-et-b-en",
+      "title": "Electrical Engineering and Information Technology, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/et-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-et-m",
+      "title": "Elektro- und Informationstechnik, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/et-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-et-m-en",
+      "title": "Electrical Engineering and Information Technology, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/et-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-eti-b",
+      "title": "Elektro- und Informationstechnik - International, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/eti-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-eti-b-en",
+      "title": "Electrical Engineering and Information Technology - International, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/eti-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ga-m",
+      "title": "Gründungsorientierte Spiele Entwicklung, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/ga-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ga-m-en",
+      "title": "Entrepreneurial Game Development, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/ga-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-gph-m",
+      "title": "Global Public Health, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/gph-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-gph-m-en",
+      "title": "Global Public Health, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/gph-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-hi-b",
+      "title": "Health Informatics, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/hi-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-hi-b-en",
+      "title": "Health Informatics, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/hi-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-hsb-m",
+      "title": "Healthy and Sustainable Buildings, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/hsb-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-hsb-m-en",
+      "title": "Healthy and Sustainable Buildings, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/hsb-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ie-b",
+      "title": "Industrial Engineering, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/ie-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ie-b-en",
+      "title": "Industrial Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/ie-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-im-b",
+      "title": "International Management, B.A. (programme page)",
+      "url": "https://www.th-deg.de/im-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-im-b-en",
+      "title": "International Management, B.A. (English programme page)",
+      "url": "https://www.th-deg.de/im-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-itd-m",
+      "title": "International Tourism Development, M.A. (programme page)",
+      "url": "https://www.th-deg.de/itd-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-itd-m-en",
+      "title": "International Tourism Development, M.A. (English programme page)",
+      "url": "https://www.th-deg.de/itd-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-itm-b",
+      "title": "International Tourism Management, B.A. (programme page)",
+      "url": "https://www.th-deg.de/itm-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-itm-b-en",
+      "title": "International Tourism Management / Health & Medical Tourism, B.A. (English programme page)",
+      "url": "https://www.th-deg.de/itm-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ki-b",
+      "title": "Künstliche Intelligenz, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/ki-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ki-b-en",
+      "title": "Artificial Intelligence, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/ki-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ki-m",
+      "title": "Artificial Intelligence for smart sensors and actuators, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/ki-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-ki-m-en",
+      "title": "Artificial Intelligence for Smart Sensors and Actuators, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/ki-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-lsi-m",
+      "title": "Life Science Informatics, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/lsi-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-lsi-m-en",
+      "title": "Life Science Informatics, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/lsi-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mb-b",
+      "title": "Maschinenbau, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mb-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mb-b-en",
+      "title": "Mechanical Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mb-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mb-m",
+      "title": "Maschinenbau, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mb-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mb-m-en",
+      "title": "Mechanical Engineering, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mb-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mcs-cham-m",
+      "title": "Mechatronische und cyber-physische Systeme, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mcs-cham-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mcs-cham-m-en",
+      "title": "Mechatronic and Cyber-Physical Systems, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mcs-cham-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mcs-m",
+      "title": "Mechatronische und cyber-physische Systeme, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mcs-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mcs-m-en",
+      "title": "Mechatronic and Cyber-Physical Systems, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mcs-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mdp-b",
+      "title": "Mechatronik und Projektmanagement für Digitale Produktion, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mdp-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mdp-b-en",
+      "title": "Mechatronics and Project Management for Digital Production, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mdp-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mgsr-b",
+      "title": "Management im Gesundheits-, Sozial- und Rettungswesen, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/mgsr-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mgsr-b-en",
+      "title": "Management in Health, Social and Rescue Services, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/mgsr-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mk-b",
+      "title": "Mechatronik, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mk-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mk-b-en",
+      "title": "Mechatronics, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mk-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mro-m",
+      "title": "Robotik, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mro-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mro-m-en",
+      "title": "Robotics, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mro-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mrw-b",
+      "title": "Management im Rettungswesen, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/mrw-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mrw-b-en",
+      "title": "Management in Rescue Services, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/mrw-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mt-b",
+      "title": "Medientechnik, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mt-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mt-b-en",
+      "title": "Media Technology, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mt-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mt-m",
+      "title": "Medientechnik, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/mt-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mt-m-en",
+      "title": "Media Technology, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/mt-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mth-b",
+      "title": "Management von Inklusion und Teilhabe, B.A. (programme page)",
+      "url": "https://www.th-deg.de/mth-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-mth-b-en",
+      "title": "Management of Inclusion and Participation, B.A. (English programme page)",
+      "url": "https://www.th-deg.de/mth-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pamv-b",
+      "title": "Physician Assistant, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/pamv-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pamv-b-en",
+      "title": "Physician Assistant / Medical Care, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/pamv-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pf-b",
+      "title": "Pflege, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/pf-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pf-b-en",
+      "title": "Nursing, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/pf-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pfi-b",
+      "title": "Nursing, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/pfi-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pfi-b-en",
+      "title": "Nursing, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/pfi-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pg-m",
+      "title": "Psychische Gesundheit, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/pg-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pg-m-en",
+      "title": "Mental Health, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/pg-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pmb-b",
+      "title": "Projektmanagement in Bauingenieurwesen, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/pmb-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-pmb-b-en",
+      "title": "Project Management in Civil and Construction Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/pmb-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-psb-b",
+      "title": "Physiotherapie dual mit Schwerpunkt Bewegungswissenschaft, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/psb-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-psb-b-en",
+      "title": "Physiotherapy Dual Majoring in Kinesiology, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/psb-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-qc-m",
+      "title": "High-Performance Computing / Quantum Computing, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/qc-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-qc-m-en",
+      "title": "High-Performance Computing / Quantum Computing, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/qc-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-sa-b",
+      "title": "Soziale Arbeit, B.A. (programme page)",
+      "url": "https://www.th-deg.de/sa-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-sa-b-en",
+      "title": "Social Work, B.A. (English programme page)",
+      "url": "https://www.th-deg.de/sa-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-sd-b",
+      "title": "Software-Design, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/sd-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-sd-b-en",
+      "title": "Software Design, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/sd-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-sim-m",
+      "title": "Strategisches und Internationales Management, M.A. (programme page)",
+      "url": "https://www.th-deg.de/sim-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-sim-m-en",
+      "title": "Strategic and International Management, M.A. (English programme page)",
+      "url": "https://www.th-deg.de/sim-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-td-b",
+      "title": "Technisches Design, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/td-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-td-b-en",
+      "title": "Technical Design, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/td-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-tem-m",
+      "title": "Technologiemanagement, M.Eng. (programme page)",
+      "url": "https://www.th-deg.de/tem-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-tem-m-en",
+      "title": "Technology Management, M.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/tem-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-tm-b",
+      "title": "Tourismusmanagement, B.A. (programme page)",
+      "url": "https://www.th-deg.de/tm-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-tm-b-en",
+      "title": "Tourism Management, B.A. (English programme page)",
+      "url": "https://www.th-deg.de/tm-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-tp-b",
+      "title": "Technische Physik, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/tp-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-tp-b-en",
+      "title": "Engineering Physics, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/tp-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-uiw-b",
+      "title": "Umweltingenieurwesen, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/uiw-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-uiw-b-en",
+      "title": "Environmental Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/uiw-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-vwl-b",
+      "title": "Volkswirtschaftslehre, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/vwl-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-vwl-b-en",
+      "title": "Economics, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/vwl-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wi-b",
+      "title": "Wirtschaftsinformatik, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/wi-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wi-b-en",
+      "title": "Business Informatics, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/wi-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wi-m",
+      "title": "Wirtschaftsinformatik, M.Sc. (programme page)",
+      "url": "https://www.th-deg.de/wi-m",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wi-m-en",
+      "title": "Business Informatics, M.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/wi-m-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wiw-b",
+      "title": "Wirtschaftsingenieurwesen, B.Eng. (programme page)",
+      "url": "https://www.th-deg.de/wiw-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wiw-b-en",
+      "title": "Industrial Engineering, B.Eng. (English programme page)",
+      "url": "https://www.th-deg.de/wiw-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wp-b",
+      "title": "Angewandte Wirtschaftspsychologie, B.Sc. (programme page)",
+      "url": "https://www.th-deg.de/wp-b",
+      "supports": [
+        "code",
+        "award",
+        "faculty",
+        "campus",
+        "intake terms",
+        "duration",
+        "language",
+        "German name"
+      ],
+      "accessedOn": "2026-10-14"
+    },
+    {
+      "id": "page-wp-b-en",
+      "title": "Organisational and Economic Psychology, B.Sc. (English programme page)",
+      "url": "https://www.th-deg.de/wp-b-en",
+      "supports": [
+        "English name"
+      ],
+      "accessedOn": "2026-10-14"
+    }
+  ],
+  "edgeCases": [
+    {
+      "id": "dual-language-ai",
+      "title": "AIN and KI are separate programmes",
+      "details": "AIN is the English-taught Artificial Intelligence B.Sc.; KI is the German-taught Künstliche Intelligenz B.Sc. Both have the English name Artificial Intelligence. Do not merge their cohorts.",
+      "sources": [
+        "page-ain-b",
+        "page-ki-b"
+      ]
+    },
+    {
+      "id": "shared-codes",
+      "title": "The same code at two levels or two campuses",
+      "details": "KI, ET, MT, MB, ASW, WI and EM each exist as a bachelor and a master; MCS runs in Deggendorf (winter start) and Cham (summer start). The id (page slug) is unique, the code is not.",
+      "sources": [
+        "bachelorCatalogue",
+        "masterCatalogue",
+        "page-mcs-m",
+        "page-mcs-cham-m"
+      ]
+    },
+    {
+      "id": "mixed-intakes",
+      "title": "Start terms differ by programme",
+      "details": "International engineering variants, the English Nursing pathway and several masters start in summer, some masters in both terms. Use each record's intakeTerms.",
+      "sources": [
+        "page-eti-b",
+        "page-pfi-b",
+        "page-mcs-cham-m"
+      ]
+    },
+    {
+      "id": "traffic-sciences",
+      "title": "Traffic Sciences intake",
+      "details": "The Traffic Sciences page still says the programme was not offered in winter 2025/26. It stays in the list for existing cohorts and is marked intake_unverified.",
+      "sources": [
+        "page-avw-b"
+      ]
+    },
+    {
+      "id": "excluded-programmes",
+      "title": "Programmes left out",
+      "details": "Car IT und Elektronik (ae-m) and Human Resource Management (hrm-m) are in the master catalogue but taught with or at OTH Regensburg, and their pages have no facts box. Discontinued programmes and part-time offers outside the two catalogues are not listed; students in them use the app's 'not listed' route.",
+      "sources": [
+        "masterCatalogue",
+        "page-ae-m",
+        "page-hrm-m"
+      ]
+    },
+    {
+      "id": "masters",
+      "title": "Master's programmes and extension semesters",
+      "details": "Master's programmes are separate degree-level identities with their own durations and start terms. Semesters 8 and 9 are a cohort-display allowance, not part of every curriculum.",
+      "sources": [
+        "masterCatalogue",
+        "focusSessionsSpec"
+      ]
+    }
+  ],
+  "programmes": [
+    {
+      "id": "aif-b",
+      "code": "AIF",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Applied Computer Science",
+      "nameDe": "Angewandte Informatik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-aif-b",
+        "page-aif-b-en"
+      ]
+    },
+    {
+      "id": "ain-b",
+      "code": "AIN",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Artificial Intelligence",
+      "nameDe": "Artificial Intelligence",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-ain-b",
+        "page-ain-b-en"
+      ],
+      "notes": [
+        "English-taught; KI is the German-taught programme. Keep the cohorts separate."
+      ]
+    },
+    {
+      "id": "anv-b",
+      "code": "ANV",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Emergency Paramedic",
+      "nameDe": "Außerklinische Akut- und Notfallversorgung",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-anv-b",
+        "page-anv-b-en"
+      ]
+    },
+    {
+      "id": "asw-b",
+      "code": "ASW",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Applied Sports Science",
+      "nameDe": "Angewandte Sportwissenschaften mit Schwerpunkt Training und Gesundheit",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-asw-b",
+        "page-asw-b-en"
+      ]
+    },
+    {
+      "id": "avw-b",
+      "code": "AVW",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Traffic Sciences",
+      "nameDe": "Verkehrswissenschaften",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "intake_unverified",
+      "sources": [
+        "bachelorCatalogue",
+        "page-avw-b",
+        "page-avw-b-en"
+      ],
+      "notes": [
+        "The programme page says it was not offered in winter 2025/26; confirm the current intake before offering new cohorts."
+      ]
+    },
+    {
+      "id": "biw-b",
+      "code": "BIW",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Civil and Construction Engineering",
+      "nameDe": "Bauingenieurwesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Bauingenieurwesen und Umwelttechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-biw-b",
+        "page-biw-b-en"
+      ]
+    },
+    {
+      "id": "bpp-b",
+      "code": "BPP",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Building Products and Processes",
+      "nameDe": "Building Products and Processes",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-bpp-b",
+        "page-bpp-b-en"
+      ],
+      "notes": [
+        "English in the foundation lectures, German in higher semesters."
+      ]
+    },
+    {
+      "id": "bs-b",
+      "code": "BS",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "Business Administration and Service Management",
+      "nameDe": "Business Administration and Service Management",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Deggendorf",
+        "Pfarrkirchen",
+        "Cham"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-bs-b",
+        "page-bs-b-en"
+      ],
+      "notes": [
+        "The programme page lists Deggendorf, Pfarrkirchen and Cham as study locations."
+      ]
+    },
+    {
+      "id": "bwl-b",
+      "code": "BWL",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "Business Administration",
+      "nameDe": "Betriebswirtschaft",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-bwl-b"
+      ]
+    },
+    {
+      "id": "ce-b",
+      "code": "CE",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Circular Engineering",
+      "nameDe": "Ressourceneffiziente Produktentwicklung - Circular Engineering",
+      "language": [
+        "de"
+      ],
+      "faculty": "Maschinenbau & Mechatronik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-ce-b",
+        "page-ce-b-en"
+      ]
+    },
+    {
+      "id": "cy-b",
+      "code": "CY",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Cyber Security",
+      "nameDe": "Cyber Security",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-cy-b",
+        "page-cy-b-en"
+      ]
+    },
+    {
+      "id": "dbm-b",
+      "code": "DBM",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Digital Biomedicine",
+      "nameDe": "Digitale Biomedizin",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-dbm-b",
+        "page-dbm-b-en"
+      ]
+    },
+    {
+      "id": "eai-b",
+      "code": "EAI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Electronics Engineering for Artificial Intelligence - International",
+      "nameDe": "Electronics Engineering for Artificial Intelligence - International",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-eai-b",
+        "page-eai-b-en"
+      ],
+      "notes": [
+        "English in semesters 1-3, German from semester 4."
+      ]
+    },
+    {
+      "id": "eki-b",
+      "code": "EKI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Electronics for Artificial Intelligence",
+      "nameDe": "Elektronik für Künstliche Intelligenz - International",
+      "language": [
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-eki-b",
+        "page-eki-b-en"
+      ]
+    },
+    {
+      "id": "em-b",
+      "code": "EM",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Electromobility, Autonomous Driving and Mobile Robotics",
+      "nameDe": "Elektromobilität, autonomes Fahren und mobile Robotik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-em-b",
+        "page-em-b-en"
+      ]
+    },
+    {
+      "id": "emi-b",
+      "code": "EMI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Electromobility, Autonomous Driving and Mobile Robotics - International",
+      "nameDe": "Elektromobilität, autonomes Fahren und mobile Robotik - International",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-emi-b",
+        "page-emi-b-en"
+      ],
+      "notes": [
+        "English in semesters 1-3, German from semester 4."
+      ]
+    },
+    {
+      "id": "en-b",
+      "code": "EN",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Sustainable Systems Engineering",
+      "nameDe": "Engineering Nachhaltiger Systeme",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-en-b",
+        "page-en-b-en"
+      ]
+    },
+    {
+      "id": "erg-b",
+      "code": "ERG",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Ergotherapy",
+      "nameDe": "Ergotherapie",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 9,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-erg-b",
+        "page-erg-b-en"
+      ]
+    },
+    {
+      "id": "ese-b",
+      "code": "ESE",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Energy Systems Engineering",
+      "nameDe": "Energy Systems Engineering",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-ese-b",
+        "page-ese-b-en"
+      ]
+    },
+    {
+      "id": "et-b",
+      "code": "ET",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Electrical Engineering and Information Technology",
+      "nameDe": "Elektro- und Informationstechnik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-et-b",
+        "page-et-b-en"
+      ]
+    },
+    {
+      "id": "eti-b",
+      "code": "ETI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Electrical Engineering and Information Technology - International",
+      "nameDe": "Elektro- und Informationstechnik - International",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-eti-b",
+        "page-eti-b-en"
+      ],
+      "notes": [
+        "English in semesters 1-3, German from semester 4."
+      ]
+    },
+    {
+      "id": "hi-b",
+      "code": "HI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Health Informatics",
+      "nameDe": "Health Informatics",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-hi-b",
+        "page-hi-b-en"
+      ]
+    },
+    {
+      "id": "ie-b",
+      "code": "IE",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Industrial Engineering",
+      "nameDe": "Industrial Engineering",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-ie-b",
+        "page-ie-b-en"
+      ]
+    },
+    {
+      "id": "im-b",
+      "code": "IM",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "International Management",
+      "nameDe": "International Management",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-im-b",
+        "page-im-b-en"
+      ]
+    },
+    {
+      "id": "itm-b",
+      "code": "ITM",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "International Tourism Management / Health & Medical Tourism",
+      "nameDe": "International Tourism Management",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-itm-b",
+        "page-itm-b-en"
+      ]
+    },
+    {
+      "id": "ki-b",
+      "code": "KI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Artificial Intelligence",
+      "nameDe": "Künstliche Intelligenz",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-ki-b",
+        "page-ki-b-en"
+      ],
+      "notes": [
+        "German-taught; AIN is the English-taught programme. Keep the cohorts separate."
+      ]
+    },
+    {
+      "id": "mb-b",
+      "code": "MB",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Mechanical Engineering",
+      "nameDe": "Maschinenbau",
+      "language": [
+        "de"
+      ],
+      "faculty": "Maschinenbau & Mechatronik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mb-b",
+        "page-mb-b-en"
+      ]
+    },
+    {
+      "id": "mdp-b",
+      "code": "MDP",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Mechatronics and Project Management for Digital Production",
+      "nameDe": "Mechatronik und Projektmanagement für Digitale Produktion",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Cham"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mdp-b",
+        "page-mdp-b-en"
+      ]
+    },
+    {
+      "id": "mgsr-b",
+      "code": "MGSR",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Management in Health, Social and Rescue Services",
+      "nameDe": "Management im Gesundheits-, Sozial- und Rettungswesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mgsr-b",
+        "page-mgsr-b-en"
+      ]
+    },
+    {
+      "id": "mk-b",
+      "code": "MK",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Mechatronics",
+      "nameDe": "Mechatronik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Maschinenbau & Mechatronik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mk-b",
+        "page-mk-b-en"
+      ]
+    },
+    {
+      "id": "mrw-b",
+      "code": "MRW",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Management in Rescue Services",
+      "nameDe": "Management im Rettungswesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mrw-b",
+        "page-mrw-b-en"
+      ]
+    },
+    {
+      "id": "mt-b",
+      "code": "MT",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Media Technology",
+      "nameDe": "Medientechnik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mt-b",
+        "page-mt-b-en"
+      ]
+    },
+    {
+      "id": "mth-b",
+      "code": "MTH",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "Management of Inclusion and Participation",
+      "nameDe": "Management von Inklusion und Teilhabe",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-mth-b",
+        "page-mth-b-en"
+      ]
+    },
+    {
+      "id": "pamv-b",
+      "code": "PAMV",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Physician Assistant / Medical Care",
+      "nameDe": "Physician Assistant",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-pamv-b",
+        "page-pamv-b-en"
+      ]
+    },
+    {
+      "id": "pf-b",
+      "code": "PF",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Nursing",
+      "nameDe": "Pflege",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-pf-b",
+        "page-pf-b-en"
+      ],
+      "notes": [
+        "German-taught, winter start; pfi-b is the international pathway with a summer start."
+      ]
+    },
+    {
+      "id": "pfi-b",
+      "code": "PFI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Nursing",
+      "nameDe": "Nursing",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 8,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-pfi-b",
+        "page-pfi-b-en"
+      ],
+      "notes": [
+        "International pathway: English in semesters 1-3, German from semester 4; pf-b is the German-taught programme."
+      ]
+    },
+    {
+      "id": "pmb-b",
+      "code": "PMB",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Project Management in Civil and Construction Engineering",
+      "nameDe": "Projektmanagement in Bauingenieurwesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Bauingenieurwesen und Umwelttechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-pmb-b",
+        "page-pmb-b-en"
+      ]
+    },
+    {
+      "id": "psb-b",
+      "code": "PSB",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Physiotherapy Dual Majoring in Kinesiology",
+      "nameDe": "Physiotherapie dual mit Schwerpunkt Bewegungswissenschaft",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 9,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-psb-b",
+        "page-psb-b-en"
+      ],
+      "notes": [
+        "Dual programme with a partner vocational school in semesters 1-6."
+      ]
+    },
+    {
+      "id": "sa-b",
+      "code": "SA",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "Social Work",
+      "nameDe": "Soziale Arbeit",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-sa-b",
+        "page-sa-b-en"
+      ],
+      "notes": [
+        "The programme page gives the Land Au site in Deggendorf."
+      ]
+    },
+    {
+      "id": "sd-b",
+      "code": "SD",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Software Design",
+      "nameDe": "Software-Design",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-sd-b",
+        "page-sd-b-en"
+      ]
+    },
+    {
+      "id": "td-b",
+      "code": "TD",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Technical Design",
+      "nameDe": "Technisches Design",
+      "language": [
+        "de"
+      ],
+      "faculty": "Maschinenbau & Mechatronik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-td-b",
+        "page-td-b-en"
+      ]
+    },
+    {
+      "id": "tm-b",
+      "code": "TM",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.A.",
+      "nameEn": "Tourism Management",
+      "nameDe": "Tourismusmanagement",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-tm-b",
+        "page-tm-b-en"
+      ]
+    },
+    {
+      "id": "tp-b",
+      "code": "TP",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Engineering Physics",
+      "nameDe": "Technische Physik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-tp-b",
+        "page-tp-b-en"
+      ]
+    },
+    {
+      "id": "uiw-b",
+      "code": "UIW",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Environmental Engineering",
+      "nameDe": "Umweltingenieurwesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Bauingenieurwesen und Umwelttechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-uiw-b",
+        "page-uiw-b-en"
+      ]
+    },
+    {
+      "id": "vwl-b",
+      "code": "VWL",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Economics",
+      "nameDe": "Volkswirtschaftslehre",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-vwl-b",
+        "page-vwl-b-en"
+      ]
+    },
+    {
+      "id": "wi-b",
+      "code": "WI",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Business Informatics",
+      "nameDe": "Wirtschaftsinformatik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-wi-b",
+        "page-wi-b-en"
+      ]
+    },
+    {
+      "id": "wiw-b",
+      "code": "WIW",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Eng.",
+      "nameEn": "Industrial Engineering",
+      "nameDe": "Wirtschaftsingenieurwesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-wiw-b",
+        "page-wiw-b-en"
+      ]
+    },
+    {
+      "id": "wp-b",
+      "code": "WP",
+      "codeStatus": "verified",
+      "level": "bachelor",
+      "award": "B.Sc.",
+      "nameEn": "Organisational and Economic Psychology",
+      "nameDe": "Angewandte Wirtschaftspsychologie",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 7,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "bachelorCatalogue",
+        "page-wp-b",
+        "page-wp-b-en"
+      ]
+    },
+    {
+      "id": "ai-m",
+      "code": "AI",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Applied Computer Science",
+      "nameDe": "Angewandte Informatik - Infotronik",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-ai-m",
+        "page-ai-m-en"
+      ]
+    },
+    {
+      "id": "aid-m",
+      "code": "AID",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Artificial Intelligence and Data Science",
+      "nameDe": "Artificial Intelligence and Data Science",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf",
+        "České Budějovice"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 4,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-aid-m",
+        "page-aid-m-en"
+      ],
+      "notes": [
+        "Joint degree with the University of South Bohemia; at least one semester in České Budějovice. THD start is March; the September start is at South Bohemia."
+      ]
+    },
+    {
+      "id": "ar-m",
+      "code": "AR",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Applied Research in Engineering Sciences",
+      "nameDe": "Applied Research in Engineering Sciences",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-ar-m",
+        "page-ar-m-en"
+      ]
+    },
+    {
+      "id": "ase-m",
+      "code": "ASE",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Automotive Software Engineering",
+      "nameDe": "Automotive Software Engineering",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-ase-m",
+        "page-ase-m-en"
+      ]
+    },
+    {
+      "id": "asw-m",
+      "code": "ASW",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Applied Sports Science with Focus on Interprofessional Care in Sports",
+      "nameDe": "Angewandte Sportwissenschaften",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-asw-m",
+        "page-asw-m-en"
+      ]
+    },
+    {
+      "id": "bu-m",
+      "code": "BU",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Civil and Environmental Engineering",
+      "nameDe": "Bau- und Umweltingenieurwesen",
+      "language": [
+        "de"
+      ],
+      "faculty": "Bauingenieurwesen und Umwelttechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-bu-m",
+        "page-bu-m-en"
+      ]
+    },
+    {
+      "id": "db-m",
+      "code": "DB",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Digital Business",
+      "nameDe": "Digital Business",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-db-m",
+        "page-db-m-en"
+      ]
+    },
+    {
+      "id": "dbp-m",
+      "code": "DBP",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Digital Business Psychology",
+      "nameDe": "Digital Business Psychology",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-dbp-m",
+        "page-dbp-m-en"
+      ]
+    },
+    {
+      "id": "dh-m",
+      "code": "DH",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Digital Health",
+      "nameDe": "Digital Health",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-dh-m",
+        "page-dh-m-en"
+      ]
+    },
+    {
+      "id": "dm-m",
+      "code": "DM",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Applied AI for Digital Production Management",
+      "nameDe": "Applied Artificial Intelligence for Digital Production Management",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Cham"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-dm-m",
+        "page-dm-m-en"
+      ]
+    },
+    {
+      "id": "em-m",
+      "code": "EM",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Electromobility",
+      "nameDe": "Elektromobilität",
+      "language": [
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-em-m",
+        "page-em-m-en"
+      ]
+    },
+    {
+      "id": "et-m",
+      "code": "ET",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Electrical Engineering and Information Technology",
+      "nameDe": "Elektro- und Informationstechnik",
+      "language": [
+        "en"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-et-m",
+        "page-et-m-en"
+      ]
+    },
+    {
+      "id": "ga-m",
+      "code": "GA",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Entrepreneurial Game Development",
+      "nameDe": "Gründungsorientierte Spiele Entwicklung",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-ga-m",
+        "page-ga-m-en"
+      ]
+    },
+    {
+      "id": "gph-m",
+      "code": "GPH",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Global Public Health",
+      "nameDe": "Global Public Health",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-gph-m",
+        "page-gph-m-en"
+      ]
+    },
+    {
+      "id": "hsb-m",
+      "code": "HSB",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Healthy and Sustainable Buildings",
+      "nameDe": "Healthy and Sustainable Buildings",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 4,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-hsb-m",
+        "page-hsb-m-en"
+      ]
+    },
+    {
+      "id": "itd-m",
+      "code": "ITD",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.A.",
+      "nameEn": "International Tourism Development",
+      "nameDe": "International Tourism Development",
+      "language": [
+        "en"
+      ],
+      "faculty": "European Campus Rottal-Inn",
+      "campus": [
+        "Pfarrkirchen"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-itd-m",
+        "page-itd-m-en"
+      ]
+    },
+    {
+      "id": "ki-m",
+      "code": "KI",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Artificial Intelligence for Smart Sensors and Actuators",
+      "nameDe": "Artificial Intelligence for smart sensors and actuators",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Cham"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-ki-m",
+        "page-ki-m-en"
+      ],
+      "notes": [
+        "Shares the code KI with the Künstliche Intelligenz bachelor; tell them apart by level and campus."
+      ]
+    },
+    {
+      "id": "lsi-m",
+      "code": "LSI",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Life Science Informatics",
+      "nameDe": "Life Science Informatics",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-lsi-m",
+        "page-lsi-m-en"
+      ]
+    },
+    {
+      "id": "mb-m",
+      "code": "MB",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Mechanical Engineering",
+      "nameDe": "Maschinenbau",
+      "language": [
+        "de"
+      ],
+      "faculty": "Maschinenbau & Mechatronik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-mb-m",
+        "page-mb-m-en"
+      ]
+    },
+    {
+      "id": "mcs-cham-m",
+      "code": "MCS",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Mechatronic and Cyber-Physical Systems",
+      "nameDe": "Mechatronische und cyber-physische Systeme",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Cham"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-mcs-cham-m",
+        "page-mcs-cham-m-en"
+      ],
+      "notes": [
+        "Cham offering of MCS; mcs-m is the Deggendorf offering with a winter start."
+      ]
+    },
+    {
+      "id": "mcs-m",
+      "code": "MCS",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Mechatronic and Cyber-Physical Systems",
+      "nameDe": "Mechatronische und cyber-physische Systeme",
+      "language": [
+        "en"
+      ],
+      "faculty": "Maschinenbau & Mechatronik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-mcs-m",
+        "page-mcs-m-en"
+      ],
+      "notes": [
+        "Deggendorf offering; mcs-cham-m is the Cham offering with a summer start."
+      ]
+    },
+    {
+      "id": "mro-m",
+      "code": "MRO",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Robotics",
+      "nameDe": "Robotik",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Cham"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-mro-m",
+        "page-mro-m-en"
+      ]
+    },
+    {
+      "id": "mt-m",
+      "code": "MT",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Media Technology",
+      "nameDe": "Medientechnik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Elektrotechnik & Medientechnik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-mt-m",
+        "page-mt-m-en"
+      ]
+    },
+    {
+      "id": "pg-m",
+      "code": "PG",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Mental Health",
+      "nameDe": "Psychische Gesundheit",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Gesundheitswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter"
+      ],
+      "standardDurationSemesters": 4,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-pg-m",
+        "page-pg-m-en"
+      ]
+    },
+    {
+      "id": "qc-m",
+      "code": "QC",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "High-Performance Computing / Quantum Computing",
+      "nameDe": "High-Performance Computing / Quantum Computing",
+      "language": [
+        "en"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-qc-m",
+        "page-qc-m-en"
+      ]
+    },
+    {
+      "id": "sim-m",
+      "code": "SIM",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.A.",
+      "nameEn": "Strategic and International Management",
+      "nameDe": "Strategisches und Internationales Management",
+      "language": [
+        "en",
+        "de"
+      ],
+      "faculty": "Angewandte Wirtschaftswissenschaften",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-sim-m",
+        "page-sim-m-en"
+      ],
+      "notes": [
+        "The facts box says M.Sc., the page title and English page say M.A.; M.A. is used here."
+      ]
+    },
+    {
+      "id": "tem-m",
+      "code": "TEM",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Eng.",
+      "nameEn": "Technology Management",
+      "nameDe": "Technologiemanagement",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Naturwissenschaften & Wirtschaftsingenieurwesen",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-tem-m",
+        "page-tem-m-en"
+      ]
+    },
+    {
+      "id": "wi-m",
+      "code": "WI",
+      "codeStatus": "verified",
+      "level": "master",
+      "award": "M.Sc.",
+      "nameEn": "Business Informatics",
+      "nameDe": "Wirtschaftsinformatik",
+      "language": [
+        "de"
+      ],
+      "faculty": "Angewandte Informatik",
+      "campus": [
+        "Deggendorf"
+      ],
+      "intakeTerms": [
+        "winter",
+        "summer"
+      ],
+      "standardDurationSemesters": 3,
+      "studyMode": "full-time",
+      "status": "active",
+      "sources": [
+        "masterCatalogue",
+        "page-wi-m",
+        "page-wi-m-en"
+      ]
+    }
+  ]
+}
