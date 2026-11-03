@@ -1,6 +1,6 @@
 {
  "version": 1,
- "week": "2026-10-19",
+ "week": "2026-10-26",
  "rooms": [
   {
    "id": 1,
@@ -643,11 +643,21 @@
    "untisLongname": null
   },
   {
-   "id": 100,
-   "ident": "r000000100",
-   "name": "Vorplatz Geb. B",
+   "id": 99,
+   "ident": "r000000099",
+   "name": "Vorplatz Geb. A",
    "seatsRegular": 0,
    "seatsExam": 0,
+   "facilities": "",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
+   "id": 113,
+   "ident": "r000000113",
+   "name": "Freifläche",
+   "seatsRegular": 1200,
+   "seatsExam": 1200,
    "facilities": "",
    "bookable": false,
    "untisLongname": null
@@ -753,32 +763,12 @@
    "untisLongname": null
   },
   {
-   "id": 135,
-   "ident": "r000000135",
-   "name": "D212 - Physiklabor",
-   "seatsRegular": 20,
-   "seatsExam": 20,
-   "facilities": "Physiklabor",
-   "bookable": false,
-   "untisLongname": null
-  },
-  {
    "id": 138,
    "ident": "r000000138",
    "name": "K105 - Besprechungsraum (ü. Dekanat AI)",
    "seatsRegular": 0,
    "seatsExam": 0,
    "facilities": "Beamer, HDMI, VGA",
-   "bookable": false,
-   "untisLongname": null
-  },
-  {
-   "id": 139,
-   "ident": "r000000139",
-   "name": "B004 - Foyer",
-   "seatsRegular": 100,
-   "seatsExam": 100,
-   "facilities": "Foyer Erdgeschoß",
    "bookable": false,
    "untisLongname": null
   },
@@ -1093,12 +1083,12 @@
    "untisLongname": null
   },
   {
-   "id": 704,
-   "ident": "r000000704",
-   "name": "H U101 EDV",
-   "seatsRegular": 24,
-   "seatsExam": 24,
-   "facilities": "Rechnerraum 68 qm",
+   "id": 709,
+   "ident": "r000000709",
+   "name": "DEGG's Biomechaniklabor",
+   "seatsRegular": 0,
+   "seatsExam": 0,
+   "facilities": "",
    "bookable": false,
    "untisLongname": null
   },
@@ -1108,6 +1098,16 @@
    "name": "Turnhalle Comenius dreifach",
    "seatsRegular": 0,
    "seatsExam": 0,
+   "facilities": "",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
+   "id": 712,
+   "ident": "r000000712",
+   "name": "C011 - Getriebelabor",
+   "seatsRegular": 20,
+   "seatsExam": 10,
    "facilities": "",
    "bookable": false,
    "untisLongname": null
@@ -1473,16 +1473,6 @@
    "untisLongname": null
   },
   {
-   "id": 782,
-   "ident": "r000000782",
-   "name": "Feriendorf Finsterau",
-   "seatsRegular": 0,
-   "seatsExam": 0,
-   "facilities": "",
-   "bookable": false,
-   "untisLongname": null
-  },
-  {
    "id": 783,
    "ident": "r000000783",
    "name": "C Hörsaal C116 (DMS)",
@@ -1653,6 +1643,26 @@
    "untisLongname": null
   },
   {
+   "id": 825,
+   "ident": "r000000825",
+   "name": "A209 - Vereinsraum",
+   "seatsRegular": 0,
+   "seatsExam": 0,
+   "facilities": "",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
+   "id": 827,
+   "ident": "r000000827",
+   "name": "Foyer II - 1. OG",
+   "seatsRegular": 0,
+   "seatsExam": 0,
+   "facilities": "",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
    "id": 829,
    "ident": "r000000829",
    "name": "ITC 2+ 2.14 (Besprechungsraum)",
@@ -1733,6 +1743,26 @@
    "untisLongname": null
   },
   {
+   "id": 877,
+   "ident": "r000000877",
+   "name": "ITC 2: 2.08/2.09 (Besprechungsraum)",
+   "seatsRegular": 15,
+   "seatsExam": 0,
+   "facilities": "ca. 55m²",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
+   "id": 878,
+   "ident": "r000000878",
+   "name": "A: Silentbox",
+   "seatsRegular": 2,
+   "seatsExam": 0,
+   "facilities": "",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
    "id": 883,
    "ident": "r000000883",
    "name": "B 1.06",
@@ -1799,6 +1829,16 @@
    "seatsRegular": 8,
    "seatsExam": 0,
    "facilities": "8 EDV-Plätze",
+   "bookable": false,
+   "untisLongname": null
+  },
+  {
+   "id": 905,
+   "ident": "r000000905",
+   "name": "Extern",
+   "seatsRegular": 0,
+   "seatsExam": 0,
+   "facilities": "",
    "bookable": false,
    "untisLongname": null
   },
